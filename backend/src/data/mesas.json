@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "nome": "Mesa 1",
+        "zona": "A",
+        "status": "ocupada"
+    },
+    {
+        "id": 2,
+        "nome": "Mesa 2",
+        "zona": "B",
+        "status": "livre"
+    }
+]
