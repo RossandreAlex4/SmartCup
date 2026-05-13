@@ -1,7 +1,8 @@
-import {useReducer} from 'react';
+import { useReducer } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
 import CustomButton from "../components/customButton";
 import { styles } from "../styles/EventoConfigScreenStyle";
+import { router } from 'expo-router';
 
 type State = {
   tables: number;
@@ -29,7 +30,7 @@ function reducer(state: State, action: Action): State {
         [action.field]: state[action.field] + 1,
       };
 
-      case "DECREMENT":
+    case "DECREMENT":
       return {
         ...state,
         [action.field]:
@@ -38,9 +39,9 @@ function reducer(state: State, action: Action): State {
             : 0,
       };
 
-        default:
+    default:
       return state;
-    }
+  }
 }
 
 export default function ConfigEvento() {
@@ -73,12 +74,12 @@ export default function ConfigEvento() {
       field: "waiters",
     },
   ];
- 
-    
+
+
   return (
     <View style={styles.container}>
       <View style={styles.titleConfig}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Image
             source={require("../../../assets/images/back.png")}
             style={styles.image}
@@ -88,8 +89,8 @@ export default function ConfigEvento() {
         <Text style={styles.title}>Configuração do Evento</Text>
       </View>
 
-      <View style={styles.line}/>
-      
+      <View style={styles.line} />
+
       <View style={styles.createContainer}>
         <Text style={styles.createName}>Nome do evento</Text>
         <View style={styles.inputContainer}>
@@ -104,17 +105,17 @@ export default function ConfigEvento() {
       <View style={styles.cardsContainer}>
         {cards.map((card) => (
           <View style={styles.card} key={card.field}>
-            
+
             <Text style={styles.cardTitle}>
               {card.title}
             </Text>
-  
+
             <Text style={styles.value}>
               {card.value}
             </Text>
-  
+
             <View style={styles.buttonsContainer}>
-              
+
               <TouchableOpacity
                 style={styles.button}
                 onPress={() =>
@@ -129,7 +130,7 @@ export default function ConfigEvento() {
                   -
                 </Text>
               </TouchableOpacity>
-  
+
               <TouchableOpacity
                 style={styles.button}
                 onPress={() =>
@@ -144,7 +145,7 @@ export default function ConfigEvento() {
                   +
                 </Text>
               </TouchableOpacity>
-  
+
             </View>
           </View>
         ))}

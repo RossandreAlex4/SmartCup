@@ -1,6 +1,7 @@
 import { Text, View, Image } from 'react-native';
 import CustomButton from "../components/customButton";
 import { styles } from "../styles/LandingScreenStyle";
+import { router } from 'expo-router';
 
 export default function TelaInicial() {
   return (
@@ -15,9 +16,9 @@ export default function TelaInicial() {
         <Text style={styles.green}>Cup</Text>
       </Text>
 
-      <View style={styles.line}/>
+      <View style={styles.line} />
 
-      <Text style={styles.subtitle}> 
+      <Text style={styles.subtitle}>
         <Text style={styles.white}>Monitoramento inteligente para </Text>
         <Text style={styles.green}>festas e eventos</Text>
       </Text>
@@ -26,7 +27,7 @@ export default function TelaInicial() {
         title="Entrar"
         width="70%"
         backgroundColor="#0fce52"
-        onPress={() => console.log("Clicked")}
+        onPress={() => router.push('/login')}
         style={{
           position: "absolute",
           bottom: 25,
