@@ -15,7 +15,7 @@ db.serialize(() => {
     if (!row || row.total === 0) {
       db.run(
         `INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, ?)`,
-        ["Carlos Organizador", "carlos20@gmail.com", senhaHash, "admin"]
+        ["Organizador(a)", "organizador@smartcup.com", senhaHash, "admin"]
       );
     }
   });
