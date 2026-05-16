@@ -5,14 +5,15 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     alignItems: 'center',
+
   },
 
   titleConfig:{
-    flexDirection: "row",
     alignItems: "center",
     marginTop: 19,
     width: '100%',
     justifyContent: "center"
+    
   },
 
   backButton: {
@@ -26,6 +27,15 @@ export const styles = StyleSheet.create({
 
   },
 
+  subtitle:{
+    color: "#0eb348",
+    fontSize: 15,
+    width: "65%",
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: 5
+  },
+
   image:{
     width:20,
     height:20,
@@ -36,22 +46,10 @@ export const styles = StyleSheet.create({
   line:{
     backgroundColor: "#0eb348",
     height: 1,
-    marginVertical: 20,
+    marginVertical: 10,
     width: "50%",
     alignSelf: "center",
     borderRadius: 100,
-  },
-
-  createContainer:{
-    width: "90%",
-    marginTop: 4
-  },
-
-  createName:{
-    color: "white",
-    fontSize: 15,
-    width: "65%",
-    
   },
 
   input: {
@@ -68,42 +66,56 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
-    marginVertical: 15,
+    marginTop: 15,
+  },
+
+  createContainer:{
+    width: "90%",
   },
 
   cardsContainer: {
-    width: "100%",
+    width: "95%",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
+    margin:20,
+   
   },
 
   card: {
-    width: "42%",
-    height: 180,
+    width: "90%",
+    height: 100,
     backgroundColor: "#1E1E1E",
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 10,
     padding: 20,
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent: "space-evenly",
+    
   },
 
   cardTitle: {
     color: "white",
     fontSize: 16,
-    textAlign: "center",
+
   },
 
-  value: {
-    color: "#0eb348",
-    fontSize: 38,
-    fontWeight: "bold",
+  cardEdit:{
+    width: 20,
+    height: 20,
+    tintColor: "#0eb348",
+    alignSelf: "flex-end"
   },
 
-  buttonsContainer: {
+  cardStatusLine:{
     flexDirection: "row",
-    gap: 15,
+    gap: 20,
+    marginTop: 10
+  },
+
+  cardStatus: {
+    color: "#0fe159",
+    fontSize: 14,
+    
   },
 
   button: {

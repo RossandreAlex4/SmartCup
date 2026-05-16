@@ -5,14 +5,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     alignItems: 'center',
+    
+    
   },
 
   titleConfig:{
-    flexDirection: "row",
     alignItems: "center",
     marginTop: 19,
     width: '100%',
     justifyContent: "center"
+    
   },
 
   backButton: {
@@ -26,6 +28,15 @@ export const styles = StyleSheet.create({
 
   },
 
+  subtitle:{
+    color: "#0eb348",
+    fontSize: 15,
+    width: "65%",
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: 5
+  },
+
   image:{
     width:20,
     height:20,
@@ -36,7 +47,7 @@ export const styles = StyleSheet.create({
   line:{
     backgroundColor: "#0eb348",
     height: 1,
-    marginVertical: 20,
+    marginVertical: 10,
     width: "50%",
     alignSelf: "center",
     borderRadius: 100,
@@ -47,45 +58,61 @@ export const styles = StyleSheet.create({
     marginTop: 4
   },
 
-  createName:{
+  overview:{
     color: "white",
     fontSize: 15,
-    width: "65%",
+    width: "85%",
+    marginTop: 4
+    
     
   },
 
-  input: {
-    color: "#fff",
-    fontSize: 16,
-    width: "100%"
-  },
-
-  inputContainer: {
+  statsContainer: {
     width: "100%",
-    height: 55,
-    backgroundColor: "#1E1E1E",
-    borderRadius: 12,
     flexDirection: "row",
+    justifyContent: "space-evenly",
+    margin: 10
+    
+  },
+  
+  statsCard: {
+    width: 70,
+    height: 70,
+    backgroundColor: "#1E1E1E",
+    borderRadius: 16,
+    justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 15,
-    marginVertical: 15,
+  },
+  
+  value: {
+    color: "#0fe159",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  
+  label: {
+    color: "white",
+    fontSize: 11,
+    marginTop: 4,
   },
 
   cardsContainer: {
-    width: "100%",
+    width: "95%",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
+    margin:20,
+   
   },
 
   card: {
-    width: "42%",
+    width: "47%",
     height: 180,
     backgroundColor: "#1E1E1E",
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 10,
     padding: 20,
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     alignItems: "center",
   },
 
@@ -95,15 +122,10 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  value: {
-    color: "#0eb348",
-    fontSize: 38,
-    fontWeight: "bold",
-  },
-
-  buttonsContainer: {
-    flexDirection: "row",
-    gap: 15,
+  cardStatus: {
+    color: "#0fe159",
+    fontSize: 14,
+    marginTop: 10,
   },
 
   button: {

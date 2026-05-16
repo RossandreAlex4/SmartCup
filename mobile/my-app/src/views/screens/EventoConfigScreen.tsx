@@ -1,8 +1,9 @@
-import { useReducer } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import { useReducer, useState, useContext } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import CustomButton from "../components/customButton";
 import { styles } from "../styles/EventoConfigScreenStyle";
 import { router } from 'expo-router';
+import { EventContext } from "../../context/EventContext";
 
 type State = {
   tables: number;
@@ -46,11 +47,14 @@ function reducer(state: State, action: Action): State {
 
 export default function ConfigEvento() {
 
+const { setEventData } = useContext(EventContext);
+
   const [state, dispatch] = useReducer(
     reducer,
     initialState
   );
 
+  const [eventName, setEventName] = useState("")
 
   const cards = [
     {
@@ -77,6 +81,10 @@ export default function ConfigEvento() {
 
 
   return (
+    <ScrollView 
+      contentContainerStyle={{
+      flexGrow: 1,
+    }}>
     <View style={styles.container}>
       <View style={styles.titleConfig}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -98,6 +106,8 @@ export default function ConfigEvento() {
             placeholder='Digite o nome do evento'
             placeholderTextColor="#999"
             style={styles.input}
+            value={eventName}
+            onChangeText={setEventName}
           />
         </View>
       </View>
@@ -155,13 +165,33 @@ export default function ConfigEvento() {
         title="Criar"
         width="70%"
         backgroundColor="#0eb348"
-        onPress={() => console.log("Clicked")}
+        onPress={() => {
+
+          const tablesArray = Array.from(
+            { length: state.tables },
+            (_, index) => ({
+              id: index + 1,
+              status: "Livre",
+            })
+          );
+        
+          setEventData({
+            eventName,
+            tables: tablesArray,
+            smartCups: state.smartCups,
+            zones: state.zones,
+            waiters: state.waiters,
+          });
+        
+          router.push("/adm-dash");
+        }}
         style={{
-          bottom: 25,
+          marginBottom: 25,
           alignSelf: "center",
         }}
       />
 
     </View>
+    </ScrollView>
   );
 }

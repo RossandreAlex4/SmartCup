@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import CustomButton from "../components/customButton";
 import { styles } from "../styles/LoginScreenStyle";
 import { router } from 'expo-router';
@@ -7,6 +7,10 @@ import { router } from 'expo-router';
 export default function Login() {
   const [rememberMe, setRememberMe] = useState(false)  
   return (
+    <ScrollView 
+      contentContainerStyle={{
+      flexGrow: 1,
+    }}>
     <View style={styles.container}>
       <Image
         source={require("../../../assets/images/logo.png")}
@@ -89,5 +93,6 @@ export default function Login() {
       </TouchableOpacity>
 
     </View>
+    </ScrollView>
   );
 }

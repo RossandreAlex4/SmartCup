@@ -1,10 +1,14 @@
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, ScrollView } from 'react-native';
 import CustomButton from "../components/customButton";
 import { styles } from "../styles/LandingScreenStyle";
 import { router } from 'expo-router';
 
 export default function TelaInicial() {
   return (
+    <ScrollView 
+      contentContainerStyle={{
+      flexGrow: 1,
+    }}>
     <View style={styles.container}>
       <Image
         source={require("../../../assets/images/logo.png")}
@@ -29,12 +33,13 @@ export default function TelaInicial() {
         backgroundColor="#0fce52"
         onPress={() => router.push('/login')}
         style={{
-          position: "absolute",
-          bottom: 25,
+          marginTop: 40,
+          marginBottom: 25,
           alignSelf: "center",
         }}
       />
 
     </View>
+    </ScrollView>
   );
 }
