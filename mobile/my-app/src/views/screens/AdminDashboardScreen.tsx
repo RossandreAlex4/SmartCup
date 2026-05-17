@@ -95,21 +95,7 @@ export default function AdmDash() {
     
       ))}
 
-</View>
-
-      <CustomButton
-        title="Criar"
-        width="70%"
-        backgroundColor="#0eb348"
-        onPress={() => {
-          router.push("/mesas-screen");
-          console.log("Clicked")}}
-        style={{
-          marginBottom: 25,
-          alignSelf: "center",
-        }}
-      />
-
+    </View>
     </View>
     </ScrollView>
   );

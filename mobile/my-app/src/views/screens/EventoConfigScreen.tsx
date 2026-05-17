@@ -183,7 +183,7 @@ const { setEventData } = useContext(EventContext);
             waiters: state.waiters,
           });
         
-          router.push("/adm-dash");
+          router.push("/(tabs)/adm-dash" as any);
         }}
         style={{
           marginBottom: 25,

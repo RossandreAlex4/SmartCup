@@ -7,14 +7,7 @@ export default function RootLayout() {
     <EventProvider>
       <SafeAreaProvider>
         <SafeAreaView style={{ flex: 1 }}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="login" />
-            <Stack.Screen name="evento-config" />
-            <Stack.Screen name="adm-dash" />
-            <Stack.Screen name="mesa-screen" />
-            <Stack.Screen name="alert" />
-          </Stack>
+          <Stack screenOptions={{ headerShown: false }} />
         </SafeAreaView>
       </SafeAreaProvider>
     </EventProvider>

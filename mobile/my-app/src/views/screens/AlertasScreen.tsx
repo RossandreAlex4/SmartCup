@@ -113,13 +113,6 @@ export default function AlertScreen() {
           <Text style={styles.cardTitle}>
             Mesa {table.id}
           </Text>
-          
-          <TouchableOpacity onPress={() => router.back()}>
-            <Image
-              source={require("../../../assets/images/edit.png")}
-              style={styles.cardEdit}
-            />
-          </TouchableOpacity>
       
           <View style={styles.cardStatusLine}>  
           <Text style={styles.cardStatus}>
@@ -137,28 +130,6 @@ export default function AlertScreen() {
           </View>
         
         ))}
-
-      <CustomButton
-        title="Adicionar Mesa"
-        width="70%"
-        backgroundColor="#0eb348"
-        onPress={() =>
-          router.push({
-            pathname: "/adm-dash",
-            params: {
-              eventName: eventName,
-              tables: state.tables.toString(),
-              smartCups: state.smartCups.toString(),
-              zones: state.zones.toString(),
-              waiters: state.waiters.toString(),
-            },
-          })
-        }
-        style={{
-          marginBottom: 25,
-          alignSelf: "center",
-        }}
-      />
 
     </View>
     </View>
