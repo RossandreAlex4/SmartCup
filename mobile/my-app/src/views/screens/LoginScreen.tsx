@@ -3,9 +3,28 @@ import { Text, View, Image, TextInput, TouchableOpacity, ScrollView } from 'reac
 import CustomButton from "../components/customButton";
 import { styles } from "../styles/LoginScreenStyle";
 import { router } from 'expo-router';
+import { api } from "../../services/api";
 
 export default function Login() {
   const [rememberMe, setRememberMe] = useState(false)  
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+async function fazerLogin() {
+  try {
+    const response = await api.post("/usuarios/login", {
+      email,
+      senha
+    });
+
+    console.log(response.data);
+
+    router.push("/evento-config");
+  } catch (error) {
+    alert("Email ou senha inválidos");
+  }
+}
+
   return (
     <ScrollView 
       contentContainerStyle={{
@@ -36,6 +55,8 @@ export default function Login() {
             placeholder='Email'
             placeholderTextColor="#999"
             style={styles.input}
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -50,6 +71,8 @@ export default function Login() {
             placeholderTextColor="#999"
             secureTextEntry
             style={styles.input}
+            value={senha}
+            onChangeText={setSenha}
           />
         </View>
         
@@ -82,7 +105,7 @@ export default function Login() {
         title="Entrar"
         width="70%"
         backgroundColor="#0db347"
-        onPress={() => router.push('/evento-config')}
+        onPress={fazerLogin}
         style={{
           alignSelf: "center",
         }}
