@@ -1,138 +1,71 @@
-import { useReducer, useState, useContext } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
-import CustomButton from "../components/customButton";
-import { styles } from "../styles/MesasScreenStyle";
-import { router } from 'expo-router';
-import { EventContext } from "../../context/EventContext";
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, SafeAreaView, StatusBar, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { styles } from '../styles/GarcomHistoricoStyle';
 
-
-type State = {
-  tables: number;
-  smartCups: number;
-  zones: number;
-  waiters: number;
-};
-
-type Action =
-  | { type: "INCREMENT"; field: keyof State }
-  | { type: "DECREMENT"; field: keyof State };
-
-const initialState: State = {
-  tables: 0,
-  smartCups: 0,
-  zones: 0,
-  waiters: 0,
-};
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "INCREMENT":
-      return {
-        ...state,
-        [action.field]: state[action.field] + 1,
-      };
-
-    case "DECREMENT":
-      return {
-        ...state,
-        [action.field]:
-          state[action.field] > 0
-            ? state[action.field] - 1
-            : 0,
-      };
-
-    default:
-      return state;
-  }
+interface Alerta {
+  id: string;
+  index: string;
+  titulo: string;
+  mesa: string;
 }
 
-export default function AlertScreen() {
+const DATA: Alerta[] = [
+  { id: '1', index: '01', titulo: 'copo vazio', mesa: 'mesa 1' },
+  { id: '2', index: '02', titulo: 'copo vazio', mesa: 'mesa 4' },
+  { id: '3', index: '03', titulo: 'copo', mesa: 'xxxxx' },
+  { id: '4', index: '04', titulo: 'copo', mesa: 'xxxxx' },
+  { id: '5', index: '05', titulo: 'copo vazio', mesa: 'mesa 2' },
+  { id: '6', index: '06', titulo: 'copo', mesa: 'mesa 3' },
+];
 
-    const { eventData } =
-  useContext(EventContext);
-    
+const AlertasScreen = () => {
+  const [alertas, setAlertas] = useState<Alerta[]>(DATA);
 
-  const [state, dispatch] = useReducer(
-    reducer,
-    initialState
+  const atenderAlerta = (id: string) => {
+    setAlertas(prev => prev.filter(alerta => alerta.id !== id));
+  };
+
+  const renderItem = ({ item }: { item: Alerta }) => (
+    <View style={styles.card}>
+      <View style={styles.indexCircle}>
+        <Text style={styles.indexText}>{item.index}</Text>
+      </View>
+      <View style={styles.cardTextContainer}>
+        <Text style={styles.cardTitle}>{item.titulo}</Text>
+        <Text style={styles.cardSubtitle}>{item.mesa}</Text>
+      </View>
+      <TouchableOpacity 
+        style={styles.checkButton} 
+        onPress={() => atenderAlerta(item.id)}
+      >
+        <Ionicons name="checkmark-circle-outline" size={32} color="#00FF00" />
+      </TouchableOpacity>
+    </View>
   );
-
-  const [eventName, setEventName] = useState("")
-
-  const cards = [
-    {
-      title: "Mesas",
-      value: state.tables,
-      field: "tables",
-    },
-    {
-      title: "SmartCups",
-      value: state.smartCups,
-      field: "smartCups",
-    },
-    {
-      title: "Zonas",
-      value: state.zones,
-      field: "zones",
-    },
-    {
-      title: "Garçons por zona",
-      value: state.waiters,
-      field: "waiters",
-    },
-  ];
-
 
   return (
-    <ScrollView 
-      contentContainerStyle={{
-      flexGrow: 1,
-    }}>
-    <View style={styles.container}>
-      <View style={styles.titleConfig}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Image
-            source={require("../../../assets/images/back.png")}
-            style={styles.image}
-          />
-        </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
 
-        <Text style={styles.title}>Alertas</Text>
+      <View style={styles.header}>
+        <Image
+          source={require("../../../assets/images/logo.png")}
+          style={{ width: 45, height: 45, resizeMode: 'contain' }}
+        />
+        <Text style={styles.headerTitle}>Historico de Alertas</Text>
+        <View style={{ width: 45 }} />
       </View>
 
-      <View style={styles.line} />
-
-      <View style={styles.cardsContainer}>
-      
-        {eventData.tables.map((table) => (
-          <View
-            key={table.id}
-            style={styles.card}
-          >
-        
-          <Text style={styles.cardTitle}>
-            Mesa {table.id}
-          </Text>
-      
-          <View style={styles.cardStatusLine}>  
-          <Text style={styles.cardStatus}>
-            {table.status}
-          </Text>
-
-
-          <Text style={styles.cardStatus}>
-            {table.status}
-          </Text> 
-          </View> 
-
-
-      
-          </View>
-        
-        ))}
-
-    </View>
-    </View>
-    </ScrollView>
+      <FlatList
+        data={alertas}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView >
   );
-}
+};
+
+export default AlertasScreen;

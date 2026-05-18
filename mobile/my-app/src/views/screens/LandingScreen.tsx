@@ -5,41 +5,53 @@ import { router } from 'expo-router';
 
 export default function TelaInicial() {
   return (
-    <ScrollView 
+    <ScrollView
       contentContainerStyle={{
-      flexGrow: 1,
-    }}>
-    <View style={styles.container}>
-      <Image
-        source={require("../../../assets/images/logo.png")}
-        style={styles.image}
-      />
+        flexGrow: 1,
+      }}>
+      <View style={styles.container}>
+        <Image
+          source={require("../../../assets/images/logo.png")}
+          style={styles.image}
+        />
 
-      <Text style={styles.title}>
-        <Text style={styles.white}>Smart</Text>
-        <Text style={styles.green}>Cup</Text>
-      </Text>
+        <Text style={styles.title}>
+          <Text style={styles.white}>Smart</Text>
+          <Text style={styles.green}>Cup</Text>
+        </Text>
 
-      <View style={styles.line} />
+        <View style={styles.line} />
 
-      <Text style={styles.subtitle}>
-        <Text style={styles.white}>Monitoramento inteligente para </Text>
-        <Text style={styles.green}>festas e eventos</Text>
-      </Text>
+        <Text style={styles.subtitle}>
+          <Text style={styles.white}>Monitoramento inteligente para </Text>
+          <Text style={styles.green}>festas e eventos</Text>
+        </Text>
 
-      <CustomButton
-        title="Entrar"
-        width="70%"
-        backgroundColor="#0fce52"
-        onPress={() => router.push('/login')}
-        style={{
-          marginTop: 40,
-          marginBottom: 25,
-          alignSelf: "center",
-        }}
-      />
+        <CustomButton
+          title="Entrar"
+          width="70%"
+          backgroundColor="#0fce52"
+          onPress={() => router.push('/login')}
+          style={{
+            position: "absolute",
+            bottom: 90,
+            alignSelf: "center",
+          }}
+        />
 
-    </View>
+        <CustomButton
+          title="Ver Histórico (Teste)"
+          width="70%"
+          backgroundColor="#333"
+          onPress={() => router.push('/(tabs)/historico')}
+          style={{
+            position: "absolute",
+            bottom: 25,
+            alignSelf: "center",
+          }}
+        />
+
+      </View>
     </ScrollView>
   );
 }
