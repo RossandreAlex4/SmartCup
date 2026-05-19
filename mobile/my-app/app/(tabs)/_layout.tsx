@@ -78,21 +78,6 @@ export default function TabsLayout() {
           )
         }}
       />
-
-      <Tabs.Screen
-        name="evento-config"
-        options={{
-          title: "Config",
-          tabBarIcon: ({ focused }) => (
-            <Ionicons
-              name="settings-outline"
-              size={24}
-              color={focused ? "#0fce52" : "#c9c9c9"}
-              style={{ opacity: focused ? 1 : 0.5 }}
-            />
-          )
-        }}
-      />
     </Tabs>
   );
 }

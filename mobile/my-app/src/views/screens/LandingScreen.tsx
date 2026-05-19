@@ -39,18 +39,6 @@ export default function TelaInicial() {
           }}
         />
 
-        <CustomButton
-          title="Ver Histórico (Teste)"
-          width="70%"
-          backgroundColor="#333"
-          onPress={() => router.push('/(tabs)/historico')}
-          style={{
-            position: "absolute",
-            bottom: 25,
-            alignSelf: "center",
-          }}
-        />
-
       </View>
     </ScrollView>
   );

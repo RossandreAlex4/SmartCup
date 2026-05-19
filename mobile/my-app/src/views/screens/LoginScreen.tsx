@@ -105,7 +105,7 @@ export default function Login() {
           title="Entrar"
           width="70%"
           backgroundColor="#0db347"
-          onPress={() => router.push('/(tabs)/evento-config')}
+          onPress={fazerLogin}
           style={{
             alignSelf: "center",
           }}
