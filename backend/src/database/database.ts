@@ -66,5 +66,13 @@ db.serialize(() => {
       FOREIGN KEY (smartcup_id) REFERENCES smartcups(id)
     )
   `);
+  db.run(`
+    CREATE TABLE IF NOT EXISTS tokens_acesso (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      token TEXT UNIQUE NOT NULL,
+      nome TEXT NOT NULL,
+      criado_em TEXT NOT NULL
+    )
+  `);
   console.log("Tabelas criadas");
 });
