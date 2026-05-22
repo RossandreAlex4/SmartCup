@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx --watch server.ts",
-    "seed": "node --loader ts-node/esm src/database/seed.ts"
+    "seed": "node --loader ts-node/esm src/database/seed.ts",
+    "test": "tsx --test src/tests/**/*.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "qrcode": "^1.5.4",
     "sqlite3": "^6.0.1"
   },
   "devDependencies": {
@@ -23,6 +25,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.2",
+    "@types/qrcode": "^1.5.6",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
