@@ -1,9 +1,22 @@
 import { useState, useContext, useEffect } from "react";
+
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator } from "react-native";
+
 import { styles } from "../styles/MesasScreenStyle";
+
 import { router } from "expo-router";
+
 import { AuthContext } from "../../context/AuthContext";
+
+import { ThemeContext } from "../../context/ThemeContext";
+
+import {
+  darkTheme,
+  lightTheme,
+} from "../../themes/colors";
+
 import { fetchMesas } from "../../services/smartcupService";
+
 import { Ionicons } from "@expo/vector-icons";
 
 interface Mesa {
@@ -14,133 +27,420 @@ interface Mesa {
 }
 
 export default function MesasScreen() {
-  const { user, logout } = useContext(AuthContext);
-  const isGarcom = user?.tipo === "garcom";
-  const [mesas, setMesas] = useState<Mesa[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [busca, setBusca] = useState("");
+
+  const {
+    user,
+    logout,
+  } = useContext(AuthContext);
+
+  const {
+    theme,
+    toggleTheme,
+  } = useContext(ThemeContext);
+
+  const colors =
+    theme === "dark"
+      ? darkTheme
+      : lightTheme;
+
+  const isGarcom =
+    user?.tipo === "garcom";
+
+  const [mesas, setMesas] =
+    useState<Mesa[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [busca, setBusca] =
+    useState("");
 
   async function carregarMesas() {
+
     try {
-      const mesasData = await fetchMesas();
+
+      const mesasData =
+        await fetchMesas();
+
       setMesas(mesasData);
+
     } catch {
-      Alert.alert("Erro", "Nao foi possivel carregar as mesas.");
+
+      Alert.alert(
+        "Erro",
+        "Nao foi possivel carregar as mesas."
+      );
+
     } finally {
+
       setLoading(false);
+
     }
   }
 
   useEffect(() => {
+
     carregarMesas();
+
   }, []);
 
   async function handleLogout() {
-    Alert.alert("Sair", "Deseja encerrar seu turno?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Sair",
-        onPress: async () => {
-          await logout();
-          router.replace("/login");
+
+    Alert.alert(
+      "Sair",
+      "Deseja encerrar seu turno?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
         },
-      },
-    ]);
+
+        {
+          text: "Sair",
+
+          onPress: async () => {
+
+            await logout();
+
+            router.replace("/login");
+
+          },
+        },
+      ]
+    );
   }
 
-  const mesasFiltradas = mesas.filter(
-    (m) =>
-      m.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      m.zona?.toLowerCase().includes(busca.toLowerCase())
-  );
+  const mesasFiltradas =
+    mesas.filter(
+      (m) =>
+        m.nome
+          .toLowerCase()
+          .includes(
+            busca.toLowerCase()
+          ) ||
+
+        m.zona
+          ?.toLowerCase()
+          .includes(
+            busca.toLowerCase()
+          )
+    );
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
+
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+      }}
+      style={{
+        backgroundColor:
+          colors.background,
+      }}
+    >
+
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            colors.background,
+        },
+      ]}
+    >
+      <TouchableOpacity
+        onPress={toggleTheme}
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 10,
+        }}
+      >
+        <Image
+          source={require("../../../assets/images/themes.png")}
+          style={[
+            styles.themeIcon,
+            {
+              tintColor: colors.primary,
+            },
+          ]}
+        />
+      </TouchableOpacity>
+
         <View style={styles.titleConfig}>
+
           {!isGarcom && (
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() =>
+                router.back()
+              }
+            >
+
               <Image
                 source={require("../../../assets/images/back.png")}
-                style={styles.image}
+                style={[
+                  styles.image,
+                  {
+                    tintColor:
+                      colors.primary,
+                  },
+                ]}
               />
+
             </TouchableOpacity>
+
           )}
-          <Text style={styles.title}>{isGarcom ? "Mesas" : "Configuracao das Mesas"}</Text>
+
+          <Text
+            style={[
+              styles.title,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
+            {isGarcom
+              ? "Mesas"
+              : "Configuracao das Mesas"}
+          </Text>
+
           {isGarcom && (
+
             <TouchableOpacity
-              style={{ position: "absolute", right: 0 }}
+              style={{
+                position: "absolute",
+                right: 0,
+              }}
               onPress={handleLogout}
             >
-              <Ionicons name="log-out-outline" size={22} color="#ce2a0f" />
+
+              <Ionicons
+                name="log-out-outline"
+                size={24}
+                color="#ce2a0f"
+              />
+
             </TouchableOpacity>
+
           )}
+
         </View>
 
-        <View style={styles.line} />
+        <View
+          style={[
+            styles.line,
+            {
+              backgroundColor:
+                colors.primary,
+            },
+          ]}
+        />
 
         <View style={styles.createContainer}>
-          <View style={styles.inputContainer}>
+
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor:
+                  colors.card,
+
+                borderColor:
+                  colors.primary,
+              },
+            ]}
+          >
+
             <TextInput
               placeholder="Buscar mesa..."
               placeholderTextColor="#999"
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  color:
+                    colors.text,
+                },
+              ]}
               value={busca}
               onChangeText={setBusca}
             />
+
           </View>
+
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#0fce52" style={{ marginTop: 40 }} />
+
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={{
+              marginTop: 40,
+            }}
+          />
+
         ) : (
+
           <View style={styles.cardsContainer}>
-            {mesasFiltradas.map((mesa) => (
-              <View key={mesa.id} style={styles.card}>
-                <Text style={styles.cardTitle}>{mesa.nome}</Text>
-                {!isGarcom && (
-                  <TouchableOpacity onPress={() => {}}>
-                    <Image
-                      source={require("../../../assets/images/edit.png")}
-                      style={styles.cardEdit}
-                    />
-                  </TouchableOpacity>
-                )}
-                <View style={styles.cardStatusLine}>
-                  <Text style={styles.cardStatus}>{mesa.status}</Text>
-                  {mesa.zona ? <Text style={styles.cardStatus}>{mesa.zona}</Text> : null}
+
+            {mesasFiltradas.map(
+              (mesa) => (
+
+                <View
+                  key={mesa.id}
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor:
+                        colors.card,
+
+                      borderColor:
+                        colors.primary,
+                    },
+                  ]}
+                >
+
+                  <Text
+                    style={[
+                      styles.cardTitle,
+                      {
+                        color:
+                          colors.text,
+                      },
+                    ]}
+                  >
+                    {mesa.nome}
+                  </Text>
+
+                  {!isGarcom && (
+
+                    <TouchableOpacity
+                      onPress={() => {}}
+                    >
+
+                      <Image
+                        source={require("../../../assets/images/edit.png")}
+                        style={[
+                          styles.cardEdit,
+                          {
+                            tintColor:
+                              colors.primary,
+                          },
+                        ]}
+                      />
+
+                    </TouchableOpacity>
+
+                  )}
+
+                  <View
+                    style={
+                      styles.cardStatusLine
+                    }
+                  >
+
+                    <Text
+                      style={[
+                        styles.cardStatus,
+                        {
+                          color:
+                            mesa.status === "Livre"
+                              ? "#0fce52"
+                              : "#ff5252",
+                        },
+                      ]}
+                    >
+                      {mesa.status}
+                    </Text>
+
+                    {mesa.zona ? (
+
+                      <Text
+                        style={[
+                          styles.cardStatus,
+                          {
+                            color:
+                              colors.secondaryText,
+                          },
+                        ]}
+                      >
+                        {mesa.zona}
+                      </Text>
+
+                    ) : null}
+
+                  </View>
+
                 </View>
-              </View>
-            ))}
+
+              )
+            )}
+
           </View>
+
         )}
 
         {!isGarcom && (
+
           <TouchableOpacity
-            style={localStyles.addButton}
-            onPress={() => router.push("/garcons" as any)}
+            style={[
+              localStyles.addButton,
+              {
+                backgroundColor:
+                  colors.primary,
+              },
+            ]}
+            onPress={() =>
+              router.push(
+                "/garcons" as any
+              )
+            }
           >
-            <Text style={localStyles.addButtonText}>Gerenciar Garcons</Text>
+
+            <Text
+              style={
+                localStyles.addButtonText
+              }
+            >
+              Gerenciar Garcons
+            </Text>
+
           </TouchableOpacity>
+
         )}
+
       </View>
+
     </ScrollView>
   );
 }
 
 const localStyles = StyleSheet.create({
+
   addButton: {
-    backgroundColor: "#0eb348",
     paddingVertical: 14,
+
     paddingHorizontal: 32,
+
     borderRadius: 12,
+
     alignSelf: "center",
+
     marginBottom: 25,
+
     marginTop: 10,
   },
+
   addButtonText: {
     color: "white",
+
     fontWeight: "700",
+
     fontSize: 15,
   },
 });

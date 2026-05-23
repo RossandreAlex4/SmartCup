@@ -3,9 +3,12 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
     alignItems: 'center',
-    
+  },
+
+  themeIcon:{
+    width: 29,
+    height: 29,
     
   },
 
@@ -23,13 +26,11 @@ export const styles = StyleSheet.create({
   },
 
   title:{
-    color: "white",
     fontSize: 20,
 
   },
 
   subtitle:{
-    color: "#0eb348",
     fontSize: 15,
     width: "65%",
     justifyContent: "center",
@@ -40,12 +41,10 @@ export const styles = StyleSheet.create({
   image:{
     width:20,
     height:20,
-    tintColor: "#0eb348",
     
   },
 
   line:{
-    backgroundColor: "#0eb348",
     height: 1,
     marginVertical: 10,
     width: "50%",
@@ -59,12 +58,9 @@ export const styles = StyleSheet.create({
   },
 
   overview:{
-    color: "white",
     fontSize: 15,
     width: "85%",
-    marginTop: 4
-    
-    
+    marginTop: 4    
   },
 
   statsContainer: {
@@ -78,20 +74,17 @@ export const styles = StyleSheet.create({
   statsCard: {
     width: 70,
     height: 70,
-    backgroundColor: "#1E1E1E",
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
   },
   
   value: {
-    color: "#0fe159",
     fontSize: 24,
     fontWeight: "bold",
   },
   
   label: {
-    color: "white",
     fontSize: 11,
     marginTop: 4,
   },
@@ -108,7 +101,6 @@ export const styles = StyleSheet.create({
   card: {
     width: "47%",
     height: 180,
-    backgroundColor: "#1E1E1E",
     borderRadius: 20,
     marginBottom: 10,
     padding: 20,
@@ -117,13 +109,11 @@ export const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    color: "white",
     fontSize: 16,
     textAlign: "center",
   },
 
   cardStatus: {
-    color: "#0fe159",
     fontSize: 14,
     marginTop: 10,
   },
@@ -132,13 +122,11 @@ export const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 12,
-    backgroundColor: "#0fe159",
     justifyContent: "center",
     alignItems: "center",
   },
 
   buttonText: {
-    color: "#000",
     fontSize: 24,
     fontWeight: "bold",
   },

@@ -1,18 +1,35 @@
+import { Text, View, Image, TouchableOpacity, ScrollView } from "react-native";
 
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
-import CustomButton from "../components/customButton";
 import { styles } from "../styles/AdminDashboardScreenStyles";
-import { router } from 'expo-router';
+
+import { router } from "expo-router";
+
 import { useContext } from "react";
+
 import { EventContext } from "../../context/EventContext";
 
+import { ThemeContext } from "../../context/ThemeContext";
 
+import {
+  darkTheme,
+  lightTheme,
+} from "../../themes/colors";
 
 export default function AdmDash() {
 
-  const { eventData } = useContext(EventContext);
+  const { eventData } =
+    useContext(EventContext);
 
-    const totalTables = Number(eventData.tables.length);
+   const {
+    theme,
+    toggleTheme,
+  } = useContext(ThemeContext);
+
+
+  const colors =
+    theme === "dark"
+      ? darkTheme
+      : lightTheme;
 
   const stats = [
     {
@@ -34,69 +51,219 @@ export default function AdmDash() {
   ];
 
   return (
-    <ScrollView 
+
+    <ScrollView
       contentContainerStyle={{
-      flexGrow: 1,
-    }}>
-    <View style={styles.container}>
-      <View style={styles.titleConfig}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        flexGrow: 1,
+      }}
+      style={{
+        backgroundColor:
+          colors.background,
+      }}
+    >
+
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor:
+              colors.background,
+          },
+        ]}
+      >
+
+        <View style={styles.titleConfig}>
+
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+
+            <Image
+              source={require("../../../assets/images/back.png")}
+              style={[
+                styles.image,
+                {
+                  tintColor:
+                    colors.primary,
+                },
+              ]}
+            />
+
+          </TouchableOpacity>
+
+          <Text
+            style={[
+              styles.title,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
+            Dashboard
+          </Text>
+
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color:
+                  colors.secondaryText,
+              },
+            ]}
+          >
+            Evento: {eventData.eventName}
+          </Text>
+
+        </View>
+
+        <TouchableOpacity
+          onPress={toggleTheme}
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 10,
+          }}
+        >
           <Image
-            source={require("../../../assets/images/back.png")}
-            style={styles.image}
+            source={require("../../../assets/images/themes.png")}
+            style={[
+              styles.themeIcon,
+              {
+                tintColor: colors.primary,
+              },
+            ]}
           />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Dashboard</Text>
-
-        <Text style={styles.subtitle}>Evento: {eventData.eventName}</Text>
-      </View>
-
-      <View style={styles.line}/>
-
-      <View style={styles.statsContainer}>
-        {stats.map((item) => (
-          <View
-            key={item.label}
-            style={styles.statsCard}
-          >
-            <Text style={styles.value}>
-              {item.value}
-            </Text>
-      
-            <Text style={styles.label}>
-              {item.label}
-            </Text>
-          </View>
-        ))}
-      </View>
-
-    <View style={styles.createContainer}>
-       <Text style={styles.overview}>Visão geral das mesas</Text>
-     </View>
-
-     <View style={styles.cardsContainer}>
-
-      {eventData.tables.map((table) => (
         <View
-          key={table.id}
-          style={styles.card}
-        >
-      
-        <Text style={styles.cardTitle}>
-          Mesa {table.id}
-        </Text>
-          
-        <Text style={styles.cardStatus}>
-          {table.status}
-        </Text>
-          
-        </View>
-    
-      ))}
+          style={[
+            styles.line,
+            {
+              backgroundColor:
+                colors.primary,
+            },
+          ]}
+        />
 
-    </View>
-    </View>
+        <View style={styles.statsContainer}>
+
+          {stats.map((item) => (
+
+            <View
+              key={item.label}
+              style={[
+                styles.statsCard,
+                {
+                  backgroundColor:
+                    colors.card,
+                  borderColor:
+                    colors.primary,
+                },
+              ]}
+            >
+
+              <Text
+                style={[
+                  styles.value,
+                  {
+                    color:
+                      colors.primary,
+                  },
+                ]}
+              >
+                {item.value}
+              </Text>
+
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color:
+                      colors.text,
+                  },
+                ]}
+              >
+                {item.label}
+              </Text>
+
+            </View>
+
+          ))}
+
+        </View>
+
+        <View style={styles.createContainer}>
+
+          <Text
+            style={[
+              styles.overview,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
+            Visão geral das mesas
+          </Text>
+
+        </View>
+
+        <View style={styles.cardsContainer}>
+
+          {eventData.tables.map((table) => (
+
+            <View
+              key={table.id}
+              style={[
+                styles.card,
+                {
+                  backgroundColor:
+                    colors.card,
+                  borderColor:
+                    colors.primary,
+                },
+              ]}
+            >
+
+              <Text
+                style={[
+                  styles.cardTitle,
+                  {
+                    color:
+                      colors.text,
+                  },
+                ]}
+              >
+                Mesa {table.id}
+              </Text>
+
+              <Text
+                style={[
+                  styles.cardStatus,
+                  {
+                    color:
+                      table.status === "Livre"
+                        ? "#0fce52"
+                        : "#ff5252",
+                  },
+                ]}
+              >
+                {table.status}
+              </Text>
+
+            </View>
+
+          ))}
+
+        </View>
+
+      </View>
+
     </ScrollView>
   );
 }

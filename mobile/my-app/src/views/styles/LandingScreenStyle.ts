@@ -3,20 +3,18 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
+  themeIcon:{
+    width: 35,
+    height: 35,
+    
+  },
+
   title:{
-    color: "white",
     fontSize: 45
-  },
-  white:{
-    color: "white"
-  },
-  green:{
-    color: "#0fce52"
   },
 
   image:{
@@ -25,7 +23,6 @@ export const styles = StyleSheet.create({
   },
 
   line:{
-    backgroundColor: "#0eb348",
     height: 1,
     marginVertical: 20,
     width: "40%",
@@ -34,7 +31,6 @@ export const styles = StyleSheet.create({
   },
 
   subtitle:{
-    color: "white",
     fontSize: 20,
     width: "65%",
     justifyContent: "center",

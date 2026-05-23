@@ -1,48 +1,103 @@
 import { Tabs } from "expo-router";
+
 import { Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
 import { useContext } from "react";
+
 import { AuthContext } from "../../src/context/AuthContext";
 
+import { ThemeContext } from "../../src/context/ThemeContext";
+
+import {
+  darkTheme,
+  lightTheme,
+} from "../../src/themes/colors";
+
 export default function TabsLayout() {
-  const { user } = useContext(AuthContext);
-  const isGarcom = user?.tipo === "garcom";
+
+  const { user } =
+    useContext(AuthContext);
+
+  const {
+    theme,
+  } = useContext(ThemeContext);
+
+  const colors =
+    theme === "dark"
+      ? darkTheme
+      : lightTheme;
+
+  const isGarcom =
+    user?.tipo === "garcom";
 
   return (
+
     <Tabs
       screenOptions={{
         headerShown: false,
+
         tabBarStyle: {
-          backgroundColor: "#121212",
+          backgroundColor:
+            colors.card,
+
           borderTopWidth: 1,
+
           height: 70,
+
           paddingTop: 7,
+
           paddingBottom: 10,
-          borderTopColor: "#0fce52",
+
+          borderTopColor:
+            colors.primary,
         },
-        tabBarActiveTintColor: "#0fce52",
-        tabBarInactiveTintColor: "#777",
+
+        tabBarActiveTintColor:
+          colors.primary,
+
+        tabBarInactiveTintColor:
+          colors.secondaryText,
+
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",
         },
       }}
     >
+
       <Tabs.Screen
         name="adm-dash"
         options={{
           title: "Dashboard",
-          href: isGarcom ? null : undefined,
-          tabBarIcon: ({ focused }) => (
+
+          href:
+            isGarcom
+              ? null
+              : undefined,
+
+          tabBarIcon: ({
+            focused,
+          }) => (
+
             <Image
               source={require("../../assets/images/home.png")}
               style={{
                 width: 24,
+
                 height: 24,
-                opacity: focused ? 1 : 0.5,
-                tintColor: focused ? "#0fce52" : "#c9c9c9",
+
+                opacity:
+                  focused
+                    ? 1
+                    : 0.5,
+
+                tintColor:
+                  focused
+                    ? colors.primary
+                    : colors.secondaryText,
               }}
             />
+
           ),
         }}
       />
@@ -51,16 +106,30 @@ export default function TabsLayout() {
         name="mesas-screen"
         options={{
           title: "Mesas",
-          tabBarIcon: ({ focused }) => (
+
+          tabBarIcon: ({
+            focused,
+          }) => (
+
             <Image
               source={require("../../assets/images/table.png")}
               style={{
                 width: 24,
+
                 height: 24,
-                opacity: focused ? 1 : 0.5,
-                tintColor: focused ? "#0fce52" : "#c9c9c9",
+
+                opacity:
+                  focused
+                    ? 1
+                    : 0.5,
+
+                tintColor:
+                  focused
+                    ? colors.primary
+                    : colors.secondaryText,
               }}
             />
+
           ),
         }}
       />
@@ -69,19 +138,34 @@ export default function TabsLayout() {
         name="alert"
         options={{
           title: "Alertas",
-          tabBarIcon: ({ focused }) => (
+
+          tabBarIcon: ({
+            focused,
+          }) => (
+
             <Image
               source={require("../../assets/images/bell.png")}
               style={{
                 width: 24,
+
                 height: 24,
-                opacity: focused ? 1 : 0.5,
-                tintColor: focused ? "#0fce52" : "#c9c9c9",
+
+                opacity:
+                  focused
+                    ? 1
+                    : 0.5,
+
+                tintColor:
+                  focused
+                    ? colors.primary
+                    : colors.secondaryText,
               }}
             />
+
           ),
         }}
       />
+
     </Tabs>
   );
 }
