@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
-import { api } from "../../services/api";
+import { fetchAlertas, resolveAlerta } from "../../services/smartcupService";
 
 interface Alerta {
   id: number;
@@ -19,10 +19,8 @@ export default function AlertasScreen() {
 
   async function carregarAlertas() {
     try {
-      const response = await api.get("/alertas");
-      if (response.data.sucesso) {
-        setAlertas(response.data.alertas);
-      }
+      const alertasData = await fetchAlertas();
+      setAlertas(alertasData);
     } catch {
       Alert.alert("Erro", "Nao foi possivel carregar os alertas.");
     } finally {
@@ -38,7 +36,7 @@ export default function AlertasScreen() {
 
   async function atenderAlerta(id: number) {
     try {
-      await api.put(`/alertas/${id}/resolver`);
+      await resolveAlerta(id);
       setAlertas((prev) => prev.filter((a) => a.id !== id));
     } catch {
       Alert.alert("Erro", "Nao foi possivel resolver este alerta.");

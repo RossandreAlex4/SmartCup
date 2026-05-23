@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView,
 import { styles } from "../styles/MesasScreenStyle";
 import { router } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
-import { api } from "../../services/api";
+import { fetchMesas } from "../../services/smartcupService";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Mesa {
@@ -22,10 +22,8 @@ export default function MesasScreen() {
 
   async function carregarMesas() {
     try {
-      const response = await api.get("/mesas");
-      if (response.data.sucesso) {
-        setMesas(response.data.mesas);
-      }
+      const mesasData = await fetchMesas();
+      setMesas(mesasData);
     } catch {
       Alert.alert("Erro", "Nao foi possivel carregar as mesas.");
     } finally {

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { api } from "../services/api";
+import { api, setApiToken } from "../services/api";
 
 export interface User {
   id: number;
@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const storagedUser = await AsyncStorage.getItem("@SmartCup:user");
         if (storagedUser) {
           const parsedUser = JSON.parse(storagedUser) as User;
+          setApiToken(parsedUser.token ?? null);
           if (parsedUser.tipo === "garcom" && parsedUser.token) {
             const response = await api.post("/usuarios/login-token", {
               token: parsedUser.token,
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (response.data.sucesso) {
               setUser(parsedUser);
             } else {
+              setApiToken(null);
               await AsyncStorage.removeItem("@SmartCup:user");
             }
           } else {
@@ -56,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await api.post("/usuarios/login", { email, senha });
     if (response.data.sucesso) {
       const userData: User = response.data.usuario;
+      setApiToken(userData.token ?? null);
       setUser(userData);
       await AsyncStorage.setItem("@SmartCup:user", JSON.stringify(userData));
     } else {
@@ -67,15 +70,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await api.post("/usuarios/login-token", { token });
     if (response.data.sucesso) {
       const userData: User = response.data.usuario;
+      setApiToken(userData.token ?? null);
       setUser(userData);
       await AsyncStorage.setItem("@SmartCup:user", JSON.stringify(userData));
     } else {
+      setApiToken(null);
       throw new Error(response.data.mensagem || "Token invalido");
     }
   }
 
   async function logout() {
     await AsyncStorage.removeItem("@SmartCup:user");
+    setApiToken(null);
     setUser(null);
   }
 

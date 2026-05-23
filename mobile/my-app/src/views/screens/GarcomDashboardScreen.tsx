@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { api } from "../../services/api";
+import { fetchAlertas, resolveAlerta } from "../../services/smartcupService";
 import { AuthContext } from "../../context/AuthContext";
 
 interface Alerta {
@@ -29,10 +29,8 @@ export default function GarcomDashboardScreen() {
 
   async function carregarAlertas() {
     try {
-      const response = await api.get("/alertas");
-      if (response.data.sucesso) {
-        setAlertas(response.data.alertas);
-      }
+      const alertasData = await fetchAlertas();
+      setAlertas(alertasData);
     } catch {
       Alert.alert("Erro", "Nao foi possivel carregar os alertas.");
     } finally {
@@ -48,7 +46,7 @@ export default function GarcomDashboardScreen() {
 
   async function resolverAlerta(id: number) {
     try {
-      await api.put(`/alertas/${id}/resolver`);
+      await resolveAlerta(id);
       setAlertas((prev) => prev.filter((a) => a.id !== id));
     } catch {
       Alert.alert("Erro", "Nao foi possivel resolver o alerta.");

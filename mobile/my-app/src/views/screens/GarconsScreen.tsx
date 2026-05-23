@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { api } from "../../services/api";
+import { fetchGarcons, createGarcom, deleteGarcom, fetchQrCodeForGarcom } from "../../services/smartcupService";
 
 interface Garcom {
   id: number;
@@ -32,10 +33,8 @@ export default function GarconsScreen() {
 
   const buscarGarcons = useCallback(async () => {
     try {
-      const response = await api.get("/usuarios/garcons");
-      if (response.data.sucesso) {
-        setGarcons(response.data.garcons);
-      }
+      const garconsData = await fetchGarcons();
+      setGarcons(garconsData);
     } catch (error: any) {
       Alert.alert("Erro", "Nao foi possivel carregar os garcons.");
     }
@@ -52,11 +51,11 @@ export default function GarconsScreen() {
     }
     try {
       setLoading(true);
-      await api.post("/usuarios/garcons", { nome: nome.trim() });
+      await createGarcom(nome.trim());
       setNome("");
       await buscarGarcons();
     } catch (error: any) {
-      Alert.alert("Erro", "Nao foi possivel criar o garcom.");
+      Alert.alert("Erro", error.message || "Nao foi possivel criar o garcom.");
     } finally {
       setLoading(false);
     }
@@ -73,7 +72,7 @@ export default function GarconsScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              await api.delete(`/usuarios/garcons/${id}`);
+              await deleteGarcom(id);
               await buscarGarcons();
             } catch {
               Alert.alert("Erro", "Nao foi possivel remover o garcom.");
@@ -87,11 +86,9 @@ export default function GarconsScreen() {
   async function verQrCode(garcom: Garcom) {
     try {
       setSelectedGarcom(garcom);
-      const response = await api.get(`/usuarios/garcons/${garcom.id}/qrcode`);
-      if (response.data.sucesso) {
-        setQrCodeImage(response.data.qrcode);
-        setQrCodeVisible(true);
-      }
+      const qrcode = await fetchQrCodeForGarcom(garcom.id);
+      setQrCodeImage(qrcode);
+      setQrCodeVisible(true);
     } catch {
       Alert.alert("Erro", "Nao foi possivel carregar o QR Code.");
     }
