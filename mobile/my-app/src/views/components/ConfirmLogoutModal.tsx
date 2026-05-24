@@ -43,7 +43,7 @@ export default function ConfirmLogoutModal({
               },
             ]}
           >
-            Encerrar sessao
+            Encerrar sessão
           </Text>
 
           <Text
@@ -54,7 +54,7 @@ export default function ConfirmLogoutModal({
               },
             ]}
           >
-            Ao voltar, sua sessao sera encerrada.
+            Ao voltar, sua sessão será encerrada.
           </Text>
 
           <View style={styles.actions}>
