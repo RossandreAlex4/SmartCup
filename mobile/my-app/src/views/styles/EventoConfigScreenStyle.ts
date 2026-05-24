@@ -4,6 +4,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    position: "relative",
   },
 
   themeIcon:{
@@ -17,16 +18,27 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 19,
     width: '100%',
-    justifyContent: "center"
+    height: 44,
+    paddingHorizontal: 16,
   },
 
   backButton: {
-    position: "absolute",
-    left: 20,
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
 
   title:{
     fontSize: 20,
+    flex: 1,
+    textAlign: "center",
+  },
+
+  titleSpacer: {
+    width: 44,
+    height: 44,
   },
 
   image:{
@@ -67,6 +79,14 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 15,
     marginVertical: 15,
+  },
+
+  errorText: {
+    color: "#ff5252",
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: -8,
+    marginBottom: 12,
   },
 
   cardsContainer: {

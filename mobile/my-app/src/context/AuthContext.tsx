@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { api, setApiToken } from "../services/api";
 
 export interface User {
@@ -55,14 +56,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function loginAdmin(email: string, senha: string) {
-    const response = await api.post("/usuarios/login", { email, senha });
-    if (response.data.sucesso) {
-      const userData: User = response.data.usuario;
-      setApiToken(userData.token ?? null);
-      setUser(userData);
-      await AsyncStorage.setItem("@SmartCup:user", JSON.stringify(userData));
-    } else {
-      throw new Error(response.data.mensagem || "Erro ao fazer login");
+    try {
+      const response = await api.post("/usuarios/login", { email, senha });
+      if (response.data.sucesso) {
+        const userData: User = response.data.usuario;
+        setApiToken(userData.token ?? null);
+        setUser(userData);
+        await AsyncStorage.setItem("@SmartCup:user", JSON.stringify(userData));
+      } else {
+        throw new Error(response.data.mensagem || "Erro ao fazer login");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const mensagem = error.response?.data?.mensagem;
+        throw new Error(mensagem || "Nao foi possivel conectar ao servidor.");
+      }
+
+      throw error;
     }
   }
 

@@ -4,11 +4,15 @@ import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert } fro
 
 import CustomButton from "../components/customButton";
 
+import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
+
 import { styles } from "../styles/EventoConfigScreenStyle";
 
 import { router } from "expo-router";
 
 import { EventContext } from "../../context/EventContext";
+
+import { AuthContext } from "../../context/AuthContext";
 
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -78,6 +82,9 @@ export default function ConfigEvento() {
   const { setEventData } =
     useContext(EventContext);
 
+  const { logout } =
+    useContext(AuthContext);
+
   const {
     theme,
     toggleTheme,
@@ -97,8 +104,34 @@ export default function ConfigEvento() {
   const [eventName, setEventName] =
     useState("");
 
+  const [eventNameError, setEventNameError] =
+    useState("");
+
   const [loading, setLoading] =
     useState(false);
+
+  const [
+    logoutModalVisible,
+    setLogoutModalVisible,
+  ] = useState(false);
+
+  function voltarParaLogin() {
+
+    setLogoutModalVisible(true);
+
+  }
+
+  async function confirmarLogout() {
+
+    setLogoutModalVisible(false);
+
+    await logout();
+
+    router.dismissAll();
+
+    router.replace("/");
+
+  }
 
   const cards = [
     {
@@ -130,6 +163,10 @@ export default function ConfigEvento() {
 
     if (!eventName.trim()) {
 
+      setEventNameError(
+        "Digite o nome do evento."
+      );
+
       Alert.alert(
         "Erro",
         "Informe o nome do evento."
@@ -137,6 +174,8 @@ export default function ConfigEvento() {
 
       return;
     }
+
+    setEventNameError("");
 
     try {
 
@@ -236,9 +275,8 @@ export default function ConfigEvento() {
 
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() =>
-              router.back()
-            }
+            onPress={voltarParaLogin}
+            activeOpacity={0.7}
           >
 
             <Image
@@ -265,6 +303,10 @@ export default function ConfigEvento() {
           >
             Configuração do Evento
           </Text>
+
+          <View
+            style={styles.titleSpacer}
+          />
 
         </View>
 
@@ -319,12 +361,29 @@ export default function ConfigEvento() {
                 },
               ]}
               value={eventName}
-              onChangeText={
-                setEventName
-              }
+              onChangeText={(text) => {
+
+                setEventName(text);
+
+                if (eventNameError) {
+
+                  setEventNameError("");
+
+                }
+              }}
             />
 
           </View>
+
+          {eventNameError ? (
+
+            <Text
+              style={styles.errorText}
+            >
+              {eventNameError}
+            </Text>
+
+          ) : null}
 
         </View>
 
@@ -460,8 +519,18 @@ export default function ConfigEvento() {
           }}
         />
 
+        <ConfirmLogoutModal
+          visible={logoutModalVisible}
+          colors={colors}
+          onCancel={() =>
+            setLogoutModalVisible(false)
+          }
+          onConfirm={confirmarLogout}
+        />
+
       </View>
 
     </ScrollView>
   );
 }
+
