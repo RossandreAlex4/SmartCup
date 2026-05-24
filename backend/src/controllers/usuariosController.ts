@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import QRCode from "qrcode";
+import * as QRCode from "qrcode";
 
 import { UsuarioModel } from "../models/usuariosModel.js";
 

@@ -166,6 +166,37 @@ export default function TabsLayout() {
         }}
       />
 
-    </Tabs>
+      <Tabs.Screen
+        name="garcons"
+        options={{
+          title: "Garçons",
+
+          tabBarIcon: ({
+            focused,
+          }) => (
+
+            <Image
+              source={require("../../assets/images/avatar.png")}
+              style={{
+                width: 24,
+
+                height: 24,
+
+                opacity:
+                  focused
+                    ? 1
+                    : 0.5,
+
+                tintColor:
+                  focused
+                    ? colors.primary
+                    : colors.secondaryText,
+              }}
+            />
+
+          ),
+        }}
+      />
+    </Tabs>   
   );
 }

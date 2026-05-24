@@ -133,9 +133,6 @@ export default function TelaInicial() {
           }}
         />
 
-
-        
-
       </View>
 
     </ScrollView>

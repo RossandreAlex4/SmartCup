@@ -1,17 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Image,
-} from "react-native";
+
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator, Image } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
+
 import { router } from "expo-router";
+
 import { fetchAlertas, resolveAlerta } from "../../services/smartcupService";
+
 import { AuthContext } from "../../context/AuthContext";
 
 interface Alerta {

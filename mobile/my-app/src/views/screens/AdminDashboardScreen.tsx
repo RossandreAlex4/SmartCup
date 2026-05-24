@@ -20,7 +20,7 @@ export default function AdmDash() {
   const { eventData } =
     useContext(EventContext);
 
-   const {
+  const {
     theme,
     toggleTheme,
   } = useContext(ThemeContext);

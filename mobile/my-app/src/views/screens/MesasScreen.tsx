@@ -206,7 +206,7 @@ export default function MesasScreen() {
           >
             {isGarcom
               ? "Mesas"
-              : "Configuracao das Mesas"}
+              : "Configuração das Mesas"}
           </Text>
 
           {isGarcom && (
@@ -382,35 +382,6 @@ export default function MesasScreen() {
             )}
 
           </View>
-
-        )}
-
-        {!isGarcom && (
-
-          <TouchableOpacity
-            style={[
-              localStyles.addButton,
-              {
-                backgroundColor:
-                  colors.primary,
-              },
-            ]}
-            onPress={() =>
-              router.push(
-                "/garcons" as any
-              )
-            }
-          >
-
-            <Text
-              style={
-                localStyles.addButtonText
-              }
-            >
-              Gerenciar Garcons
-            </Text>
-
-          </TouchableOpacity>
 
         )}
 
