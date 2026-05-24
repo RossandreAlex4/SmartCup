@@ -14,7 +14,12 @@ export class AlertasController {
   static async resolver(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      await AlertaModel.resolver(Number(id));
+      const linhasAfetadas = await AlertaModel.resolver(Number(id));
+
+      if (linhasAfetadas === 0) {
+        return res.status(404).json({ sucesso: false, mensagem: "Alerta nao encontrado" });
+      }
+
       return res.json({ sucesso: true, mensagem: "Alerta resolvido" });
     } catch (error: any) {
       return res.status(500).json({ sucesso: false, mensagem: error.message });

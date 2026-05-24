@@ -68,25 +68,25 @@ export class UsuarioModel {
   }
 
   static deletarToken(id: number) {
-    return new Promise((resolve, reject) => {
-      db.run("DELETE FROM tokens_acesso WHERE id = ?", [id], (error) => {
+    return new Promise<number>((resolve, reject) => {
+      db.run("DELETE FROM tokens_acesso WHERE id = ?", [id], function (error) {
         if (error) {
-          reject(error);
-          return;
+          return reject(error);
         }
-        resolve(true);
+
+        resolve(this.changes);
       });
     });
   }
 
   static deletarTodosTokens() {
-    return new Promise((resolve, reject) => {
-      db.run("DELETE FROM tokens_acesso", (error) => {
+    return new Promise<number>((resolve, reject) => {
+      db.run("DELETE FROM tokens_acesso", function (error) {
         if (error) {
-          reject(error);
-          return;
+          return reject(error);
         }
-        resolve(true);
+
+        resolve(this.changes);
       });
     });
   }

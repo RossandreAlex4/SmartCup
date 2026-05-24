@@ -44,23 +44,29 @@ export class SmartCupModel {
         pesoAtual: number,
         ultimaComunicacao: string
     ) {
-        return new Promise((resolve, reject) => {
+        return new Promise<number>((resolve, reject) => {
         db.run(
             "UPDATE smartcups SET status = ?, peso_atual = ?, ultima_comunicacao = ? WHERE id = ?",
             [status, pesoAtual, ultimaComunicacao, id],
-            (error) => {
-            if (error) reject(error);
-            resolve(true);
+            function (error) {
+            if (error) {
+                return reject(error);
+            }
+
+            resolve(this.changes);
             }
         );
         });
     }
 
     static deletar(id: number) {
-        return new Promise((resolve, reject) => {
-        db.run("DELETE FROM smartcups WHERE id = ?", [id], (error) => {
-            if (error) reject(error);
-            resolve(true);
+        return new Promise<number>((resolve, reject) => {
+        db.run("DELETE FROM smartcups WHERE id = ?", [id], function (error) {
+            if (error) {
+            return reject(error);
+            }
+
+            resolve(this.changes);
         });
         });
     }

@@ -53,26 +53,35 @@ export class SmartCupController {
         const { id } = req.params;
         const { status, peso_atual, ultima_comunicacao } = req.body;
 
-        await SmartCupModel.atualizar(
+        const linhasAfetadas = await SmartCupModel.atualizar(
             Number(id),
             status || "ativo",
             peso_atual || 0,
             ultima_comunicacao || new Date().toISOString()
         );
 
-        res.json({ sucesso: true, mensagem: "SmartCup atualizado com sucesso" });
+        if (linhasAfetadas === 0) {
+            return res.status(404).json({ sucesso: false, mensagem: "SmartCup nÃ£o encontrado" });
+        }
+
+        return res.json({ sucesso: true, mensagem: "SmartCup atualizado com sucesso" });
         } catch (error: any) {
-        res.status(500).json({ sucesso: false, mensagem: error.message });
+        return res.status(500).json({ sucesso: false, mensagem: error.message });
         }
     }
 
     static async deletar(req: Request, res: Response) {
         try {
         const { id } = req.params;
-        await SmartCupModel.deletar(Number(id));
-        res.json({ sucesso: true, mensagem: "SmartCup deletado com sucesso" });
+        const linhasAfetadas = await SmartCupModel.deletar(Number(id));
+
+        if (linhasAfetadas === 0) {
+            return res.status(404).json({ sucesso: false, mensagem: "SmartCup nÃ£o encontrado" });
+        }
+
+        return res.json({ sucesso: true, mensagem: "SmartCup deletado com sucesso" });
         } catch (error: any) {
-        res.status(500).json({ sucesso: false, mensagem: error.message });
+        return res.status(500).json({ sucesso: false, mensagem: error.message });
         }
     }
 

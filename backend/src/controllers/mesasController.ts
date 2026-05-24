@@ -43,27 +43,54 @@ export class MesaController {
 
     static async atualizar(req: Request, res: Response) {
         try {
-        const { id } = req.params;
-        const { nome, zona, status } = req.body;
+            const { id } = req.params;
+            const { nome, zona, status } = req.body;
 
-        if (!nome || !zona || !status) {
-            return res.status(400).json({ sucesso: false, mensagem: "Nome, zona e status são obrigatórios" });
-        }
+            if (!nome || !zona || !status) {
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "Nome, zona e status são obrigatórios",
+            });
+            }
 
-        await MesaModel.atualizar(Number(id), nome, zona, status);
-        res.json({ sucesso: true, mensagem: "Mesa atualizada com sucesso" });
+            const linhasAfetadas = await MesaModel.atualizar(
+            Number(id),
+            nome,
+            zona,
+            status
+            );
+
+            if (linhasAfetadas === 0) {
+            return res.status(404).json({
+                sucesso: false,
+                mensagem: "Mesa não encontrada",
+            });
+            }
+
+            return res.json({
+            sucesso: true,
+            mensagem: "Mesa atualizada com sucesso",
+            });
         } catch (error: any) {
-        res.status(500).json({ sucesso: false, mensagem: error.message });
+            return res.status(500).json({
+            sucesso: false,
+            mensagem: error.message,
+            });
         }
-    }
+}
 
     static async deletar(req: Request, res: Response) {
         try {
         const { id } = req.params;
-        await MesaModel.deletar(Number(id));
-        res.json({ sucesso: true, mensagem: "Mesa deletada com sucesso" });
+        const linhasAfetadas = await MesaModel.deletar(Number(id));
+
+        if (linhasAfetadas === 0) {
+            return res.status(404).json({ sucesso: false, mensagem: "Mesa nÃ£o encontrada" });
+        }
+
+        return res.json({ sucesso: true, mensagem: "Mesa deletada com sucesso" });
         } catch (error: any) {
-        res.status(500).json({ sucesso: false, mensagem: error.message });
+        return res.status(500).json({ sucesso: false, mensagem: error.message });
         }
     }
 

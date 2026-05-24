@@ -18,7 +18,7 @@ test("Alerta Model - Operations", async (t) => {
     assert.strictEqual(activeAlert.mesa_id, mesaId);
 
     const resolved = await AlertaModel.resolver(id);
-    assert.strictEqual(resolved, true);
+    assert.strictEqual(resolved, 1);
 
     const listAfter: any = await AlertaModel.listarAtivos();
     const resolvedAlert = listAfter.find((item: any) => item.id === id);

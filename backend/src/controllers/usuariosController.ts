@@ -95,7 +95,15 @@ export class UsuarioController {
   static async deletarGarcom(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      await UsuarioModel.deletarToken(Number(id));
+      const linhasAfetadas = await UsuarioModel.deletarToken(Number(id));
+
+      if (linhasAfetadas === 0) {
+        return res.status(404).json({
+          sucesso: false,
+          mensagem: "Garcom nao encontrado",
+        });
+      }
+
       return res.json({
         sucesso: true,
         mensagem: "Garcom removido",
@@ -110,9 +118,10 @@ export class UsuarioController {
 
   static async deletarTodosGarcons(req: Request, res: Response) {
     try {
-      await UsuarioModel.deletarTodosTokens();
+      const linhasAfetadas = await UsuarioModel.deletarTodosTokens();
       return res.json({
         sucesso: true,
+        removidos: linhasAfetadas,
         mensagem: "Todos os garcons foram removidos",
       });
     } catch (error: any) {
@@ -193,6 +202,11 @@ export class UsuarioController {
   static async acessoWeb(req: Request, res: Response) {
     try {
       const { token } = req.params;
+
+      if (!token || Array.isArray(token)) {
+        return res.status(400).send("<h1>Token invalido</h1>");
+      }
+
       const garcom: any = await UsuarioModel.buscarToken(token);
 
       if (!garcom) {

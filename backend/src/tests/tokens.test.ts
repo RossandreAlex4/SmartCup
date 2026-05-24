@@ -21,7 +21,7 @@ test("Token Model - CRUD Operations", async (t) => {
     assert.ok(found);
 
     const deleted = await UsuarioModel.deletarToken(id);
-    assert.strictEqual(deleted, true);
+    assert.strictEqual(deleted, 1);
 
     const afterDelete: any = await UsuarioModel.buscarToken(tokenStr);
     assert.strictEqual(afterDelete, undefined);

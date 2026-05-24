@@ -33,26 +33,32 @@ export class MesaModel {
     }
 
     static atualizar(id: number, nome: string, zona: string, status: string) {
-        return new Promise((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
         db.run(
-            "UPDATE mesas SET nome = ?, zona = ?, status = ? WHERE id = ?",
-            [nome, zona, status, id],
-            (error) => {
-            if (error) reject(error);
-            resolve(true);
+        "UPDATE mesas SET nome = ?, zona = ?, status = ? WHERE id = ?",
+        [nome, zona, status, id],
+        function (error) {
+            if (error) {
+            return reject(error);
             }
+
+            resolve(this.changes);
+        }
         );
-        });
-    }
+    });
+}
 
     static deletar(id: number) {
-        return new Promise((resolve, reject) => {
-        db.run("DELETE FROM mesas WHERE id = ?", [id], (error) => {
-            if (error) reject(error);
-            resolve(true);
-        });
-        });
-    }
+        return new Promise<number>((resolve, reject) => {
+            db.run("DELETE FROM mesas WHERE id = ?", [id], function (error) {
+            if (error) {
+                return reject(error);
+            }
+
+            resolve(this.changes);
+            });
+                 });
+}
 
     static buscarSmartcupsDaMesa(mesaId: number) {
         return new Promise((resolve, reject) => {

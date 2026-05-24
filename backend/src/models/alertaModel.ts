@@ -23,16 +23,16 @@ export class AlertaModel {
   }
 
   static resolver(id: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
       db.run(
         "UPDATE alertas SET resolvido = 1 WHERE id = ?",
         [id],
-        (error) => {
+        function (error) {
           if (error) {
-            reject(error);
-            return;
+            return reject(error);
           }
-          resolve(true);
+
+          resolve(this.changes);
         }
       );
     });
