@@ -50,6 +50,9 @@ export default function Login() {
   const [isLogging, setIsLogging] =
     useState(false);
 
+  const [loginError, setLoginError] =
+    useState("");
+
   useEffect(() => {
 
     if (!loading && user) {
@@ -71,7 +74,13 @@ export default function Login() {
 
   async function fazerLogin() {
 
+    setLoginError("");
+
     if (!email || !senha) {
+
+      setLoginError(
+        "Preencha email e senha."
+      );
 
       Alert.alert(
         "Erro",
@@ -96,10 +105,15 @@ export default function Login() {
 
     } catch (error: any) {
 
+      const message =
+        error.message ||
+        "Email ou senha invalidos.";
+
+      setLoginError(message);
+
       Alert.alert(
         "Erro de Login",
-        error.message ||
-          "Email ou senha inválidos."
+        message
       );
 
     } finally {
@@ -390,6 +404,16 @@ export default function Login() {
 
           </TouchableOpacity>
 
+          {loginError ? (
+
+            <Text
+              style={styles.errorText}
+            >
+              {loginError}
+            </Text>
+
+          ) : null}
+
         </View>
 
         <CustomButton
@@ -403,6 +427,7 @@ export default function Login() {
             colors.primary
           }
           onPress={fazerLogin}
+          disabled={isLogging}
           style={{
             alignSelf: "center",
           }}

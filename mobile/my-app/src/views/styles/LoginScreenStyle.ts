@@ -99,6 +99,16 @@ export const styles = StyleSheet.create({
     height:20
   },
 
+  errorText: {
+    width: "85%",
+    color: "#ff5252",
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: -12,
+    marginBottom: 18,
+  },
+
   forgot:{
     fontSize:14,
     margin:15

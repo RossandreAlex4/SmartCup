@@ -18,6 +18,7 @@ type CustomButtonProps = {
   fontSize?: number;
   borderRadius?: number;
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 };
 
 export default function CustomButton({
@@ -30,6 +31,7 @@ export default function CustomButton({
   fontSize = 18,
   borderRadius = 12,
   style,
+  disabled = false,
 }: CustomButtonProps) {
   return (
     <TouchableOpacity
@@ -42,9 +44,11 @@ export default function CustomButton({
           borderRadius,
         },
         style,
+        disabled && styles.disabled,
       ]}
       onPress={onPress}
       activeOpacity={0.8}
+      disabled={disabled}
     >
       <Text
         style={[
@@ -70,5 +74,9 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontWeight: "bold",
+  },
+
+  disabled: {
+    opacity: 0.7,
   },
 });
