@@ -16,7 +16,7 @@ export default function QRCodeScannerScreen() {
 
     try {
       const parsed = JSON.parse(data);
-      if (!parsed.smartcup_auth || !parsed.token) {
+      if (!parsed.token) {
         Alert.alert("QR Code invalido", "Este codigo nao e de acesso SmartCup.", [
           { text: "Tentar novamente", onPress: () => setScanned(false) },
         ]);

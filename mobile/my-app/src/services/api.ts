@@ -3,24 +3,26 @@ import { Platform } from "react-native";
 import Constants from "expo-constants";
 
 function getBackendHost() {
-  const manifest = Constants.manifest || (Constants as any).expoConfig || {};
-  const debuggerHost = (manifest as any).debuggerHost || (manifest as any).packagerOpts?.hostUri;
+  if (Platform.OS === "web") {
+    return "localhost";
+  }
+  if (Platform.OS === "android" && !Constants.expoConfig?.developmentClient) {
+  }
+  const hostUri = Constants.expoConfig?.hostUri || 
+  Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostUri ||
+  Constants.manifest?.debuggerHost;
 
-  if (debuggerHost) {
-    const [host] = debuggerHost.split(":");
+  if (hostUri) {
+    const [host] = hostUri.split(":");
     return host;
   }
-
-  if (Platform.OS === "android") {
-    return "10.0.2.2";
-  }
-
   return "localhost";
 }
 
-const baseURL = Platform.OS === "web"
-  ? "http://localhost:3000"
-  : `http://${getBackendHost()}:3000`;
+const host = getBackendHost();
+const baseURL = `http://${host}:3000`;
+
+console.log("🔌 API Conectada em:", baseURL);
 
 export const api = axios.create({
     baseURL

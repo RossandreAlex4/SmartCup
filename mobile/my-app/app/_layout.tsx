@@ -85,10 +85,6 @@ export default function RootLayout() {
                 />
 
                 <Stack.Screen
-                  name="garcons"
-                />
-
-                <Stack.Screen
                   name="qrcode-scanner"
                 />
 

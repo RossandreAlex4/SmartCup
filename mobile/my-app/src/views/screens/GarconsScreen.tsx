@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from "react";
 
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Modal, Image, Clipboard } from "react-native";
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Modal, Image, Platform, FlatList } from "react-native";
 
 import { styles } from "../styles/GarconsScreenStyle";
 
@@ -125,92 +125,63 @@ export default function GarconsScreen() {
     }
   }
 
-  async function removerGarcom(
-    id: number,
-    nomeGarcom: string
-  ) {
+  async function removerGarcom(id: number,nomeGarcom: string) {
+    const acaoRemover = async () => {
+      try {
+        await deleteGarcom(id);
+        await buscarGarcons();
+      } catch {
+        if (Platform.OS === "web") alert("Nao foi possivel remover o garcom.");
+        else Alert.alert("Erro", "Nao foi possivel remover o garcom.");
+      }
+    };
 
-    Alert.alert(
-      "Remover acesso",
-      `Remover acesso de ${nomeGarcom}?`,
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-
-        {
-          text: "Remover",
-
-          style: "destructive",
-
-          onPress: async () => {
-
-            try {
-
-              await deleteGarcom(id);
-
-              await buscarGarcons();
-
-            } catch {
-
-              Alert.alert(
-                "Erro",
-                "Nao foi possivel remover o garcom."
-              );
-
-            }
-          },
-        },
-      ]
-    );
-  }
-
-  async function verQrCode(
-    garcom: Garcom
-  ) {
-
-    try {
-
-      setSelectedGarcom(garcom);
-
-      const qrcode =
-        await fetchQrCodeForGarcom(
-          garcom.id
-        );
-
-      setQrCodeImage(qrcode);
-
-      setQrCodeVisible(true);
-
-    } catch {
-
-      Alert.alert(
-        "Erro",
-        "Nao foi possivel carregar o QR Code."
-      );
-
+    if (Platform.OS === "web") {
+      if (window.confirm(`Remover acesso de ${nomeGarcom}?`)) {
+        await acaoRemover();
+      }
+    } else {
+      Alert.alert("Remover acesso", `Remover acesso de ${nomeGarcom}?`, [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Remover", style: "destructive", onPress: acaoRemover },
+      ]);
     }
   }
 
-  function copiarLink(
-    garcom: Garcom
-  ) {
+  async function verQrCode(garcom: Garcom){
+   try {
+      setSelectedGarcom(garcom);
+      
+      let qrcode = await fetchQrCodeForGarcom(garcom.id);
+      
+      if (Platform.OS !== "web" && qrcode.includes("localhost")) {
+        const baseUrl = api.defaults.baseURL;
+        qrcode = qrcode.replace("http://localhost:3000", baseUrl);
+      }
 
-    const baseUrl =
-      api.defaults.baseURL;
-
-    const link =
-      `${baseUrl}/usuarios/garcons/acesso/${garcom.token}`;
-
-    Clipboard.setString(link);
-
-    Alert.alert(
-      "Link copiado!",
-      `Link de acesso de ${garcom.nome} copiado para a area de transferencia.`
-    );
+      setQrCodeImage(qrcode);
+      setQrCodeVisible(true);
+    } catch {
+      if (Platform.OS === "web") alert("Nao foi possivel carregar o QR Code.");
+      else Alert.alert("Erro", "Nao foi possivel carregar o QR Code.");
+    }
   }
+ async function copiarLink(garcom: Garcom) {
+    const baseUrl = api.defaults.baseURL;
+    const link = `${baseUrl}/usuarios/garcons/acesso/${garcom.token}`;
 
+    if (Platform.OS === "web") {
+      try {
+        await navigator.clipboard.writeText(link);
+        alert(`Link de acesso de ${garcom.nome} copiado para a area de transferencia.`);
+      } catch {
+        alert("Erro ao copiar o link.");
+      }
+    } else {
+      Alert.alert("Token de Acesso", `Copie este código para o garçom:\n\n${garcom.token}`
+      );
+    }
+  }
   return (
 
     <View
@@ -386,164 +357,41 @@ export default function GarconsScreen() {
         Acessos Ativos
       </Text>
 
-      <ScrollView
+      <FlatList
+        data={garcons}
+        keyExtractor={(item) => item.id.toString()}
         style={styles.list}
-        contentContainerStyle={{
-          paddingBottom: 30,
-        }}
-      >
-
-        {garcons.length === 0 && (
-
-          <Text
-            style={[
-              styles.emptyText,
-              {
-                color:
-                  colors.secondaryText,
-              },
-            ]}
-          >
+        contentContainerStyle={{ paddingBottom: 30 }}
+        ListEmptyComponent={
+          <Text style={[styles.emptyText, { color: colors.secondaryText }]}>
             Nenhum garçom cadastrado ainda.
           </Text>
-
-        )}
-
-        {garcons.map(
-          (garcom) => (
-
-            <View
-              key={garcom.id}
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    colors.card,
-
-                  borderColor:
-                    colors.primary,
-                },
-              ]}
-            >
-
-              <View
-                style={styles.cardInfo}
-              >
-
-                <Text
-                  style={[
-                    styles.cardName,
-                    {
-                      color:
-                        colors.text,
-                    },
-                  ]}
-                >
-                  {garcom.nome}
-                </Text>
-
-                <Text
-                  style={[
-                    styles.cardDate,
-                    {
-                      color:
-                        colors.secondaryText,
-                    },
-                  ]}
-                >
-                  {new Date(
-                    garcom.criado_em
-                  ).toLocaleDateString(
-                    "pt-BR"
-                  )}
-                </Text>
-
-              </View>
-
-              <View
-                style={
-                  styles.cardActions
-                }
-              >
-
-                <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    {
-                      backgroundColor:
-                        colors.primary,
-                    },
-                  ]}
-                  onPress={() =>
-                    verQrCode(
-                      garcom
-                    )
-                  }
-                >
-
-                  <Text
-                    style={
-                      styles.actionButtonText
-                    }
-                  >
-                    QR Code
-                  </Text>
-
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    styles.linkButton,
-                  ]}
-                  onPress={() =>
-                    copiarLink(
-                      garcom
-                    )
-                  }
-                >
-
-                  <Text
-                    style={
-                      styles.actionButtonText
-                    }
-                  >
-                    Copiar Link
-                  </Text>
-
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[
-                    styles.actionButton,
-                    styles.removeButton,
-                  ]}
-                  onPress={() =>
-                    removerGarcom(
-                      garcom.id,
-                      garcom.nome
-                    )
-                  }
-                >
-
-                  <Text
-                    style={
-                      styles.removeButtonText
-                    }
-                  >
-                    Remover
-                  </Text>
-
-                </TouchableOpacity>
-
-              </View>
-
+        }
+        renderItem={({ item: garcom }: { item: Garcom }) => (
+          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+            <View style={styles.cardInfo}>
+              <Text style={[styles.cardName, { color: colors.text }]}>{garcom.nome}</Text>
+              <Text style={[styles.cardDate, { color: colors.secondaryText }]}>
+                {new Date(garcom.criado_em).toLocaleDateString("pt-BR")}
+              </Text>
             </View>
 
-          )
-        )}
+            <View style={styles.cardActions}>
+              <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.primary }]} onPress={() => verQrCode(garcom)}>
+                <Text style={styles.actionButtonText}>QR Code</Text>
+              </TouchableOpacity>
 
-      </ScrollView>
+              <TouchableOpacity style={[styles.actionButton, styles.linkButton]} onPress={() => copiarLink(garcom)}>
+                <Text style={styles.actionButtonText}>Copiar Link</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={[styles.actionButton, styles.removeButton]} onPress={() => removerGarcom(garcom.id, garcom.nome)}>
+                <Text style={styles.removeButtonText}>Remover</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
 
       <Modal
         visible={qrCodeVisible}

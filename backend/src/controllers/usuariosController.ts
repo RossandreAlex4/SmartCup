@@ -192,7 +192,7 @@ export class UsuarioController {
 
   static async acessoWeb(req: Request, res: Response) {
     try {
-      const { token } = req.params;
+      const  token  = req.params.token as string;
       const garcom: any = await UsuarioModel.buscarToken(token);
 
       if (!garcom) {

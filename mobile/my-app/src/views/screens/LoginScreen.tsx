@@ -436,7 +436,7 @@ export default function Login() {
         <TouchableOpacity
           onPress={() =>
             router.push(
-              "//(tabs)/qrcode-scanner"
+              "/qrcode-scanner"
             )
           }
           style={{
