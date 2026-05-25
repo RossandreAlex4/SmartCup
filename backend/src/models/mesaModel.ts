@@ -66,4 +66,29 @@ export class MesaModel {
         );
         });
     }
+    static configurarEvento(qtdMesas: number, qtdZonas: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run("DELETE FROM mesas", (error) => {
+                    if (error) return reject(error);
+                });
+
+                const stmt = db.prepare("INSERT INTO mesas (nome, zona, status) VALUES (?, ?, ?)");
+                
+                for (let i = 1; i <= qtdMesas; i++) {
+                    const nomeMesa = `Mesa ${i < 10 ? '0' + i : i}`;
+                    const letras = ["A", "B", "C", "D", "E", "F"];
+                    const indiceZona = (i - 1) % qtdZonas;
+                    const nomeZona = `Zona ${letras[indiceZona] || indiceZona + 1}`;
+
+                    stmt.run(nomeMesa, nomeZona, "Ativa");
+                }
+
+                stmt.finalize((error) => {
+                    if (error) reject(error);
+                    else resolve(true);
+                });
+            });
+        });
+    }
 }

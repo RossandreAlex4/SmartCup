@@ -8,5 +8,6 @@ router.get("/:id", MesaController.obterPorId);
 router.post("/", MesaController.criar);
 router.put("/:id", MesaController.atualizar);
 router.delete("/:id", MesaController.deletar);
+router.post("/configurar-evento", MesaController.configurarEvento);
 
 export default router;

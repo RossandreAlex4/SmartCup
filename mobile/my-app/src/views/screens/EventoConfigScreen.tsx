@@ -1,20 +1,13 @@
-import { useReducer, useState, useContext } from "react";
-
+import { useReducer, useState, useContext, useEffect } from "react";
 import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
-
 import CustomButton from "../components/customButton";
-
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
-
 import { styles } from "../styles/EventoConfigScreenStyle";
-
 import { router } from "expo-router";
-
 import { EventContext } from "../../context/EventContext";
-
 import { AuthContext } from "../../context/AuthContext";
-
 import { ThemeContext } from "../../context/ThemeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   darkTheme,
@@ -115,6 +108,39 @@ export default function ConfigEvento() {
     setLogoutModalVisible,
   ] = useState(false);
 
+  useEffect(() => {
+  async function verificarEventoAtivo() {
+    try {
+      const foiEncerrado = await AsyncStorage.getItem("@evento_encerrado");
+      
+      if (foiEncerrado === "true") {
+        await AsyncStorage.removeItem("@evento_encerrado");
+        return;
+      }
+
+      const response = await api.get("/mesas");
+      const listaMesas = response.data?.mesas || response.data;
+      
+      if (Array.isArray(listaMesas) && listaMesas.length > 0) {
+        const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
+        setEventData({
+          eventName: nomeSalvo || "Evento Ativo",
+          tables: [],
+          smartCups: state.smartCups,
+          zones: state.zones,
+          waiters: state.waiters,
+        });
+        
+        router.replace("/(tabs)/adm-dash");
+      }
+    } catch (error) {
+      console.log("Nenhum evento ativo ou erro ao conectar:", error);
+    }
+  }
+
+  verificarEventoAtivo();
+}, []);
+  
   function voltarParaLogin() {
 
     setLogoutModalVisible(true);
@@ -185,46 +211,31 @@ export default function ConfigEvento() {
         "/usuarios/garcons"
       );
 
-      const tablesArray =
-        Array.from(
-          {
-            length: state.tables,
-          },
+      await api.post("/mesas/configurar-evento", {
+      qtd_mesas: state.tables,
+      qtd_zonas: state.zones
+    });
 
-          (_, index) => ({
-            id: index + 1,
-            status: "Livre",
-          })
-        );
+    await AsyncStorage.setItem("@nome_evento", eventName)
 
-      setEventData({
-        eventName,
-        tables: tablesArray,
-        smartCups:
-          state.smartCups,
-        zones: state.zones,
-        waiters:
-          state.waiters,
-      });
+    setEventData({
+      eventName,
+      tables: [], 
+      smartCups: state.smartCups,
+      zones: state.zones,
+      waiters: state.waiters,
+    });
 
-      router.push(
-        "/(tabs)/adm-dash"
-      );
+    Alert.alert("Sucesso", "O evento e as mesas foram gerados no banco!");
+    router.push("/(tabs)/adm-dash");
 
-    } catch {
-
-      Alert.alert(
-        "Erro",
-        "Não foi possível iniciar o evento."
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
+  } catch (error) {
+    console.error(error);
+    Alert.alert("Erro", "Não foi possível conectar com o servidor.");
+  } finally {
+    setLoading(false);
   }
-
+}
   return (
 
     <ScrollView

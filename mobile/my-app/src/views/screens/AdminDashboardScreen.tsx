@@ -1,30 +1,65 @@
-import { Text, View, Image, TouchableOpacity, ScrollView } from "react-native";
-
+import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from "react-native";
 import { styles } from "../styles/AdminDashboardScreenStyles";
-
 import { router } from "expo-router";
-
-import { useContext } from "react";
-
+import { useContext,useState, useEffect } from "react";
 import { EventContext } from "../../context/EventContext";
-
 import { ThemeContext } from "../../context/ThemeContext";
-
 import {
   darkTheme,
   lightTheme,
 } from "../../themes/colors";
+import { api } from "../../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+type Mesa = {
+  id: number;
+  nome: string;
+  zona: string;
+  status: string;
+};
 
 export default function AdmDash() {
 
-  const { eventData } =
-    useContext(EventContext);
+const [mesas, setMesas] = useState<Mesa[]>([]);
+const [loading, setLoading] = useState(true);
+const { eventData, setEventData } = useContext(EventContext);
+
 
   const {
     theme,
     toggleTheme,
   } = useContext(ThemeContext);
 
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        setLoading(true);
+        
+        const response = await api.get("/mesas");
+        if (response.data && response.data.mesas) {
+          setMesas(response.data.mesas);
+        } else if (Array.isArray(response.data)) {
+          setMesas(response.data);
+        }
+
+        if (!eventData.eventName) {
+          const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
+          if (nomeSalvo) {
+            setEventData((prev) => ({
+              ...prev,
+              eventName: nomeSalvo,
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao buscar mesas:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, []);
 
   const colors =
     theme === "dark"
@@ -34,7 +69,7 @@ export default function AdmDash() {
   const stats = [
     {
       label: "Mesas",
-      value: eventData.tables.length,
+      value: mesas.length,
     },
     {
       label: "SmartCups",
@@ -49,6 +84,39 @@ export default function AdmDash() {
       value: eventData.waiters,
     },
   ];
+async function encerrarEvento() {
+  Alert.alert(
+    "Encerrar Evento",
+    "Deseja realmente encerrar este evento? Isso apagará as mesas atuais.",
+    [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Sim, Encerrar",
+        style: "destructive",
+        onPress: async () => {
+          try { 
+            setLoading(true); 
+
+            await AsyncStorage.setItem("@evento_encerrado", "true");
+
+            await api.post("/mesas/configurar-evento", {
+              qtd_mesas: 0,
+              qtd_zonas: 0
+            }).catch(() => console.log("Apenas limpando o banco local"));
+
+            await AsyncStorage.removeItem("@nome_evento");
+            
+            router.replace("/evento-config");
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      }
+    ]
+  );
+}
 
   return (
 
@@ -75,9 +143,7 @@ export default function AdmDash() {
         <View style={styles.titleConfig}>
 
           <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
+            style={styles.backButton}onPress={encerrarEvento}>
 
             <Image
               source={require("../../../assets/images/back.png")}
@@ -113,7 +179,7 @@ export default function AdmDash() {
               },
             ]}
           >
-            Evento: {eventData.eventName}
+            Evento: {eventData.eventName || "Carregando..."}
           </Text>
 
         </View>
@@ -213,57 +279,22 @@ export default function AdmDash() {
 
         </View>
 
-        <View style={styles.cardsContainer}>
-
-          {eventData.tables.map((table) => (
-
-            <View
-              key={table.id}
-              style={[
-                styles.card,
-                {
-                  backgroundColor:
-                    colors.card,
-                  borderColor:
-                    colors.primary,
-                },
-              ]}
-            >
-
-              <Text
-                style={[
-                  styles.cardTitle,
-                  {
-                    color:
-                      colors.text,
-                  },
-                ]}
-              >
-                Mesa {table.id}
-              </Text>
-
-              <Text
-                style={[
-                  styles.cardStatus,
-                  {
-                    color:
-                      table.status === "Livre"
-                        ? "#0fce52"
-                        : "#ff5252",
-                  },
-                ]}
-              >
-                {table.status}
-              </Text>
-
-            </View>
-
-          ))}
-
-        </View>
+       {loading ? (
+          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
+        ) : (
+          <View style={styles.cardsContainer}>
+            {mesas.map((table) => (
+              <View key={table.id} style={[styles.card, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+                <Text style={[styles.cardTitle, { color: colors.text }]}>{table.nome}</Text>
+                <Text style={[styles.cardStatus, { color: table.status === "Livre" || table.status === "Ativa" ? "#0fce52" : "#ff5252" }]}>
+                  {table.status}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
 
       </View>
-
     </ScrollView>
   );
 }

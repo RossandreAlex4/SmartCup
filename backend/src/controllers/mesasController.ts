@@ -76,4 +76,26 @@ export class MesaController {
         res.status(500).json({ sucesso: false, mensagem: error.message });
         }
     }
+
+    static async configurarEvento(req: Request, res: Response) {
+    try {
+        const { qtd_mesas, qtd_zonas } = req.body;
+
+        if (!qtd_mesas || !qtd_zonas) {
+            return res.status(400).json({ 
+                sucesso: false, 
+                mensagem: "Quantidade de mesas e zonas são obrigatórias" 
+            });
+        }
+
+        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas));
+
+        res.status(201).json({ 
+            sucesso: true, 
+            mensagem: "Evento configurado com sucesso" 
+        });
+    } catch (error: any) {
+        res.status(500).json({ sucesso: false, mensagem: error.message });
+    }
+}
 }
