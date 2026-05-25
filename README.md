@@ -80,4 +80,4 @@ O SmartCup utiliza sensores para coletar dados sobre o nível das bebidas. Essas
 
 👨‍💻 Autor
 
-Desenvolvido por SmartCup Team (João Pedro Batista Princisval, Rossandre Alex, Cassiano Ferreira)
+Desenvolvido por SmartCup Team (João Pedro Batista Princisval, Rossandre Alex, Cassiano Ferreira, Thiago Gonçalves)
