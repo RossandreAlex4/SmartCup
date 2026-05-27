@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const mensagem = error.response?.data?.mensagem;
-        throw new Error(mensagem || "Nao foi possivel conectar ao servidor.");
+        throw new Error(mensagem || "Não foi possível conectar ao servidor.");
       }
 
       throw error;

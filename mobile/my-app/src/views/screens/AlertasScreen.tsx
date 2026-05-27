@@ -68,7 +68,7 @@ export default function AlertasScreen() {
 
       Alert.alert(
         "Erro",
-        "Nao foi possivel carregar os alertas."
+        "Não foi possível carregar os alertas."
       );
 
     } finally {
@@ -111,7 +111,7 @@ export default function AlertasScreen() {
 
       Alert.alert(
         "Erro",
-        "Nao foi possivel resolver este alerta."
+        "Não foi possível resolver este alerta."
       );
 
     }

@@ -48,10 +48,10 @@ export default function QRCodeScannerScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.permissionText}>
-          Precisamos de acesso a camera para escanear o QR Code.
+          Precisamos de acesso a câmera para escanear o QR Code.
         </Text>
         <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-          <Text style={styles.permissionButtonText}>Permitir Camera</Text>
+          <Text style={styles.permissionButtonText}>Permitir câmera</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Text style={styles.backText}>Voltar</Text>
@@ -83,7 +83,7 @@ export default function QRCodeScannerScreen() {
         </View>
         <View style={styles.bottomOverlay}>
           <Text style={styles.instructionText}>
-            {loading ? "Verificando acesso..." : "Aponte a camera para o QR Code de acesso"}
+            {loading ? "Verificando acesso..." : "Aponte a câmera para o QR Code de acesso"}
           </Text>
           {loading && <ActivityIndicator size="small" color="#0fce52" style={{ marginTop: 12 }} />}
           <TouchableOpacity style={styles.cancelButton} onPress={() => router.back()}>

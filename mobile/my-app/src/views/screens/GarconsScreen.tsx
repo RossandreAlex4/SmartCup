@@ -73,7 +73,7 @@ export default function GarconsScreen() {
 
         Alert.alert(
           "Erro",
-          "Nao foi possivel carregar os garcons."
+          "Não foi possível carregar os garçons."
         );
 
       }
@@ -92,7 +92,7 @@ export default function GarconsScreen() {
 
       Alert.alert(
         "Erro",
-        "Digite o nome do garcom."
+        "Digite o nome do garçom."
       );
 
       return;
@@ -115,7 +115,7 @@ export default function GarconsScreen() {
       Alert.alert(
         "Erro",
         error.message ||
-          "Nao foi possivel criar o garcom."
+          "Não foi possível criar o garçom."
       );
 
     } finally {
@@ -131,8 +131,8 @@ export default function GarconsScreen() {
         await deleteGarcom(id);
         await buscarGarcons();
       } catch {
-        if (Platform.OS === "web") alert("Nao foi possivel remover o garcom.");
-        else Alert.alert("Erro", "Nao foi possivel remover o garcom.");
+        if (Platform.OS === "web") alert("Não foi possível remover o garçom.");
+        else Alert.alert("Erro", "Não foi possível remover o garçom.");
       }
     };
 
@@ -162,8 +162,8 @@ export default function GarconsScreen() {
       setQrCodeImage(qrcode);
       setQrCodeVisible(true);
     } catch {
-      if (Platform.OS === "web") alert("Nao foi possivel carregar o QR Code.");
-      else Alert.alert("Erro", "Nao foi possivel carregar o QR Code.");
+      if (Platform.OS === "web") alert("Não foi possível carregar o QR Code.");
+      else Alert.alert("Erro", "Não foi possível carregar o QR Code.");
     }
   }
  async function copiarLink(garcom: Garcom) {
@@ -173,7 +173,7 @@ export default function GarconsScreen() {
     if (Platform.OS === "web") {
       try {
         await navigator.clipboard.writeText(link);
-        alert(`Link de acesso de ${garcom.nome} copiado para a area de transferencia.`);
+        alert(`Link de acesso de ${garcom.nome} copiado para a área de transferência.`);
       } catch {
         alert("Erro ao copiar o link.");
       }

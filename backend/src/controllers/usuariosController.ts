@@ -54,7 +54,7 @@ export class UsuarioController {
       if (!nome) {
         return res.status(400).json({
           sucesso: false,
-          mensagem: "Nome e obrigatorio",
+          mensagem: "Nome é obrigatório",
         });
       }
 
@@ -98,7 +98,7 @@ export class UsuarioController {
       await UsuarioModel.deletarToken(Number(id));
       return res.json({
         sucesso: true,
-        mensagem: "Garcom removido",
+        mensagem: "Garçom removido",
       });
     } catch (error: any) {
       return res.status(500).json({
@@ -113,7 +113,7 @@ export class UsuarioController {
       await UsuarioModel.deletarTodosTokens();
       return res.json({
         sucesso: true,
-        mensagem: "Todos os garcons foram removidos",
+        mensagem: "Todos os garçons foram removidos",
       });
     } catch (error: any) {
       return res.status(500).json({
@@ -223,7 +223,7 @@ export class UsuarioController {
         </head>
         <body>
           <h1>Acesso do Garcom</h1>
-          <p>Ola, <strong>${garcom.nome}</strong>! Use uma das opcoes abaixo para acessar o app:</p>
+          <p>Ola, <strong>${garcom.nome}</strong>! Use uma das opções abaixo para acessar o app:</p>
           
           <div class="qr-container">
             <img src="${qrImage}" alt="QR Code" width="250" height="250">
