@@ -1,5 +1,5 @@
 import { useReducer, useState, useContext, useEffect } from "react";
-import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
+import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator } from "react-native";
 import CustomButton from "../components/customButton";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import { styles } from "../styles/EventoConfigScreenStyle";
@@ -108,6 +108,8 @@ export default function ConfigEvento() {
     setLogoutModalVisible,
   ] = useState(false);
 
+  const [checandoEvento, setChecandoEvento] = useState(true);
+
   useEffect(() => {
   async function verificarEventoAtivo() {
     try {
@@ -115,6 +117,7 @@ export default function ConfigEvento() {
       
       if (foiEncerrado === "true") {
         await AsyncStorage.removeItem("@evento_encerrado");
+        setChecandoEvento(false);
         return;
       }
 
@@ -132,6 +135,8 @@ export default function ConfigEvento() {
         });
         
         router.replace("/(tabs)/adm-dash");
+      } else {
+        setChecandoEvento(false); //
       }
     } catch (error) {
       console.log("Nenhum evento ativo ou erro ao conectar:", error);
@@ -235,6 +240,15 @@ export default function ConfigEvento() {
   } finally {
     setLoading(false);
   }
+}
+
+if (checandoEvento) {
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Text style={{ color: colors.text, marginTop: 10 }}>Sincronizando evento...</Text>
+    </View>
+  );
 }
   return (
 

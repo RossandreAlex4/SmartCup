@@ -3,9 +3,10 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { EventProvider } from "../src/context/EventContext";
 import { AuthProvider, AuthContext } from "../src/context/AuthContext";
 import { ThemeProvider, ThemeContext } from "../src/context/ThemeContext";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { darkTheme, lightTheme } from "../src/themes/colors";
 import * as Linking from "expo-linking";
+import {ActivityIndicator, View} from 'react-native';
 
 function DeepLinkHandler() {
 
@@ -52,7 +53,22 @@ function DeepLinkHandler() {
 
 function RootContent() {
   const { theme } = useContext(ThemeContext); 
+  const [appPronto, setAppPronto] = useState(false);
   const colors = theme === "dark" ? darkTheme : lightTheme;
+
+  useEffect(() => {
+    if (theme) {
+      setAppPronto(true);
+    }
+  }, [theme]);
+
+  if (!appPronto) {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#121212", justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#FF9000" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView
