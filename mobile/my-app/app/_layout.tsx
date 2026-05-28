@@ -2,8 +2,9 @@ import { Stack, router } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { EventProvider } from "../src/context/EventContext";
 import { AuthProvider, AuthContext } from "../src/context/AuthContext";
-import { ThemeProvider } from "../src/context/ThemeContext";
+import { ThemeProvider, ThemeContext } from "../src/context/ThemeContext";
 import { useContext, useEffect } from "react";
+import { darkTheme, lightTheme } from "../src/themes/colors";
 import * as Linking from "expo-linking";
 
 function DeepLinkHandler() {
@@ -49,6 +50,34 @@ function DeepLinkHandler() {
   return null;
 }
 
+function RootContent() {
+  const { theme } = useContext(ThemeContext); 
+  const colors = theme === "dark" ? darkTheme : lightTheme;
+
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+      }}
+    >
+      <DeepLinkHandler />
+
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="evento-config" />
+        <Stack.Screen name="qrcode-scanner" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </SafeAreaView>
+  );
+}
+
 export default function RootLayout() {
 
   return (
@@ -61,40 +90,7 @@ export default function RootLayout() {
 
           <SafeAreaProvider>
 
-            <SafeAreaView
-              style={{
-                flex: 1,
-                backgroundColor: "#121212",
-              }}
-            >
-
-              <DeepLinkHandler />
-
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                }}
-              >
-
-                <Stack.Screen name="index" />
-
-                <Stack.Screen name="login" />
-
-                <Stack.Screen
-                  name="evento-config"
-                />
-
-                <Stack.Screen
-                  name="qrcode-scanner"
-                />
-
-                <Stack.Screen
-                  name="(tabs)"
-                />
-
-              </Stack>
-
-            </SafeAreaView>
+            <RootContent />
 
           </SafeAreaProvider>
 
