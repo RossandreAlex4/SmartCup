@@ -73,13 +73,30 @@ export class MesaModel {
                     if (error) return reject(error);
                 });
 
+                db.run("DELETE FROM alertas", (error) => {
+                if (error) console.log("Aviso ao limpar alertas:", error.message);
+            });
+
+            db.run("DELETE FROM smartcups", (error) => {
+                if (error) console.log("Aviso ao limpar smartcups:", error.message);
+            });
+
+                db.run("DELETE FROM tokens_acesso", (error) => {
+                if (error) return reject(error);
+            });
+
+            db.run("DELETE FROM sqlite_sequence WHERE name IN ('mesas', 'tokens_acesso', 'smartcups', 'alertas')", (error) => {
+                if (error) console.log("Aviso ao limpar sequencias:", error);
+            });
+
                 const stmt = db.prepare("INSERT INTO mesas (nome, zona, status) VALUES (?, ?, ?)");
                 
                 for (let i = 1; i <= qtdMesas; i++) {
                     const nomeMesa = `Mesa ${i < 10 ? '0' + i : i}`;
-                    const letras = ["A", "B", "C", "D", "E", "F"];
+                    const letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
                     const indiceZona = (i - 1) % qtdZonas;
-                    const nomeZona = `Zona ${letras[indiceZona] || indiceZona + 1}`;
+                    const nomeZona = `Zona ${letras[indiceZona] || "Extra"}`;
+                    
 
                     stmt.run(nomeMesa, nomeZona, "Ativa");
                 }
