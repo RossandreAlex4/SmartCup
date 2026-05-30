@@ -129,17 +129,21 @@ export default function ConfigEvento() {
         return;
       }
 
+      const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
       const response = await api.get("/mesas");
       const listaMesas = response.data?.mesas || response.data;
       
-      if (Array.isArray(listaMesas) && listaMesas.length > 0) {
-        const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
+      if (nomeSalvo && Array.isArray(listaMesas) && listaMesas.length > 0) {
+        const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
+        const gatilhoSalvo = await AsyncStorage.getItem("@gatilho_alerta");
+        const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
+
         setEventData({
-          eventName: nomeSalvo || "Evento Ativo",
+          eventName: nomeSalvo,
           tables: [],
-          volumeCopo: state.volumeCopo,
-          zones: state.zones,
-          gatilhoAlerta: state.gatilhoAlerta,
+          volumeCopo: volumeSalvo ? Number(volumeSalvo) : 0,
+          zones: zonasSalvas ? Number(zonasSalvas) : 0,
+          gatilhoAlerta: gatilhoSalvo ? Number(gatilhoSalvo) : 0,
         });
         
         router.replace("/(tabs)/adm-dash");
