@@ -79,16 +79,16 @@ export class MesaController {
 
     static async configurarEvento(req: Request, res: Response) {
     try {
-        const { qtd_mesas, qtd_zonas } = req.body;
+        const { qtd_mesas, qtd_zonas, volume_copo, gatilho_alerta, nome_evento } = req.body;
 
-        if (!qtd_mesas || !qtd_zonas) {
+        if (!qtd_mesas || !qtd_zonas || !volume_copo || !gatilho_alerta || !nome_evento) {
             return res.status(400).json({ 
                 sucesso: false, 
-                mensagem: "Quantidade de mesas e zonas são obrigatórias" 
+                mensagem: "Todos os campos são obrigatórios" 
             });
         }
 
-        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas));
+        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(volume_copo), Number(gatilho_alerta), nome_evento);
 
         res.status(201).json({ 
             sucesso: true, 

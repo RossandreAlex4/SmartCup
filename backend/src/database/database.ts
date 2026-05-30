@@ -75,4 +75,14 @@ db.serialize(() => {
     )
   `);
   console.log("Tabelas criadas");
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS configuracoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_evento TEXT,
+    volume_copo INTEGER,
+    gatilho_alerta INTEGER
+  )
+`);
+
 });

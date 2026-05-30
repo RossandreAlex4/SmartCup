@@ -67,7 +67,7 @@ export class MesaModel {
         );
         });
     }
-    static configurarEvento(qtdMesas: number, qtdZonas: number): Promise<boolean> {
+    static configurarEvento(qtdMesas: number, qtdZonas: number, volumeCopo: number, gatilhoAlerta: number, nomeEvento: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.run("DELETE FROM mesas", (error) => {
@@ -86,9 +86,17 @@ export class MesaModel {
                 if (error) return reject(error);
             });
 
-            db.run("DELETE FROM sqlite_sequence WHERE name IN ('mesas', 'tokens_acesso', 'smartcups', 'alertas')", (error) => {
+            db.run("DELETE FROM sqlite_sequence WHERE name IN ('mesas', 'tokens_acesso', 'smartcups', 'alertas', 'configuracoes')", (error) => {
                 if (error) console.log("Aviso ao limpar sequencias:", error);
             });
+
+            db.run(
+                    "INSERT INTO configuracoes (nome_evento, volume_copo, gatilho_alerta) VALUES (?, ?, ?)",
+                    [nomeEvento, volumeCopo, gatilhoAlerta],
+                    (error) => {
+                        if (error) return reject(error);
+                    }
+                );
 
             const inserirMesa = (nome: string, zona: string, status: string): Promise<number> => {
                     return new Promise((resolve, reject) => {

@@ -237,10 +237,14 @@ export default function ConfigEvento() {
       qtd_mesas: state.tables,
       qtd_zonas: state.zones,
       volume_copo: state.volumeCopo,
-      gatilho_alerta: state.gatilhoAlerta
+      gatilho_alerta: state.gatilhoAlerta,
+      nome_evento: eventName,
     });
 
     await AsyncStorage.setItem("@nome_evento", eventName)
+    await AsyncStorage.setItem("@volume_copo", String(state.volumeCopo));
+    await AsyncStorage.setItem("@gatilho_alerta", String(state.gatilhoAlerta));
+    await AsyncStorage.setItem("@qtd_zonas", String(state.zones));
 
     setEventData({
       eventName,

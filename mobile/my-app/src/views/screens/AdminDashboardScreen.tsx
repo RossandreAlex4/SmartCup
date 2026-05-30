@@ -9,6 +9,7 @@ import { api } from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 
+
 type Mesa = {
   id: number;
   nome: string;
@@ -27,7 +28,7 @@ const [modalVisivel, setModalVisivel] = useState(false);
   const {theme,toggleTheme,
   } = useContext(ThemeContext);
 
-  useEffect(() => {
+ useEffect(() => {
     async function carregarDados() {
       try {
         setLoading(true);
@@ -39,14 +40,19 @@ const [modalVisivel, setModalVisivel] = useState(false);
           setMesas(response.data);
         }
 
-        if (!eventData.eventName) {
-          const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
-          if (nomeSalvo) {
-            setEventData((prev) => ({
-              ...prev,
-              eventName: nomeSalvo,
-            }));
-          }
+        const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
+        const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
+        const gatilhoSalvo = await AsyncStorage.getItem("@gatilho_alerta");
+        const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
+
+        if (nomeSalvo) {
+          setEventData({
+            eventName: nomeSalvo,
+            tables: [],
+            volumeCopo: volumeSalvo ? Number(volumeSalvo) : 0,
+            gatilhoAlerta: gatilhoSalvo ? Number(gatilhoSalvo) : 0,
+            zones: zonasSalvas ? Number(zonasSalvas) : 0,
+          });
         }
       } catch (error) {
         console.error("Erro ao buscar mesas:", error);
@@ -93,6 +99,10 @@ async function encerrarEvento() {
       }).catch(() => console.log("Apenas limpando o banco local"));
 
       await AsyncStorage.removeItem("@nome_evento");
+      await AsyncStorage.removeItem("@volume_copo");
+      await AsyncStorage.removeItem("@gatilho_alerta");
+      await AsyncStorage.removeItem("@qtd_zonas");
+
       router.replace("/evento-config");
     } catch (error) {
       console.error(error);
