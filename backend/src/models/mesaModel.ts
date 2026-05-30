@@ -1,4 +1,5 @@
 import { db } from "../database/database.js";
+import { SmartcupModel } from "./smartcupModel.js";
 
 export class MesaModel {
     static listar() {
@@ -89,23 +90,42 @@ export class MesaModel {
                 if (error) console.log("Aviso ao limpar sequencias:", error);
             });
 
-                const stmt = db.prepare("INSERT INTO mesas (nome, zona, status) VALUES (?, ?, ?)");
-                
+            const inserirMesa = (nome: string, zona: string, status: string): Promise<number> => {
+                    return new Promise((resolve, reject) => {
+                        db.run(
+                            "INSERT INTO mesas (nome, zona, status) VALUES (?, ?, ?)",
+                            [nome, zona, status],
+                            function (error) {
+                                if (error) return reject(error);
+                                resolve(this.lastID); 
+                            }
+                        );
+                    });
+                };
+
+            async function gerarEstruturaDoEvento() {
+                    try {
+                        const letras = [
+                            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
+                            "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
                 for (let i = 1; i <= qtdMesas; i++) {
                     const nomeMesa = `Mesa ${i < 10 ? '0' + i : i}`;
-                    const letras = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
                     const indiceZona = (i - 1) % qtdZonas;
                     const nomeZona = `Zona ${letras[indiceZona] || "Extra"}`;
+
+                    const novaMesaId = await inserirMesa(nomeMesa, nomeZona, "Ativa");
+                    await SmartcupModel.criarCoposDaMesa(novaMesaId, i);
+                    }
                     
-
-                    stmt.run(nomeMesa, nomeZona, "Ativa");
+                    resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
                 }
-
-                stmt.finalize((error) => {
-                    if (error) reject(error);
-                    else resolve(true);
-                });
+                gerarEstruturaDoEvento();
             });
         });
     }
 }
+              

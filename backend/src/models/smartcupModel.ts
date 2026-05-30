@@ -177,4 +177,26 @@ export class SmartcupModel {
         });
 
     }
+
+    static criarCoposDaMesa(mesaId: number, numeroMesa: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const stmtCup = db.prepare(
+                "INSERT INTO smartcups (identificador, mesa_id, status, peso_atual, ultima_comunicacao) VALUES (?, ?, ?, ?, ?)"
+            );
+
+            const prefixoMesa = numeroMesa < 10 ? `0${numeroMesa}` : numeroMesa;
+            const dataAtual = new Date().toISOString();
+
+            for (let j = 1; j <= 4; j++) {
+                const identificador = `SC-${prefixoMesa}-${j}`;
+                stmtCup.run(identificador, mesaId, "ativo", 0, dataAtual);
+            }
+
+            stmtCup.finalize((error) => {
+                if (error) return reject(error);
+                resolve();
+            });
+        });
+    }
+
 }
