@@ -102,6 +102,7 @@ export class MesaModel {
                         );
                     });
                 };
+            
 
             async function gerarEstruturaDoEvento() {
                     try {
@@ -109,9 +110,11 @@ export class MesaModel {
                             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
                             "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
+                const mesasPorZona = Math.ceil(qtdMesas / qtdZonas)
+
                 for (let i = 1; i <= qtdMesas; i++) {
                     const nomeMesa = `Mesa ${i < 10 ? '0' + i : i}`;
-                    const indiceZona = (i - 1) % qtdZonas;
+                    const indiceZona = Math.floor((i - 1) / mesasPorZona) % qtdZonas;
                     const nomeZona = `Zona ${letras[indiceZona] || "Extra"}`;
 
                     const novaMesaId = await inserirMesa(nomeMesa, nomeZona, "Ativa");

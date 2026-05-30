@@ -1,5 +1,5 @@
 import { useReducer, useState, useContext, useEffect } from "react";
-import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator, Platform } from "react-native";
 import CustomButton from "../components/customButton";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import { styles } from "../styles/EventoConfigScreenStyle";
@@ -18,9 +18,9 @@ import { api } from "../../services/api";
 
 type State = {
   tables: number;
-  smartCups: number;
+  volumeCopo: number;
   zones: number;
-  waiters: number;
+  gatilhoAlerta: number;
 };
 
 type Action =
@@ -35,34 +35,42 @@ type Action =
 
 const initialState: State = {
   tables: 0,
-  smartCups: 0,
+  volumeCopo: 0,
   zones: 0,
-  waiters: 0,
+  gatilhoAlerta: 0,
 };
 
-function reducer(
-  state: State,
-  action: Action
-): State {
+function reducer(state: State,action: Action): State {
+    let passo = 1;
+  if (action.field === "volumeCopo") passo = 50;
+  if (action.field === "gatilhoAlerta") passo = 5;
 
   switch (action.type) {
 
     case "INCREMENT":
 
+    if (action.field === "gatilhoAlerta" && state.gatilhoAlerta >= 40) {
+        return state;
+      }
+
+    if (action.field === "volumeCopo" && state.volumeCopo >= 950) {
+        return state;
+      }
+
       return {
         ...state,
         [action.field]:
-          state[action.field] + 1,
+          state[action.field] + passo,
       };
 
     case "DECREMENT":
+      const valorMinimo = action.field === "volumeCopo" || action.field === "gatilhoAlerta" ? passo : 0;
 
       return {
         ...state,
-        [action.field]:
-          state[action.field] > 0
-            ? state[action.field] - 1
-            : 0,
+        [action.field]: state[action.field] > valorMinimo
+          ? state[action.field] - passo
+          : valorMinimo,
       };
 
     default:
@@ -129,14 +137,14 @@ export default function ConfigEvento() {
         setEventData({
           eventName: nomeSalvo || "Evento Ativo",
           tables: [],
-          smartCups: state.smartCups,
+          volumeCopo: state.volumeCopo,
           zones: state.zones,
-          waiters: state.waiters,
+          gatilhoAlerta: state.gatilhoAlerta,
         });
         
         router.replace("/(tabs)/adm-dash");
       } else {
-        setChecandoEvento(false); //
+        setChecandoEvento(false); 
       }
     } catch (error) {
       console.log("Nenhum evento ativo ou erro ao conectar:", error);
@@ -167,26 +175,26 @@ export default function ConfigEvento() {
   const cards = [
     {
       title: "Mesas",
-      value: state.tables,
+      value: `${state.tables}`,
       field: "tables",
     },
 
     {
-      title: "SmartCups",
-      value: state.smartCups,
-      field: "smartCups",
+      title: "Volume do copo (ml)",
+      value: `${state.volumeCopo} ml`,
+      field: "volumeCopo",
     },
 
     {
       title: "Zonas",
-      value: state.zones,
+      value: `${state.zones}`,
       field: "zones",
     },
 
     {
-      title: "Garçons por zona",
-      value: state.waiters,
-      field: "waiters",
+      title: "Gatilho de alerta",
+      value: `${state.gatilhoAlerta}%`,
+      field: "gatilhoAlerta",
     },
   ];
 
@@ -206,19 +214,30 @@ export default function ConfigEvento() {
       return;
     }
 
+    if (state.tables === 0 || state.volumeCopo === 0 || state.zones === 0 || state.gatilhoAlerta === 0) {
+      const mensagemErro = "Por favor, configure todos os campos do evento antes de continuar.";
+      
+      if (Platform.OS === "web") {
+        window.alert(mensagemErro);
+      } else {
+        Alert.alert("Erro", mensagemErro);
+      }
+      return;
+    }
+
     setEventNameError("");
 
     try {
 
       setLoading(true);
 
-      await api.delete(
-        "/usuarios/garcons"
-      );
+      await api.delete("/usuarios/garcons").catch(() => console.log("Sem garçons para limpar"));
 
       await api.post("/mesas/configurar-evento", {
       qtd_mesas: state.tables,
-      qtd_zonas: state.zones
+      qtd_zonas: state.zones,
+      volume_copo: state.volumeCopo,
+      gatilho_alerta: state.gatilhoAlerta
     });
 
     await AsyncStorage.setItem("@nome_evento", eventName)
@@ -226,9 +245,9 @@ export default function ConfigEvento() {
     setEventData({
       eventName,
       tables: [], 
-      smartCups: state.smartCups,
+      volumeCopo: state.volumeCopo,
       zones: state.zones,
-      waiters: state.waiters,
+      gatilhoAlerta: state.gatilhoAlerta,
     });
 
     Alert.alert("Sucesso", "O evento e as mesas foram gerados no banco!");

@@ -1,15 +1,13 @@
-import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Platform } from "react-native";
 import { styles } from "../styles/AdminDashboardScreenStyles";
 import { router } from "expo-router";
 import { useContext,useState, useEffect } from "react";
 import { EventContext } from "../../context/EventContext";
 import { ThemeContext } from "../../context/ThemeContext";
-import {
-  darkTheme,
-  lightTheme,
-} from "../../themes/colors";
+import {darkTheme,lightTheme,} from "../../themes/colors";
 import { api } from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 
 type Mesa = {
   id: number;
@@ -23,11 +21,10 @@ export default function AdmDash() {
 const [mesas, setMesas] = useState<Mesa[]>([]);
 const [loading, setLoading] = useState(true);
 const { eventData, setEventData } = useContext(EventContext);
+const [modalVisivel, setModalVisivel] = useState(false);
 
 
-  const {
-    theme,
-    toggleTheme,
+  const {theme,toggleTheme,
   } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -72,54 +69,40 @@ const { eventData, setEventData } = useContext(EventContext);
       value: mesas.length,
     },
     {
-      label: "SmartCups",
-      value: eventData.smartCups,
+      label: "Volume do copo",
+      value: eventData.volumeCopo ? `${eventData.volumeCopo} ml` : "Não configurado"
     },
     {
       label: "Zonas",
       value: eventData.zones,
     },
     {
-      label: "Garçons",
-      value: eventData.waiters,
+      label: "Gatilho de alerta",
+      value: eventData.gatilhoAlerta ? `${eventData.gatilhoAlerta}%` : "Não configurado"
     },
   ];
 async function encerrarEvento() {
-  Alert.alert(
-    "Encerrar Evento",
-    "Deseja realmente encerrar este evento? Isso apagará as mesas atuais.",
-    [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Sim, Encerrar",
-        style: "destructive",
-        onPress: async () => {
-          try { 
-            setLoading(true); 
+  try {
+      setModalVisivel(false);
+      setLoading(true); 
+      await AsyncStorage.setItem("@evento_encerrado", "true");
 
-            await AsyncStorage.setItem("@evento_encerrado", "true");
+      await api.post("/mesas/configurar-evento", {
+        qtd_mesas: 0,
+        qtd_zonas: 0
+      }).catch(() => console.log("Apenas limpando o banco local"));
 
-            await api.post("/mesas/configurar-evento", {
-              qtd_mesas: 0,
-              qtd_zonas: 0
-            }).catch(() => console.log("Apenas limpando o banco local"));
-
-            await AsyncStorage.removeItem("@nome_evento");
-            
-            router.replace("/evento-config");
-          } catch (error) {
-            console.error(error);
-          } finally {
-            setLoading(false);
-          }
-        }
-      }
-    ]
-  );
-}
+      await AsyncStorage.removeItem("@nome_evento");
+      router.replace("/evento-config");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-
+    <>
     <ScrollView
       contentContainerStyle={{
         flexGrow: 1,
@@ -143,7 +126,25 @@ async function encerrarEvento() {
         <View style={styles.titleConfig}>
 
           <TouchableOpacity
-            style={styles.backButton}onPress={encerrarEvento}>
+            style={styles.backButton}
+            onPress={() => {
+              if (Platform.OS === "web") {
+      const confirmar = window.confirm("Deseja mesmo encerrar o evento?");
+      if (confirmar) encerrarEvento();
+    } else {
+      Alert.alert(
+        "Encerrar Evento",
+        "Deseja mesmo encerrar o evento?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Encerrar", onPress: encerrarEvento }
+        ]
+      );
+    }
+  }}
+>
+            
+              
 
             <Image
               source={require("../../../assets/images/back.png")}
@@ -296,5 +297,15 @@ async function encerrarEvento() {
 
       </View>
     </ScrollView>
+  {}
+    <ConfirmLogoutModal 
+      visible={modalVisivel}
+      colors={colors}
+      onCancel={() => setModalVisivel(false)}
+       onConfirm={encerrarEvento}
+    />
+  </> 
   );
 }
+    
+

@@ -72,21 +72,23 @@ export const styles = StyleSheet.create({
   },
   
   statsCard: {
-    width: 70,
-    height: 70,
+    width: 95,
+    height: 80,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 4
   },
   
   value: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
   },
   
   label: {
     fontSize: 11,
     marginTop: 4,
+    textAlign: "center",
   },
 
   cardsContainer: {
