@@ -154,8 +154,6 @@ async function encerrarEvento() {
   }}
 >
             
-              
-
             <Image
               source={require("../../../assets/images/back.png")}
               style={[
@@ -166,7 +164,6 @@ async function encerrarEvento() {
                 },
               ]}
             />
-
           </TouchableOpacity>
 
           <Text
@@ -289,21 +286,30 @@ async function encerrarEvento() {
           </Text>
 
         </View>
-
-       {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
-        ) : (
-          <View style={styles.cardsContainer}>
-            {mesas.map((table) => (
-              <View key={table.id} style={[styles.card, { backgroundColor: colors.card, borderColor: colors.primary }]}>
-                <Text style={[styles.cardTitle, { color: colors.text }]}>{table.nome}</Text>
-                <Text style={[styles.cardStatus, { color: table.status === "Livre" || table.status === "Ativa" ? "#0fce52" : "#ff5252" }]}>
-                  {table.status}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
+         {loading ? (
+            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
+          ) : (
+            <View style={styles.cardsContainer}>
+              {mesas.map((table) => (
+                <TouchableOpacity 
+                  key={table.id} 
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    router.push({
+                      pathname: "/mesaDetalhes",
+                      params: { id: table.id }
+                    });
+                  }}
+                  style={[styles.card, { backgroundColor: colors.card, borderColor: colors.primary }]}
+                >
+                  <Text style={[styles.cardTitle, { color: colors.text }]}>{table.nome}</Text>
+                  <Text style={[styles.cardStatus, { color: table.status === "Livre" || table.status === "Ativa" ? "#0fce52" : "#ff5252" }]}>
+                    {table.status}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
       </View>
     </ScrollView>
