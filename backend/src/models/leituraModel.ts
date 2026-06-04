@@ -86,4 +86,23 @@ export class LeituraModel {
             );
         });
     }
+    static async deletarTodas() {
+        return new Promise((resolve, reject) => {
+        db.run("DELETE FROM leituras", (error) => {
+            if (error) {
+            reject(error);
+            return;
+            }
+
+            db.run("DELETE FROM sqlite_sequence WHERE name='leituras'", (error) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve(true);
+            });
+        });
+        });
+    }
 }

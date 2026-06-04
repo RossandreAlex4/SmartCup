@@ -154,4 +154,20 @@ export class LeituraController {
             });
         }
     }
+    static async deletarTodas(req: Request, res: Response) {
+    try {
+        await LeituraModel.deletarTodas();
+
+        res.status(200).json({
+        sucesso: true,
+        mensagem: "Todas as leituras foram removidas."
+        });
+
+    } catch (error: any) {
+        res.status(500).json({
+        sucesso: false,
+        mensagem: error.message
+        });
+    }
+}
 }

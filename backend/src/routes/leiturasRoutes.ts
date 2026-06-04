@@ -8,5 +8,6 @@ router.get("/smartcup/:smartcupId", LeituraController.obterPorSmartcup);
 router.get("/:id", LeituraController.obterPorId);
 router.get("/", LeituraController.listar);
 router.post("/", LeituraController.criar);
+router.delete("/", LeituraController.deletarTodas);
 
 export default router;
