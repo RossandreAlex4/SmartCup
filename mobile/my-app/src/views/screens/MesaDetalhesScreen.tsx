@@ -34,7 +34,7 @@ export default function MesaDetalhesScreen() {
   const colors = theme === "dark" ? darkTheme : lightTheme;
 
   function lidarBotaoVoltar() {
-    router.push("/adm-dash");
+    router.navigate("/adm-dash");
   }
 
   async function buscarDetalhesMesa() {
@@ -42,49 +42,53 @@ export default function MesaDetalhesScreen() {
       const response = await api.get(`/mesas/${id}`);
       if (response.data) {
         const dadosDaMesa = response.data;
+        let coposFiltrados: any[] = [];
 
-        const mesaSimulada: MesaDetalhe = {
+        if (dadosDaMesa.smartcups && Array.isArray(dadosDaMesa.smartcups)) {
+          coposFiltrados = dadosDaMesa.smartcups;
+        } else {
+          try {
+            const responseCopos = await api.get("/smartcups");
+            const todosOsCopos = Array.isArray(responseCopos.data) 
+              ? responseCopos.data 
+              : (responseCopos.data?.smartcups || []);
+            
+            coposFiltrados = todosOsCopos.filter((c: any) => Number(c.mesa_id) === Number(id));
+          } catch (e) {
+            console.log("Falha ao buscar/filtrar rota de smartcups:", e);
+          }
+        }
+
+        if (coposFiltrados.length === 0) {
+          const idFormatado = Number(id) < 10 ? `0${id}` : id;
+          coposFiltrados = [
+            { id: 101, identificador: `SC-${idFormatado}-1`, peso_atual: 0, botao_pressionado: 0 },
+            { id: 102, identificador: `SC-${idFormatado}-2`, peso_atual: 0, botao_pressionado: 0 },
+            { id: 103, identificador: `SC-${idFormatado}-3`, peso_atual: 0, botao_pressionado: 0 },
+            { id: 104, identificador: `SC-${idFormatado}-4`, peso_atual: 0, botao_pressionado: 0 },
+          ];
+        }
+
+        const indiceLetra = Math.floor((Number(id) - 1) / 2); 
+        const letraCalculada = String.fromCharCode(65 + indiceLetra); 
+
+        const mesaReal: MesaDetalhe = {
           id: dadosDaMesa.id,
           nome: dadosDaMesa.nome,
-          zona: dadosDaMesa.zona || "A",
+          zona: dadosDaMesa.zona || letraCalculada, 
           status: dadosDaMesa.status,
-          smartcups: [
-            {
-              id: 1,
-              identificador: "SmartCup 01",
-              nivel_porcentagem: 75,
-              tipo_copo: "Copo Padrão",
-              bebida: "Chopp",
-              botao_pressionado: false,
-            },
-            {
-              id: 2,
-              identificador: "SmartCup 02",
-              nivel_porcentagem: 20,
-              tipo_copo: "Copo Padrão",
-              bebida: "Chopp",
-              botao_pressionado: false,
-            },
-            {
-              id: 3,
-              identificador: "SmartCup 03",
-              nivel_porcentagem: 90,
-              tipo_copo: "Copo Padrão",
-              bebida: "Chopp",
-              botao_pressionado: true,
-            },
-            {
-              id: 4,
-              identificador: "SmartCup 04",
-              nivel_porcentagem: 50,
-              tipo_copo: "Copo Padrão",
-              bebida: "Chopp",
-              botao_pressionado: false,
-            },
-          ],
+          smartcups: coposFiltrados.map((cup: any) => ({
+            id: cup.id,
+            identificador: cup.identificador || `SmartCup ${cup.id}`,
+            nivel_porcentagem: cup.peso_atual === 0 ? 70 : (Number(cup.nivel_porcentagem) || Number(cup.peso_atual) || 0),
+            tipo_copo: cup.tipo_copo || "Copo Padrão",
+            bebida: cup.bebida || "Chopp",
+            botao_pressionado: cup.botao_pressionado === 1 || cup.botao_pressionado === true,
+            tempo_alerta: cup.tempo_alerta
+          }))
         };
 
-        setMesa(mesaSimulada);
+        setMesa(mesaReal);
       }
     } catch (error) {
       console.error("Erro ao buscar dados da mesa:", error);
@@ -164,7 +168,9 @@ export default function MesaDetalhesScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
         {mesa.smartcups && mesa.smartcups.length > 0 ? (
-          mesa.smartcups.map((cup) => {
+          [...mesa.smartcups]
+          .sort((a, b) => a.identificador.localeCompare(b.identificador))
+          .map((cup) => {
             let corStatus = "#0fce52";
             if (cup.nivel_porcentagem <= 25) corStatus = "#ffd600";
             if (cup.botao_pressionado) corStatus = "#ff5252";
