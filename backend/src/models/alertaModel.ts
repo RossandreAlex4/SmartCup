@@ -38,20 +38,22 @@ export class AlertaModel {
     });
   }
 
-  static criar(mesaId: number, tipo: string) {
+  static criar(mesaId: number, smartcupId: number, tipo: string) {
     return new Promise((resolve, reject) => {
       const data = new Date().toISOString();
+
       db.run(
-        "INSERT INTO alertas (mesa_id, tipo, data) VALUES (?, ?, ?)",
-        [mesaId, tipo, data],
+        "INSERT INTO alertas (mesa_id, smartcup_id, tipo, data) VALUES (?, ?, ?, ?)",
+        [mesaId, smartcupId, tipo, data],
         function (error) {
           if (error) {
             reject(error);
             return;
           }
+
           resolve(this.lastID);
         }
       );
     });
-  }
+}
 }

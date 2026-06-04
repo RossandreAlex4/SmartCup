@@ -49,6 +49,8 @@ db.serialize(() => {
       smartcup_id INTEGER NOT NULL,
       mesa_id INTEGER NOT NULL,
       peso REAL NOT NULL,
+      porcentagem REAL NOT NULL,
+      status TEXT NOT NULL,
       data TEXT NOT NULL,
       FOREIGN KEY (smartcup_id) REFERENCES smartcups(id),
       FOREIGN KEY (mesa_id) REFERENCES mesas(id)

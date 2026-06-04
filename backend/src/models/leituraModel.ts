@@ -32,11 +32,18 @@ export class LeituraModel {
         });
     }
 
-    static criar(smartcupId: number, mesaId: number, peso: number, data: string) {
+    static criar(
+        smartcupId: number,
+        mesaId: number,
+        peso: number,
+        porcentagem: number,
+        status: string,
+        data: string
+        ) {
         return new Promise((resolve, reject) => {
             db.run(
-                "INSERT INTO leituras (smartcup_id, mesa_id, peso, data) VALUES (?, ?, ?, ?)",
-                [smartcupId, mesaId, peso, data],
+                "INSERT INTO leituras (smartcup_id, mesa_id, peso, porcentagem, status, data) VALUES (?, ?, ?, ?, ?, ?)",
+                [smartcupId, mesaId, peso, porcentagem, status, data],
                 function (error) {
                     if (error) {
                         return reject(error);

@@ -52,12 +52,12 @@ export class LeituraController {
 
     static async criar(req: Request, res: Response) {
         try {
-            const { smartcup_id, mesa_id, peso, data } = req.body;
+            const { smartcup_id, mesa_id, peso, porcentagem, status, data } = req.body;
 
-            if (!smartcup_id || !mesa_id || peso === undefined) {
+            if (!smartcup_id || !mesa_id || peso === undefined || porcentagem === undefined || status === undefined) {
                 return res.status(400).json({
                     sucesso: false,
-                    mensagem: "smartcup_id, mesa_id e peso são obrigatórios"
+                    mensagem: "smartcup_id, mesa_id, peso, porcentagem e status são obrigatórios"
                 });
             }
 
@@ -68,10 +68,27 @@ export class LeituraController {
                 });
             }
 
+            if (typeof porcentagem !== "number") {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: "A porcentagem deve ser um número"
+                });
+            }
+
+            if (typeof status !== "string") {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: "O status deve ser um texto"
+                });
+
+            }
+
             const leituraId = await LeituraModel.criar(
                 Number(smartcup_id),
                 Number(mesa_id),
                 peso,
+                porcentagem,
+                status,
                 data || new Date().toISOString()
             );
 

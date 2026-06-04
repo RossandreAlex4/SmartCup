@@ -23,14 +23,31 @@ export class AlertasController {
 
   static async criar(req: Request, res: Response) {
     try {
-      const { mesa_id, tipo } = req.body;
-      if (!mesa_id || !tipo) {
-        return res.status(400).json({ sucesso: false, mensagem: "mesa_id e tipo sao obrigatorios" });
+      const { mesa_id, smartcup_id, tipo } = req.body;
+
+      if (!mesa_id || !smartcup_id || !tipo) {
+        return res.status(400).json({
+          sucesso: false,
+          mensagem: "mesa_id, smartcup_id e tipo são obrigatórios"
+        });
       }
-      const alertaId = await AlertaModel.criar(Number(mesa_id), tipo);
-      return res.status(201).json({ sucesso: true, alertaId });
+
+      const alertaId = await AlertaModel.criar(
+        Number(mesa_id),
+        Number(smartcup_id),
+        tipo
+      );
+
+      return res.status(201).json({
+        sucesso: true,
+        mensagem: "Alerta cadastrado com sucesso",
+        alertaId
+      });
     } catch (error: any) {
-      return res.status(500).json({ sucesso: false, mensagem: error.message });
+      return res.status(500).json({
+        sucesso: false,
+        mensagem: error.message
+      });
     }
   }
 }
