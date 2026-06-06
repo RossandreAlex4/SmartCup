@@ -25,7 +25,7 @@ export default function QRCodeScannerScreen() {
 
       setLoading(true);
       await loginGarcom(parsed.token);
-      router.replace("/(tabs)/mesas-screen");
+      router.replace("/garcom-dash");
     } catch (error: any) {
       setLoading(false);
       Alert.alert(

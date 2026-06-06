@@ -143,7 +143,7 @@ export default function MesaDetalhesScreen() {
           <Text style={[styles.headerTitle, { color: colors.text }]}>{mesa.nome}</Text>
         </View>
         
-        <View style={[styles.badgeAlerta, { backgroundColor: mesa.status === "Alerta" ? "#2a1415" : "#142a15" }]}>
+        <View style={[styles.badgeAlerta, { backgroundColor: mesa.status === "Alerta" ? "#2a1415" : colors.card }]}>
           <Text style={[styles.badgeAlertaText, { color: mesa.status === "Alerta" ? "#ff5252" : "#0fce52" }]}>
             {mesa.status === "Alerta" ? "Alerta ativo" : "Normal"}
           </Text>

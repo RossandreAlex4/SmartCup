@@ -15,6 +15,10 @@ type Mesa = {
   nome: string;
   zona: string;
   status: string;
+
+  totalCopos?: number;
+  totalAlertas?: number;
+  percentualMedio?: number;
 };
 
 export default function AdmDash() {
@@ -34,10 +38,71 @@ const [modalVisivel, setModalVisivel] = useState(false);
         setLoading(true);
         
         const response = await api.get("/mesas");
+        let mesasApi = [];
+   
         if (response.data && response.data.mesas) {
-          setMesas(response.data.mesas);
+          mesasApi = response.data.mesas;
         } else if (Array.isArray(response.data)) {
-          setMesas(response.data);
+          mesasApi = response.data;
+        }
+        
+        try {
+          const responseCopos = await api.get("/smartcups");
+        
+          const smartcups = Array.isArray(responseCopos.data)
+            ? responseCopos.data
+            : responseCopos.data?.smartcups || [];
+        
+          const mesasComResumo = mesasApi.map((mesa: any) => {
+        
+            const coposMesa = smartcups.filter(
+              (cup: any) => Number(cup.mesa_id) === Number(mesa.id)
+            );
+        
+            const alertas = coposMesa.filter((cup: any) => {
+        
+              const nivel =
+                Number(cup.nivel_porcentagem) ||
+                Number(cup.peso_atual) ||
+                0;
+        
+              return (
+                cup.botao_pressionado === true ||
+                cup.botao_pressionado === 1 ||
+                nivel <= 25
+              );
+            });
+
+            const somaPercentuais = coposMesa.reduce(
+              (acc: number, cup: any) =>
+                acc +
+                (
+                  Number(cup.nivel_porcentagem) ||
+                  Number(cup.peso_atual) ||
+                  0
+                ),
+              0
+            );
+          
+            const percentualMedio =
+              coposMesa.length > 0
+                ? Math.round(
+                    somaPercentuais / coposMesa.length
+                  )
+                : 0;
+        
+            return {
+              ...mesa,
+              totalCopos: coposMesa.length,
+              totalAlertas: alertas.length,
+              percentualMedio,
+            };
+          });
+        
+          setMesas(mesasComResumo);
+        
+        } catch {
+          setMesas(mesasApi);
         }
 
         const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
@@ -302,10 +367,121 @@ async function encerrarEvento() {
                   }}
                   style={[styles.card, { backgroundColor: colors.card, borderColor: colors.primary }]}
                 >
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>{table.nome}</Text>
-                  <Text style={[styles.cardStatus, { color: table.status === "Livre" || table.status === "Ativa" ? "#0fce52" : "#ff5252" }]}>
-                    {table.status}
+                  <Text
+                    style={[
+                      styles.cardTitle,
+                      {
+                        color: colors.text,
+                      },
+                    ]}
+                  >
+                    {table.nome}
                   </Text>
+                  
+                  <View style={{ marginTop: 8 }}>
+                  
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <Image
+                        source={require("../../../assets/images/danger.png")}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          tintColor:
+                            (table.totalAlertas || 0) > 0
+                              ? "#ff5252"
+                              : "#0fce52",
+                        }}
+                      />
+                  
+                      <Text
+                        style={[
+                          styles.cardStatus,
+                          {
+                            color:
+                              (table.totalAlertas || 0) > 0
+                                ? "#ff5252"
+                                : "#0fce52",
+                            marginTop: 0,
+                          },
+                        ]}
+                      >
+                        {(table.totalAlertas || 0) > 0
+                          ? `${table.totalAlertas} alerta(s)`
+                          : "Normal"}
+                      </Text>
+                    </View>
+                  
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 6,
+                        marginTop: 6,
+                      }}
+                    >
+                      <Image
+                        source={require("../../../assets/images/glass.png")}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          tintColor: colors.secondaryText,
+                        }}
+                      />
+                  
+                      <Text
+                        style={{
+                          color: colors.secondaryText,
+                          fontSize: 12,
+                        }}
+                      >
+                        {table.totalCopos || 0} SmartCup(s)
+                      </Text>
+                    </View>
+                  
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 6,
+                        marginTop: 6,
+                      }}
+                    >
+                      <Image
+                        source={require("../../../assets/images/segmentation.png")}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          tintColor:
+                            (table.percentualMedio || 0) <= 25
+                              ? "#ff5252"
+                              : (table.percentualMedio || 0) <= 50
+                              ? "#ffd600"
+                              : "#0fce52",
+                        }}
+                      />
+                  
+                      <Text
+                        style={{
+                          color:
+                            (table.percentualMedio || 0) <= 25
+                              ? "#ff5252"
+                              : (table.percentualMedio || 0) <= 50
+                              ? "#ffd600"
+                              : "#0fce52",
+                          fontSize: 12,
+                          fontWeight: "600",
+                        }}
+                      >
+                        Média: {table.percentualMedio || 0}%
+                      </Text>
+                    </View>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>

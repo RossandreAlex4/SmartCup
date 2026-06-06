@@ -1,14 +1,420 @@
+// import { useState, useEffect, useContext } from "react";
+
+// import { styles } from "../styles/GarcomDashboardScreenStyle";
+
+// import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert,
+//   ActivityIndicator, Image } from "react-native";
+
+// import { Ionicons } from "@expo/vector-icons";
+
+// import { router } from "expo-router";
+
+// import {
+//   fetchAlertas,
+//   resolveAlerta,
+// } from "../../services/smartcupService";
+
+// import { AuthContext } from "../../context/AuthContext";
+
+// import { ThemeContext } from "../../context/ThemeContext";
+
+// import {
+//   darkTheme,
+//   lightTheme,
+// } from "../../themes/colors";
+
+// interface Alerta {
+//   id: number;
+//   tipo: string;
+//   mesa_nome: string;
+//   mesa_id: number;
+//   data: string;
+// }
+
+// export default function GarcomDashboardScreen() {
+
+//   const {
+//     user,
+//     logout,
+//   } = useContext(AuthContext);
+
+//   const {
+//     theme,
+//     toggleTheme,
+//   } = useContext(ThemeContext);
+
+//   const colors =
+//     theme === "dark"
+//       ? darkTheme
+//       : lightTheme;
+
+//   const [alertas, setAlertas] =
+//     useState<Alerta[]>([]);
+
+//   const [loading, setLoading] =
+//     useState(true);
+
+//   async function carregarAlertas() {
+
+//     try {
+
+//       const alertasData =
+//         await fetchAlertas();
+
+//       setAlertas(alertasData);
+
+//     } catch {
+
+//       Alert.alert(
+//         "Erro",
+//         "Nao foi possivel carregar os alertas."
+//       );
+
+//     } finally {
+
+//       setLoading(false);
+
+//     }
+//   }
+
+//   useEffect(() => {
+
+//     carregarAlertas();
+
+//     const interval =
+//       setInterval(
+//         carregarAlertas,
+//         10000
+//       );
+
+//     return () =>
+//       clearInterval(interval);
+
+//   }, []);
+
+//   async function resolverAlerta(
+//     id: number
+//   ) {
+
+//     try {
+
+//       await resolveAlerta(id);
+
+//       setAlertas((prev) =>
+//         prev.filter(
+//           (a) => a.id !== id
+//         )
+//       );
+
+//     } catch {
+
+//       Alert.alert(
+//         "Erro",
+//         "Nao foi possivel resolver o alerta."
+//       );
+
+//     }
+//   }
+
+//   async function handleLogout() {
+
+//     Alert.alert(
+//       "Sair",
+//       "Deseja encerrar seu turno?",
+//       [
+//         {
+//           text: "Cancelar",
+//           style: "cancel",
+//         },
+
+//         {
+//           text: "Sair",
+
+//           onPress: async () => {
+
+//             await logout();
+
+//             router.replace("/login");
+
+//           },
+//         },
+//       ]
+//     );
+//   }
+
+//   const renderAlerta = ({
+//     item,
+//   }: {
+//     item: Alerta;
+//   }) => (
+
+//     <View
+//       style={[
+//         styles.card,
+//         {
+//           backgroundColor:
+//             colors.card,
+
+//           borderColor:
+//             colors.primary,
+//         },
+//       ]}
+//     >
+
+//       <View style={styles.cardLeft}>
+
+//         <View
+//           style={[
+//             styles.alertDot,
+//             {
+//               backgroundColor:
+//                 colors.primary,
+//             },
+//           ]}
+//         />
+
+//         <View>
+
+//           <Text
+//             style={[
+//               styles.cardTitle,
+//               {
+//                 color:
+//                   colors.text,
+//               },
+//             ]}
+//           >
+//             {item.tipo}
+//           </Text>
+
+//           <Text
+//             style={[
+//               styles.cardSub,
+//               {
+//                 color:
+//                   colors.secondaryText,
+//               },
+//             ]}
+//           >
+//             {item.mesa_nome ||
+//               `Mesa ${item.mesa_id}`}
+//           </Text>
+
+//         </View>
+
+//       </View>
+
+//       <TouchableOpacity
+//         style={styles.checkButton}
+//         onPress={() =>
+//           resolverAlerta(item.id)
+//         }
+//       >
+
+//         <Ionicons
+//           name="checkmark-circle"
+//           size={32}
+//           color={colors.primary}
+//         />
+
+//       </TouchableOpacity>
+
+//     </View>
+//   );
+
+//   return (
+
+//     <View
+//       style={[
+//         styles.container,
+//         {
+//           backgroundColor:
+//             colors.background,
+//         },
+//       ]}
+//     >
+
+      
+//      <View style={styles.header}>
+
+//   <View>
+
+//     <Text
+//       style={[
+//         styles.greeting,
+//         {
+//           color: colors.text,
+//         },
+//       ]}
+//     >
+//       Ola, {user?.nome}
+//     </Text>
+
+//     <Text
+//       style={[
+//         styles.role,
+//         {
+//           color: colors.primary,
+//         },
+//       ]}
+//     >
+//       Garcom
+//     </Text>
+
+//   </View>
+
+//   <View style={styles.headerActions}>
+
+//     <TouchableOpacity
+//       onPress={toggleTheme}
+//       style={styles.themeButton}
+//     >
+//       <Image
+//         source={require("../../../assets/images/themes.png")}
+//         style={{
+//           width: 26,
+//           height: 26,
+//           tintColor: colors.primary,
+//         }}
+//       />
+//     </TouchableOpacity>
+
+//     <TouchableOpacity
+//       style={[
+//         styles.logoutButton,
+//         {
+//           backgroundColor: colors.card,
+//           borderColor: colors.primary,
+//         },
+//       ]}
+//       onPress={handleLogout}
+//     >
+//       <Ionicons
+//         name="log-out-outline"
+//         size={22}
+//         color="#ce2a0f"
+//       />
+//     </TouchableOpacity>
+
+//   </View>
+
+// </View>
+
+//       <View
+//         style={[
+//           styles.divider,
+//           {
+//             backgroundColor:
+//               colors.primary,
+//           },
+//         ]}
+//       />
+
+//       <Text
+//         style={[
+//           styles.sectionTitle,
+//           {
+//             color:
+//               colors.secondaryText,
+//           },
+//         ]}
+//       >
+//         Alertas Pendentes
+//       </Text>
+
+//       {loading ? (
+
+//         <ActivityIndicator
+//           size="large"
+//           color={colors.primary}
+//           style={{
+//             marginTop: 40,
+//           }}
+//         />
+
+//       ) : (
+
+//         <FlatList
+//           data={alertas}
+//           renderItem={renderAlerta}
+//           keyExtractor={(item) =>
+//             item.id.toString()
+//           }
+//           contentContainerStyle={{
+//             paddingBottom: 30,
+//           }}
+//           onRefresh={
+//             carregarAlertas
+//           }
+//           refreshing={loading}
+//           ListEmptyComponent={
+
+//             <View
+//               style={
+//                 styles.emptyContainer
+//               }
+//             >
+
+//               <Ionicons
+//                 name="checkmark-circle-outline"
+//                 size={60}
+//                 color={colors.primary}
+//               />
+
+//               <Text
+//                 style={[
+//                   styles.emptyText,
+//                   {
+//                     color:
+//                       colors.secondaryText,
+//                   },
+//                 ]}
+//               >
+//                 Sem alertas pendentes
+//               </Text>
+
+//             </View>
+
+//           }
+//         />
+
+//       )}
+
+//     </View>
+//   );
+// }
+
 import { useState, useEffect, useContext } from "react";
 
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+} from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 
 import { router } from "expo-router";
 
-import { fetchAlertas, resolveAlerta } from "../../services/smartcupService";
+import {
+  fetchAlertas,
+  resolveAlerta,
+} from "../../services/smartcupService";
 
 import { AuthContext } from "../../context/AuthContext";
+
+import { ThemeContext } from "../../context/ThemeContext";
+
+import {
+  darkTheme,
+  lightTheme,
+} from "../../themes/colors";
 
 interface Alerta {
   id: number;
@@ -19,190 +425,570 @@ interface Alerta {
 }
 
 export default function GarcomDashboardScreen() {
-  const { user, logout } = useContext(AuthContext);
-  const [alertas, setAlertas] = useState<Alerta[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const { user, logout } =
+    useContext(AuthContext);
+
+  const { theme, toggleTheme } =
+    useContext(ThemeContext);
+
+  const colors =
+    theme === "dark"
+      ? darkTheme
+      : lightTheme;
+
+  const [alertas, setAlertas] =
+    useState<Alerta[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
 
   async function carregarAlertas() {
+
     try {
-      const alertasData = await fetchAlertas();
+
+      const alertasData =
+        await fetchAlertas();
+
       setAlertas(alertasData);
+
     } catch {
-      Alert.alert("Erro", "Nao foi possivel carregar os alertas.");
+
+      Alert.alert(
+        "Erro",
+        "Nao foi possivel carregar os alertas."
+      );
+
     } finally {
+
       setLoading(false);
+
     }
   }
 
   useEffect(() => {
+
     carregarAlertas();
-    const interval = setInterval(carregarAlertas, 10000);
-    return () => clearInterval(interval);
+
+    const interval =
+      setInterval(
+        carregarAlertas,
+        10000
+      );
+
+    return () =>
+      clearInterval(interval);
+
   }, []);
 
-  async function resolverAlerta(id: number) {
+  async function resolverAlerta(
+    id: number
+  ) {
+
     try {
+
       await resolveAlerta(id);
-      setAlertas((prev) => prev.filter((a) => a.id !== id));
+
+      setAlertas(prev =>
+        prev.filter(
+          alerta =>
+            alerta.id !== id
+        )
+      );
+
     } catch {
-      Alert.alert("Erro", "Nao foi possivel resolver o alerta.");
+
+      Alert.alert(
+        "Erro",
+        "Nao foi possivel resolver o alerta."
+      );
+
     }
   }
 
   async function handleLogout() {
-    Alert.alert("Sair", "Deseja encerrar seu turno?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Sair",
-        onPress: async () => {
-          await logout();
-          router.replace("/login");
+
+    Alert.alert(
+      "Sair",
+      "Deseja encerrar seu turno?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
         },
-      },
-    ]);
+        {
+          text: "Sair",
+          onPress: async () => {
+
+            await logout();
+
+            router.replace("/login");
+
+          },
+        },
+      ]
+    );
   }
 
-  const renderAlerta = ({ item }: { item: Alerta }) => (
-    <View style={styles.card}>
-      <View style={styles.cardLeft}>
-        <View style={styles.alertDot} />
+  const stats = [
+    {
+      label: "Alertas",
+      value: alertas.length,
+    },
+    {
+      label: "Pendentes",
+      value: alertas.length,
+    },
+    {
+      label: "Status",
+      value: "Online",
+    },
+    {
+      label: "Turno",
+      value: "Ativo",
+    },
+  ];
+
+  const renderAlerta = ({
+    item,
+  }: {
+    item: Alerta;
+  }) => (
+
+    <View
+      style={[
+        styles.alertCard,
+        {
+          backgroundColor:
+            colors.card,
+          borderColor:
+            colors.primary,
+        },
+      ]}
+    >
+
+      <View
+        style={styles.alertLeft}
+      >
+
+        <View
+          style={[
+            styles.alertDot,
+            {
+              backgroundColor:
+                colors.primary,
+            },
+          ]}
+        />
+
         <View>
-          <Text style={styles.cardTitle}>{item.tipo}</Text>
-          <Text style={styles.cardSub}>{item.mesa_nome || `Mesa ${item.mesa_id}`}</Text>
+
+          <Text
+            style={[
+              styles.alertTitle,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
+            {item.tipo}
+          </Text>
+
+          <Text
+            style={[
+              styles.alertSub,
+              {
+                color:
+                  colors.secondaryText,
+              },
+            ]}
+          >
+            {item.mesa_nome ||
+              `Mesa ${item.mesa_id}`}
+          </Text>
+
         </View>
+
       </View>
-      <TouchableOpacity style={styles.checkButton} onPress={() => resolverAlerta(item.id)}>
-        <Ionicons name="checkmark-circle" size={32} color="#0fce52" />
+
+      <TouchableOpacity
+        onPress={() =>
+          resolverAlerta(item.id)
+        }
+      >
+
+        <Ionicons
+          name="checkmark-circle"
+          size={32}
+          color={colors.primary}
+        />
+
       </TouchableOpacity>
+
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Ola, {user?.nome}</Text>
-          <Text style={styles.role}>Garcom</Text>
+
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+      }}
+      style={{
+        backgroundColor:
+          colors.background,
+      }}
+    >
+
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor:
+              colors.background,
+          },
+        ]}
+      >
+
+        <View
+          style={styles.titleConfig}
+        >
+
+          <Text
+            style={[
+              styles.title,
+              {
+                color:
+                  colors.text,
+              },
+            ]}
+          >
+            Dashboard
+          </Text>
+
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                color:
+                  colors.secondaryText,
+              },
+            ]}
+          >
+            Olá, {user?.nome}
+          </Text>
+
         </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={22} color="#ce2a0f" />
-        </TouchableOpacity>
+
+        <View
+          style={
+            styles.headerActions
+          }
+        >
+
+          <TouchableOpacity
+            onPress={toggleTheme}
+            style={
+              styles.themeButton
+            }
+          >
+
+            <Image
+              source={require("../../../assets/images/themes.png")}
+              style={{
+                width: 28,
+                height: 28,
+                tintColor:
+                  colors.primary,
+              }}
+            />
+
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.logoutButton,
+              {
+                backgroundColor:
+                  colors.card,
+                borderColor:
+                  colors.primary,
+              },
+            ]}
+            onPress={handleLogout}
+          >
+
+            <Ionicons
+              name="log-out-outline"
+              size={22}
+              color="#ce2a0f"
+            />
+
+          </TouchableOpacity>
+
+        </View>
+
+        <View
+          style={[
+            styles.line,
+            {
+              backgroundColor:
+                colors.primary,
+            },
+          ]}
+        />
+
+        <View
+          style={
+            styles.statsContainer
+          }
+        >
+
+          {stats.map(item => (
+
+            <View
+              key={item.label}
+              style={[
+                styles.statsCard,
+                {
+                  backgroundColor:
+                    colors.card,
+                  borderColor:
+                    colors.primary,
+                },
+              ]}
+            >
+
+              <Text
+                style={[
+                  styles.value,
+                  {
+                    color:
+                      colors.primary,
+                  },
+                ]}
+              >
+                {item.value}
+              </Text>
+
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color:
+                      colors.text,
+                  },
+                ]}
+              >
+                {item.label}
+              </Text>
+
+            </View>
+
+          ))}
+
+        </View>
+
+        <Text
+          style={[
+            styles.overview,
+            {
+              color:
+                colors.text,
+            },
+          ]}
+        >
+          Visão geral dos alertas
+        </Text>
+
+        {loading ? (
+
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={{
+              marginTop: 30,
+            }}
+          />
+
+        ) : (
+
+          <FlatList
+            scrollEnabled={false}
+            data={alertas}
+            renderItem={renderAlerta}
+            keyExtractor={(item) =>
+              item.id.toString()
+            }
+            contentContainerStyle={{
+              paddingBottom: 30,
+            }}
+            ListEmptyComponent={
+
+              <View
+                style={
+                  styles.emptyContainer
+                }
+              >
+
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={60}
+                  color={colors.primary}
+                />
+
+                <Text
+                  style={[
+                    styles.emptyText,
+                    {
+                      color:
+                        colors.secondaryText,
+                    },
+                  ]}
+                >
+                  Sem alertas pendentes
+                </Text>
+
+              </View>
+
+            }
+          />
+
+        )}
+
       </View>
 
-      <View style={styles.divider} />
-
-      <Text style={styles.sectionTitle}>Alertas Pendentes</Text>
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#0fce52" style={{ marginTop: 40 }} />
-      ) : (
-        <FlatList
-          data={alertas}
-          renderItem={renderAlerta}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingBottom: 30 }}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="checkmark-circle-outline" size={60} color="#0fce52" />
-              <Text style={styles.emptyText}>Sem alertas pendentes</Text>
-            </View>
-          }
-          onRefresh={carregarAlertas}
-          refreshing={loading}
-        />
-      )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    backgroundColor: "#121212",
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 20,
   },
-  greeting: {
-    color: "white",
-    fontSize: 20,
+
+  titleConfig: {
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
+  },
+
+  title: {
+    fontSize: 22,
     fontWeight: "700",
   },
-  role: {
-    color: "#0fce52",
-    fontSize: 13,
-    marginTop: 2,
+
+  subtitle: {
+    marginTop: 6,
+    fontSize: 15,
   },
+
+  headerActions: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "center",
+  },
+
+  themeButton: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   logoutButton: {
     padding: 8,
-    backgroundColor: "#2a1414",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#3a1a1a",
   },
-  divider: {
+
+  line: {
     height: 1,
-    backgroundColor: "#0eb348",
-    marginVertical: 14,
     width: "50%",
-    alignSelf: "center",
+    marginVertical: 18,
     borderRadius: 100,
   },
-  sectionTitle: {
-    color: "#aaa",
-    fontSize: 13,
-    marginBottom: 14,
-    textTransform: "uppercase",
-    letterSpacing: 1,
+
+  statsContainer: {
+    width: "92%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
-  card: {
-    backgroundColor: "#1e1e1e",
+
+  statsCard: {
+    flex: 1,
+    height: 90,
+    marginHorizontal: 4,
+    borderRadius: 16,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  value: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  label: {
+    marginTop: 4,
+    fontSize: 11,
+    textAlign: "center",
+  },
+
+  overview: {
+    width: "90%",
+    fontSize: 16,
+    marginBottom: 15,
+  },
+
+  alertCard: {
+    width: "100%",
+    borderWidth: 1,
     borderRadius: 14,
     padding: 16,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#2e2e2e",
   },
-  cardLeft: {
+
+  alertLeft: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     flex: 1,
   },
+
   alertDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#ffa500",
   },
-  cardTitle: {
-    color: "white",
+
+  alertTitle: {
     fontSize: 15,
     fontWeight: "600",
-    textTransform: "capitalize",
   },
-  cardSub: {
-    color: "#888",
+
+  alertSub: {
     fontSize: 13,
     marginTop: 2,
   },
-  checkButton: {
-    padding: 4,
-  },
+
   emptyContainer: {
     alignItems: "center",
-    marginTop: 60,
+    marginTop: 50,
   },
+
   emptyText: {
-    color: "#555",
+    marginTop: 10,
     fontSize: 16,
-    marginTop: 14,
   },
+
 });

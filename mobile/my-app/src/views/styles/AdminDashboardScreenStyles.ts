@@ -64,20 +64,20 @@ export const styles = StyleSheet.create({
   },
 
   statsContainer: {
-    width: "100%",
+    width: "90%",
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    margin: 10
-    
+    marginVertical: 10,
+   
   },
   
   statsCard: {
-    width: 95,
+    flex: 1,
+    marginHorizontal: 4,
     height: 80,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 4
+    
   },
   
   value: {
