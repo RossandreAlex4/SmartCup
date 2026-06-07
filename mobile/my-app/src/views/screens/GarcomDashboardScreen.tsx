@@ -1,420 +1,13 @@
-// import { useState, useEffect, useContext } from "react";
-
-// import { styles } from "../styles/GarcomDashboardScreenStyle";
-
-// import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert,
-//   ActivityIndicator, Image } from "react-native";
-
-// import { Ionicons } from "@expo/vector-icons";
-
-// import { router } from "expo-router";
-
-// import {
-//   fetchAlertas,
-//   resolveAlerta,
-// } from "../../services/smartcupService";
-
-// import { AuthContext } from "../../context/AuthContext";
-
-// import { ThemeContext } from "../../context/ThemeContext";
-
-// import {
-//   darkTheme,
-//   lightTheme,
-// } from "../../themes/colors";
-
-// interface Alerta {
-//   id: number;
-//   tipo: string;
-//   mesa_nome: string;
-//   mesa_id: number;
-//   data: string;
-// }
-
-// export default function GarcomDashboardScreen() {
-
-//   const {
-//     user,
-//     logout,
-//   } = useContext(AuthContext);
-
-//   const {
-//     theme,
-//     toggleTheme,
-//   } = useContext(ThemeContext);
-
-//   const colors =
-//     theme === "dark"
-//       ? darkTheme
-//       : lightTheme;
-
-//   const [alertas, setAlertas] =
-//     useState<Alerta[]>([]);
-
-//   const [loading, setLoading] =
-//     useState(true);
-
-//   async function carregarAlertas() {
-
-//     try {
-
-//       const alertasData =
-//         await fetchAlertas();
-
-//       setAlertas(alertasData);
-
-//     } catch {
-
-//       Alert.alert(
-//         "Erro",
-//         "Nao foi possivel carregar os alertas."
-//       );
-
-//     } finally {
-
-//       setLoading(false);
-
-//     }
-//   }
-
-//   useEffect(() => {
-
-//     carregarAlertas();
-
-//     const interval =
-//       setInterval(
-//         carregarAlertas,
-//         10000
-//       );
-
-//     return () =>
-//       clearInterval(interval);
-
-//   }, []);
-
-//   async function resolverAlerta(
-//     id: number
-//   ) {
-
-//     try {
-
-//       await resolveAlerta(id);
-
-//       setAlertas((prev) =>
-//         prev.filter(
-//           (a) => a.id !== id
-//         )
-//       );
-
-//     } catch {
-
-//       Alert.alert(
-//         "Erro",
-//         "Nao foi possivel resolver o alerta."
-//       );
-
-//     }
-//   }
-
-//   async function handleLogout() {
-
-//     Alert.alert(
-//       "Sair",
-//       "Deseja encerrar seu turno?",
-//       [
-//         {
-//           text: "Cancelar",
-//           style: "cancel",
-//         },
-
-//         {
-//           text: "Sair",
-
-//           onPress: async () => {
-
-//             await logout();
-
-//             router.replace("/login");
-
-//           },
-//         },
-//       ]
-//     );
-//   }
-
-//   const renderAlerta = ({
-//     item,
-//   }: {
-//     item: Alerta;
-//   }) => (
-
-//     <View
-//       style={[
-//         styles.card,
-//         {
-//           backgroundColor:
-//             colors.card,
-
-//           borderColor:
-//             colors.primary,
-//         },
-//       ]}
-//     >
-
-//       <View style={styles.cardLeft}>
-
-//         <View
-//           style={[
-//             styles.alertDot,
-//             {
-//               backgroundColor:
-//                 colors.primary,
-//             },
-//           ]}
-//         />
-
-//         <View>
-
-//           <Text
-//             style={[
-//               styles.cardTitle,
-//               {
-//                 color:
-//                   colors.text,
-//               },
-//             ]}
-//           >
-//             {item.tipo}
-//           </Text>
-
-//           <Text
-//             style={[
-//               styles.cardSub,
-//               {
-//                 color:
-//                   colors.secondaryText,
-//               },
-//             ]}
-//           >
-//             {item.mesa_nome ||
-//               `Mesa ${item.mesa_id}`}
-//           </Text>
-
-//         </View>
-
-//       </View>
-
-//       <TouchableOpacity
-//         style={styles.checkButton}
-//         onPress={() =>
-//           resolverAlerta(item.id)
-//         }
-//       >
-
-//         <Ionicons
-//           name="checkmark-circle"
-//           size={32}
-//           color={colors.primary}
-//         />
-
-//       </TouchableOpacity>
-
-//     </View>
-//   );
-
-//   return (
-
-//     <View
-//       style={[
-//         styles.container,
-//         {
-//           backgroundColor:
-//             colors.background,
-//         },
-//       ]}
-//     >
-
-      
-//      <View style={styles.header}>
-
-//   <View>
-
-//     <Text
-//       style={[
-//         styles.greeting,
-//         {
-//           color: colors.text,
-//         },
-//       ]}
-//     >
-//       Ola, {user?.nome}
-//     </Text>
-
-//     <Text
-//       style={[
-//         styles.role,
-//         {
-//           color: colors.primary,
-//         },
-//       ]}
-//     >
-//       Garcom
-//     </Text>
-
-//   </View>
-
-//   <View style={styles.headerActions}>
-
-//     <TouchableOpacity
-//       onPress={toggleTheme}
-//       style={styles.themeButton}
-//     >
-//       <Image
-//         source={require("../../../assets/images/themes.png")}
-//         style={{
-//           width: 26,
-//           height: 26,
-//           tintColor: colors.primary,
-//         }}
-//       />
-//     </TouchableOpacity>
-
-//     <TouchableOpacity
-//       style={[
-//         styles.logoutButton,
-//         {
-//           backgroundColor: colors.card,
-//           borderColor: colors.primary,
-//         },
-//       ]}
-//       onPress={handleLogout}
-//     >
-//       <Ionicons
-//         name="log-out-outline"
-//         size={22}
-//         color="#ce2a0f"
-//       />
-//     </TouchableOpacity>
-
-//   </View>
-
-// </View>
-
-//       <View
-//         style={[
-//           styles.divider,
-//           {
-//             backgroundColor:
-//               colors.primary,
-//           },
-//         ]}
-//       />
-
-//       <Text
-//         style={[
-//           styles.sectionTitle,
-//           {
-//             color:
-//               colors.secondaryText,
-//           },
-//         ]}
-//       >
-//         Alertas Pendentes
-//       </Text>
-
-//       {loading ? (
-
-//         <ActivityIndicator
-//           size="large"
-//           color={colors.primary}
-//           style={{
-//             marginTop: 40,
-//           }}
-//         />
-
-//       ) : (
-
-//         <FlatList
-//           data={alertas}
-//           renderItem={renderAlerta}
-//           keyExtractor={(item) =>
-//             item.id.toString()
-//           }
-//           contentContainerStyle={{
-//             paddingBottom: 30,
-//           }}
-//           onRefresh={
-//             carregarAlertas
-//           }
-//           refreshing={loading}
-//           ListEmptyComponent={
-
-//             <View
-//               style={
-//                 styles.emptyContainer
-//               }
-//             >
-
-//               <Ionicons
-//                 name="checkmark-circle-outline"
-//                 size={60}
-//                 color={colors.primary}
-//               />
-
-//               <Text
-//                 style={[
-//                   styles.emptyText,
-//                   {
-//                     color:
-//                       colors.secondaryText,
-//                   },
-//                 ]}
-//               >
-//                 Sem alertas pendentes
-//               </Text>
-
-//             </View>
-
-//           }
-//         />
-
-//       )}
-
-//     </View>
-//   );
-// }
-
 import { useState, useEffect, useContext } from "react";
-
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Image,
-  ScrollView,
-} from "react-native";
-
+import { useBackHandlerModal } from "../../hooks/useBackHandlerModal";
+import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
+import {View,Text,StyleSheet,FlatList,TouchableOpacity,Alert,ActivityIndicator,Image,ScrollView,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
 import { router } from "expo-router";
-
-import {
-  fetchAlertas,
-  resolveAlerta,
-} from "../../services/smartcupService";
-
+import {fetchAlertas,resolveAlerta,} from "../../services/smartcupService";
 import { AuthContext } from "../../context/AuthContext";
-
 import { ThemeContext } from "../../context/ThemeContext";
-
-import {
-  darkTheme,
-  lightTheme,
-} from "../../themes/colors";
+import {darkTheme,lightTheme,} from "../../themes/colors";
 
 interface Alerta {
   id: number;
@@ -425,9 +18,11 @@ interface Alerta {
 }
 
 export default function GarcomDashboardScreen() {
-
+  
   const { user, logout } =
     useContext(AuthContext);
+const [modalVisivel, setModalVisivel] = useState(false)
+    useBackHandlerModal(() => setModalVisivel(true))
 
   const { theme, toggleTheme } =
     useContext(ThemeContext);
@@ -442,6 +37,7 @@ export default function GarcomDashboardScreen() {
 
   const [loading, setLoading] =
     useState(true);
+    
 
   async function carregarAlertas() {
 
@@ -506,30 +102,21 @@ export default function GarcomDashboardScreen() {
     }
   }
 
-  async function handleLogout() {
+  async function handleConfirmarSaidaGarcom() {
+    try {
+      setModalVisivel(false);
+      
+      router.replace("/login"); 
 
-    Alert.alert(
-      "Sair",
-      "Deseja encerrar seu turno?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Sair",
-          onPress: async () => {
+      setTimeout(async () => {
+        await logout();
+      }, 100);
 
-            await logout();
-
-            router.replace("/login");
-
-          },
-        },
-      ]
-    );
+    } catch {
+      Alert.alert("Erro", "Não foi possível encerrar o turno.");
+    }
   }
-
+  
   const stats = [
     {
       label: "Alertas",
@@ -716,7 +303,7 @@ export default function GarcomDashboardScreen() {
                   colors.primary,
               },
             ]}
-            onPress={handleLogout}
+            onPress={() => setModalVisivel(true)}
           >
 
             <Ionicons
@@ -858,7 +445,12 @@ export default function GarcomDashboardScreen() {
         )}
 
       </View>
-
+    <ConfirmLogoutModal 
+      visible={modalVisivel}
+      colors={colors}
+      onCancel={() => setModalVisivel(false)}
+      onConfirm={handleConfirmarSaidaGarcom}
+    />
     </ScrollView>
   );
 }

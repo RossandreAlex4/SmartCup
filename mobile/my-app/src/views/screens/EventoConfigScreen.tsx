@@ -1,5 +1,5 @@
-import { useReducer, useState, useContext, useEffect } from "react";
-import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator, Platform } from "react-native";
+import { useReducer, useState, useContext, useEffect, useCallback } from "react";
+import { Text, View, Image, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator, Platform, BackHandler } from "react-native";
 import CustomButton from "../components/customButton";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import { styles } from "../styles/EventoConfigScreenStyle";
@@ -8,6 +8,7 @@ import { EventContext } from "../../context/EventContext";
 import { AuthContext } from "../../context/AuthContext";
 import { ThemeContext } from "../../context/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "expo-router";
 
 import {
   darkTheme,
@@ -82,6 +83,19 @@ export default function ConfigEvento() {
 
   const { setEventData } =
     useContext(EventContext);
+
+  useFocusEffect(
+  useCallback(() => {
+    const onBackPress = () => {
+      voltarParaLogin(); 
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+    return () => subscription.remove();
+  }, [])
+);
 
   const { logout } =
     useContext(AuthContext);

@@ -9,6 +9,7 @@ import { api } from "../../services/api";
 import { AuthContext } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
+import { useBackHandlerModal } from "../../hooks/useBackHandlerModal";
 
 
 type Mesa = {
@@ -29,21 +30,9 @@ const [loading, setLoading] = useState(true);
 const { eventData, setEventData } = useContext(EventContext);
 const [modalVisivel, setModalVisivel] = useState(false);
 const {theme,toggleTheme,} = useContext(ThemeContext);
-const { user, loading: authLoading } = useContext(AuthContext);
+const { user, loading: authLoading, logout } = useContext(AuthContext);
+useBackHandlerModal(() => {setModalVisivel(true);});
 
-useEffect(() => {
-    if (!authLoading && user?.tipo === "garcom") {
-      router.replace("/(tabs)/mesas-screen");
-    }
-  }, [user, authLoading]);
-
-  if (authLoading || user?.tipo === "garcom") {
-    return (
-      <View style={{ flex: 1, backgroundColor: "#121212", justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#FF9000" />
-      </View>
-    );
-  }
 
  useEffect(() => {
     async function carregarDados() {
@@ -119,9 +108,17 @@ useEffect(() => {
         }
 
         const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
+
+        if (!nomeSalvo) {
+          router.replace("/evento-config");
+          return;
+        }
+
         const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
         const gatilhoSalvo = await AsyncStorage.getItem("@gatilho_alerta");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
+
+        
 
         if (nomeSalvo) {
           setEventData({
@@ -141,6 +138,22 @@ useEffect(() => {
 
     carregarDados();
   }, []);
+
+  useEffect(() => {
+    console.log("Estado atual do usuário:", user);
+    if (!authLoading && user?.tipo === "garcom") {
+      router.replace("/garcom-dash");
+    }
+  }, [user, authLoading]);
+
+  if (authLoading || user?.tipo === "garcom") {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#121212", justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#FF9000" />
+      </View>
+    );
+  }
+
 
   const colors =
     theme === "dark"
@@ -169,19 +182,20 @@ async function encerrarEvento() {
   try {
       setModalVisivel(false);
       setLoading(true); 
+
       await AsyncStorage.setItem("@evento_encerrado", "true");
-
-      await api.post("/mesas/configurar-evento", {
-        qtd_mesas: 0,
-        qtd_zonas: 0
-      }).catch(() => console.log("Apenas limpando o banco local"));
-
       await AsyncStorage.removeItem("@nome_evento");
       await AsyncStorage.removeItem("@volume_copo");
       await AsyncStorage.removeItem("@gatilho_alerta");
       await AsyncStorage.removeItem("@qtd_zonas");
 
-      router.replace("/evento-config");
+      await AsyncStorage.setItem("@evento_encerrado", "true");
+      await api.post("/mesas/configurar-evento", {qtd_mesas: 0,qtd_zonas: 0
+      }).catch(() => console.log("Apenas limpando o banco local"));
+
+      await logout();
+
+      router.replace("/login");
     } catch (error) {
       console.error(error);
     } finally {
@@ -220,14 +234,7 @@ async function encerrarEvento() {
       const confirmar = window.confirm("Deseja mesmo encerrar o evento?");
       if (confirmar) encerrarEvento();
     } else {
-      Alert.alert(
-        "Encerrar Evento",
-        "Deseja mesmo encerrar o evento?",
-        [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Encerrar", onPress: encerrarEvento }
-        ]
-      );
+     setModalVisivel(true)
     }
   }}
 >
