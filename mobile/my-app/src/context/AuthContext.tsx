@@ -9,6 +9,7 @@ export interface User {
   tipo: "admin" | "garcom";
   email?: string;
   token?: string;
+  zona?: string;
 }
 
 interface AuthContextType {

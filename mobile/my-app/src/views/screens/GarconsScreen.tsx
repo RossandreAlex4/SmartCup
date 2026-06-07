@@ -27,6 +27,7 @@ interface Garcom {
   nome: string;
   token: string;
   criado_em: string;
+  zona?: string;
 }
 
 export default function GarconsScreen() {
@@ -372,7 +373,7 @@ export default function GarconsScreen() {
             <View style={styles.cardInfo}>
               <Text style={[styles.cardName, { color: colors.text }]}>{garcom.nome}</Text>
               <Text style={[styles.cardDate, { color: colors.secondaryText }]}>
-                {new Date(garcom.criado_em).toLocaleDateString("pt-BR")}
+                {new Date(garcom.criado_em).toLocaleDateString("pt-BR")} | Zona: {garcom.zona || "Nenhuma"}
               </Text>
             </View>
 

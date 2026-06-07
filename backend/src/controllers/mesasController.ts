@@ -1,10 +1,15 @@
 import type { Request, Response } from "express";
 import { MesaModel } from "../models/mesaModel.js";
+import { ZonaService } from "../services/zonaService.js";
+import type { AuthenticatedRequest } from "../middlewares/authMiddleware.js";
 
 export class MesaController {
     static async listar(req: Request, res: Response) {
         try {
-        const mesas = await MesaModel.listar();
+        const usuario = (req as AuthenticatedRequest).usuario;
+        const zona = usuario && usuario.tipo === "garcom" ? (usuario.zona || "NENHUMA_ZONA") : undefined;
+
+        const mesas = await MesaModel.listar(zona);
         res.json({ sucesso: true, mesas });
         } catch (error: any) {
         res.status(500).json({ sucesso: false, mensagem: error.message });
@@ -14,10 +19,15 @@ export class MesaController {
     static async obterPorId(req: Request, res: Response) {
         try {
         const { id } = req.params;
-        const mesa = await MesaModel.buscarPorId(Number(id));
+        const mesa: any = await MesaModel.buscarPorId(Number(id));
 
         if (!mesa) {
             return res.status(404).json({ sucesso: false, mensagem: "Mesa não encontrada" });
+        }
+
+        const usuario = (req as AuthenticatedRequest).usuario;
+        if (usuario && usuario.tipo === "garcom" && usuario.zona && mesa.zona !== usuario.zona) {
+            return res.status(403).json({ sucesso: false, mensagem: "Acesso negado a mesas fora da sua zona" });
         }
 
         res.json({ sucesso: true, mesa });
@@ -89,6 +99,9 @@ export class MesaController {
         }
 
         await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(volume_copo), Number(gatilho_alerta), nome_evento);
+
+        // Reatribuir zonas após reconfigurar as mesas/zonas do evento
+        await ZonaService.atribuirZonasSequencialmente();
 
         res.status(201).json({ 
             sucesso: true, 

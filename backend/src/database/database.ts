@@ -73,9 +73,15 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       token TEXT UNIQUE NOT NULL,
       nome TEXT NOT NULL,
-      criado_em TEXT NOT NULL
+      criado_em TEXT NOT NULL,
+      zona TEXT
     )
   `);
+
+  db.run("ALTER TABLE tokens_acesso ADD COLUMN zona TEXT", (error) => {
+    // Ignorar erro caso a coluna já exista no banco SQLite atual
+  });
+
   console.log("Tabelas criadas");
 
 db.run(`

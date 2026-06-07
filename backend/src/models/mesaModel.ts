@@ -2,12 +2,16 @@ import { db } from "../database/database.js";
 import { SmartcupModel } from "./smartcupModel.js";
 
 export class MesaModel {
-    static listar() {
+    static listar(zona?: string) {
         return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM mesas", (error, rows) => {
-            if (error) reject(error);
-            resolve(rows);
-        });
+        db.all(
+            "SELECT * FROM mesas WHERE (? IS NULL OR zona = ?)",
+            [zona || null, zona || null],
+            (error, rows) => {
+                if (error) reject(error);
+                resolve(rows);
+            }
+        );
         });
     }
 

@@ -4,6 +4,7 @@ import crypto from "crypto";
 import * as QRCode from "qrcode";
 
 import { UsuarioModel } from "../models/usuariosModel.js";
+import { ZonaService } from "../services/zonaService.js";
 
 export class UsuarioController {
   static async login(req: Request, res: Response) {
@@ -61,6 +62,9 @@ export class UsuarioController {
       const token = "tkn_" + crypto.randomBytes(16).toString("hex");
       const id = await UsuarioModel.criarTokenGarcom(nome, token);
 
+      // Reatribuir zonas sequencialmente
+      await ZonaService.atribuirZonasSequencialmente();
+
       return res.status(201).json({
         sucesso: true,
         garcom: {
@@ -96,6 +100,10 @@ export class UsuarioController {
     try {
       const { id } = req.params;
       await UsuarioModel.deletarToken(Number(id));
+
+      // Reatribuir zonas sequencialmente
+      await ZonaService.atribuirZonasSequencialmente();
+
       return res.json({
         sucesso: true,
         mensagem: "Garçom removido",
@@ -111,6 +119,10 @@ export class UsuarioController {
   static async deletarTodosGarcons(req: Request, res: Response) {
     try {
       await UsuarioModel.deletarTodosTokens();
+
+      // Reatribuir zonas sequencialmente
+      await ZonaService.atribuirZonasSequencialmente();
+
       return res.json({
         sucesso: true,
         mensagem: "Todos os garçons foram removidos",
@@ -180,6 +192,7 @@ export class UsuarioController {
           nome: garcom.nome,
           tipo: "garcom",
           token: garcom.token,
+          zona: garcom.zona,
         },
       });
     } catch (error: any) {

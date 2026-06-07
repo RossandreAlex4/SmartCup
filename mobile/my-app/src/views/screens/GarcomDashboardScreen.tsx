@@ -128,12 +128,12 @@ export default function GarcomDashboardScreen() {
       value: alertas.length,
     },
     {
-      label: "Pendentes",
-      value: alertas.length,
-    },
-    {
       label: "Status",
       value: "Online",
+    },
+    {
+      label: "Zona",
+      value: user?.zona || "Nenhuma",
     },
     {
       label: "Turno",

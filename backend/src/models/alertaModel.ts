@@ -1,16 +1,17 @@
 import { db } from "../database/database.js";
 
 export class AlertaModel {
-  static listarAtivos() {
+  static listarAtivos(zona?: string) {
     return new Promise((resolve, reject) => {
       db.all(
         `
         SELECT a.id, a.tipo, a.resolvido, a.data, a.mesa_id, m.nome AS mesa_nome
         FROM alertas a
         LEFT JOIN mesas m ON a.mesa_id = m.id
-        WHERE a.resolvido = 0
+        WHERE a.resolvido = 0 AND (? IS NULL OR m.zona = ?)
         ORDER BY a.id DESC
         `,
+        [zona || null, zona || null],
         (error, rows) => {
           if (error) {
             reject(error);
