@@ -1,12 +1,9 @@
 import { Tabs } from "expo-router";
-
 import { Image } from "react-native";
-
 import { useContext } from "react";
-
 import { AuthContext } from "../../src/context/AuthContext";
-
 import { ThemeContext } from "../../src/context/ThemeContext";
+import { Redirect} from "expo-router"
 
 import {
   darkTheme,
@@ -17,6 +14,9 @@ export default function TabsLayout() {
 
   const { user } =
     useContext(AuthContext);
+if (!user) {
+    return <Redirect href="/login" />;
+  }
 
   const {
     theme,
@@ -31,7 +31,6 @@ export default function TabsLayout() {
     user?.tipo === "garcom";
 
   return (
-
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -106,7 +105,7 @@ export default function TabsLayout() {
         name="mesas-screen"
         options={{
           title: "Mesas",
-
+          href: isGarcom ? null : undefined,
           tabBarIcon: ({
             focused,
           }) => (
@@ -135,13 +134,34 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
+        name="garcom-mesas"
+        options={{
+          title: "Mesas",
+          href: isGarcom ? undefined : null,
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={require("../../assets/images/table.png")}
+              style={{
+                width: 24,
+                height: 24,
+                opacity: focused ? 1 : 0.5,
+                tintColor: focused ? colors.primary : colors.secondaryText,
+              }}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="alert"
         options={{
           title: "Alertas",
-
+          href: isGarcom ? null : undefined,
           tabBarIcon: ({
             focused,
           }) => (
+
+            
 
             <Image
               source={require("../../assets/images/bell.png")}
@@ -162,6 +182,25 @@ export default function TabsLayout() {
               }}
             />
 
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="garcom-dash"
+        options={{
+          title: "Alertas", 
+          href: isGarcom ? undefined : null,
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={require("../../assets/images/bell.png")}
+              style={{
+                width: 24,
+                height: 24,
+                opacity: focused ? 1 : 0.5,
+                tintColor: focused ? colors.primary : colors.secondaryText,
+              }}
+            />
           ),
         }}
       />

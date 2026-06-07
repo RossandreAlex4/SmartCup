@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext,useLayoutEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, useNavigation } from "expo-router";
 import { api } from "../../services/api";
 import { ThemeContext } from "../../context/ThemeContext";
 import { darkTheme, lightTheme } from "../../themes/colors";
 import { styles } from "../styles/MesaDetalhesStyles";
+import { Ionicons } from '@expo/vector-icons';
+import { AuthContext } from "@/src/context/AuthContext";
 
 type SmartCupData = {
   id: number;
@@ -29,13 +31,34 @@ export default function MesaDetalhesScreen() {
   const [mesa, setMesa] = useState<MesaDetalhe | null>(null);
   const [loading, setLoading] = useState(true);
   const [atendendo, setAtendendo] = useState(false);
-
+const { user } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const colors = theme === "dark" ? darkTheme : lightTheme;
+  const navigation = useNavigation();
 
   function lidarBotaoVoltar() {
-    router.navigate("/adm-dash");
+
+    if (!user) return;
+
+   if (user?.tipo === "garcom") {
+    router.replace("/(tabs)/garcom-mesas");
+  } else {
+    router.replace("/(tabs)/mesas-screen");
   }
+  }
+
+  useLayoutEffect(() => {
+  navigation.setOptions({
+    headerLeft: () => (
+      <TouchableOpacity 
+        onPress={() => lidarBotaoVoltar()}
+        style={{ marginLeft: 10 }}
+      >
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
+    ),
+  });
+}, [navigation, user]);
 
   async function buscarDetalhesMesa() {
     try {

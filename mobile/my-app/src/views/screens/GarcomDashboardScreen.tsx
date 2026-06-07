@@ -1,28 +1,11 @@
 import { useState, useEffect, useContext } from "react";
-
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Image,
-  ScrollView,
-} from "react-native";
-
+import { useBackHandlerModal } from "../../hooks/useBackHandlerModal";
+import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator, Image, ScrollView, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
 import { router } from "expo-router";
-
-import {
-  fetchAlertas,
-  resolveAlerta,
-} from "../../services/smartcupService";
-
+import { fetchAlertas, resolveAlerta, } from "../../services/smartcupService";
 import { AuthContext } from "../../context/AuthContext";
-
 import { ThemeContext } from "../../context/ThemeContext";
 
 import {
@@ -43,6 +26,8 @@ export default function GarcomDashboardScreen() {
 
   const { user, logout } =
     useContext(AuthContext);
+  const [modalVisivel, setModalVisivel] = useState(false)
+  useBackHandlerModal(() => setModalVisivel(true))
 
   const { theme, toggleTheme } =
     useContext(ThemeContext);
@@ -57,6 +42,7 @@ export default function GarcomDashboardScreen() {
 
   const [loading, setLoading] =
     useState(true);
+
 
   async function carregarAlertas() {
 
@@ -121,28 +107,19 @@ export default function GarcomDashboardScreen() {
     }
   }
 
-  async function handleLogout() {
+  async function handleConfirmarSaidaGarcom() {
+    try {
+      setModalVisivel(false);
 
-    Alert.alert(
-      "Sair",
-      "Deseja encerrar seu turno?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Sair",
-          onPress: async () => {
+      router.replace("/login");
 
-            await logout();
+      setTimeout(async () => {
+        await logout();
+      }, 100);
 
-            router.replace("/login");
-
-          },
-        },
-      ]
-    );
+    } catch {
+      Alert.alert("Erro", "Não foi possível encerrar o turno.");
+    }
   }
 
   const stats = [
@@ -331,7 +308,7 @@ export default function GarcomDashboardScreen() {
                   colors.primary,
               },
             ]}
-            onPress={handleLogout}
+            onPress={() => setModalVisivel(true)}
           >
 
             <Ionicons
@@ -473,7 +450,12 @@ export default function GarcomDashboardScreen() {
         )}
 
       </View>
-
+      <ConfirmLogoutModal
+        visible={modalVisivel}
+        colors={colors}
+        onCancel={() => setModalVisivel(false)}
+        onConfirm={handleConfirmarSaidaGarcom}
+      />
     </ScrollView>
   );
 }
