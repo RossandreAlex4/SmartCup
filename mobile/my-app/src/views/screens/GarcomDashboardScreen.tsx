@@ -29,6 +29,7 @@ import {
   darkTheme,
   lightTheme,
 } from "../../themes/colors";
+import { scale, verticalScale, scaleFont, isLargeScreen } from "../../themes/responsive";
 
 interface Alerta {
   id: number;
@@ -485,27 +486,27 @@ const styles = StyleSheet.create({
   },
 
   titleConfig: {
-    marginTop: 20,
+    marginTop: verticalScale(20),
     width: "100%",
     alignItems: "center",
   },
 
   title: {
-    fontSize: 22,
+    fontSize: scaleFont(22),
     fontWeight: "700",
   },
 
   subtitle: {
-    marginTop: 6,
-    fontSize: 15,
+    marginTop: verticalScale(6),
+    fontSize: scaleFont(15),
   },
 
   headerActions: {
     position: "absolute",
-    top: 20,
-    right: 20,
+    top: verticalScale(20),
+    right: scale(20),
     flexDirection: "row",
-    gap: 12,
+    gap: scale(12),
     alignItems: "center",
   },
 
@@ -515,58 +516,60 @@ const styles = StyleSheet.create({
   },
 
   logoutButton: {
-    padding: 8,
-    borderRadius: 10,
+    padding: scale(8),
+    borderRadius: scale(10),
     borderWidth: 1,
   },
 
   line: {
-    height: 1,
+    height: verticalScale(1),
     width: "50%",
-    marginVertical: 18,
-    borderRadius: 100,
+    marginVertical: verticalScale(18),
+    borderRadius: scale(100),
   },
 
   statsContainer: {
     width: "92%",
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
+    gap: scale(8),
   },
 
   statsCard: {
-    flex: 1,
-    height: 90,
-    marginHorizontal: 4,
-    borderRadius: 16,
+    width: isLargeScreen ? "23%" : "48%",
+    minHeight: verticalScale(80),
+    borderRadius: scale(16),
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: scale(6),
   },
 
   value: {
-    fontSize: 18,
+    fontSize: scaleFont(18),
     fontWeight: "700",
   },
 
   label: {
-    marginTop: 4,
-    fontSize: 11,
+    marginTop: verticalScale(4),
+    fontSize: scaleFont(11),
     textAlign: "center",
   },
 
   overview: {
     width: "90%",
-    fontSize: 16,
-    marginBottom: 15,
+    fontSize: scaleFont(16),
+    marginBottom: verticalScale(15),
   },
 
   alertCard: {
     width: "100%",
     borderWidth: 1,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 10,
+    borderRadius: scale(14),
+    padding: scale(16),
+    marginBottom: verticalScale(10),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -575,34 +578,34 @@ const styles = StyleSheet.create({
   alertLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: scale(12),
     flex: 1,
   },
 
   alertDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: scale(10),
+    height: scale(10),
+    borderRadius: scale(5),
   },
 
   alertTitle: {
-    fontSize: 15,
+    fontSize: scaleFont(15),
     fontWeight: "600",
   },
 
   alertSub: {
-    fontSize: 13,
-    marginTop: 2,
+    fontSize: scaleFont(13),
+    marginTop: verticalScale(2),
   },
 
   emptyContainer: {
     alignItems: "center",
-    marginTop: 50,
+    marginTop: verticalScale(50),
   },
 
   emptyText: {
-    marginTop: 10,
-    fontSize: 16,
+    marginTop: verticalScale(10),
+    fontSize: scaleFont(16),
   },
 
 });

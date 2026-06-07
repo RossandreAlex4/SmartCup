@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { scale, verticalScale, scaleFont } from "../../themes/responsive";
 
 export const styles = StyleSheet.create({
   container: {
@@ -8,85 +9,82 @@ export const styles = StyleSheet.create({
   },
 
   themeIcon:{
-    width: 29,
-    height: 29,
-    
+    width: scale(29),
+    height: scale(29),
   },
 
   titleConfig:{
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 19,
+    marginTop: verticalScale(19),
     width: '100%',
-    height: 44,
-    paddingHorizontal: 16,
+    minHeight: verticalScale(44),
+    paddingHorizontal: scale(16),
   },
 
   backButton: {
-    width: 44,
-    height: 44,
+    width: scale(44),
+    height: verticalScale(44),
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
   },
 
   title:{
-    fontSize: 20,
+    fontSize: scaleFont(20),
     flex: 1,
     textAlign: "center",
   },
 
   titleSpacer: {
-    width: 44,
-    height: 44,
+    width: scale(44),
+    height: verticalScale(44),
   },
 
   image:{
-    width:20,
-    height:20,
-    
+    width: scale(20),
+    height: scale(20),
   },
 
   line:{
-    height: 1,
-    marginVertical: 20,
+    height: verticalScale(1),
+    marginVertical: verticalScale(20),
     width: "50%",
     alignSelf: "center",
-    borderRadius: 100,
+    borderRadius: scale(100),
   },
 
   createContainer:{
     width: "90%",
-    marginTop: 4
+    marginTop: verticalScale(4)
   },
 
   createName:{
-    fontSize: 15,
+    fontSize: scaleFont(15),
     width: "65%",
-    
   },
 
   input: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     width: "100%"
   },
 
   inputContainer: {
     width: "100%",
-    height: 55,
-    borderRadius: 12,
+    height: verticalScale(55),
+    borderRadius: scale(12),
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
-    marginVertical: 15,
+    paddingHorizontal: scale(15),
+    marginVertical: verticalScale(15),
   },
 
   errorText: {
     color: "#ff5252",
-    fontSize: 14,
+    fontSize: scaleFont(14),
     fontWeight: "600",
-    marginTop: -8,
-    marginBottom: 12,
+    marginTop: verticalScale(-8),
+    marginBottom: verticalScale(12),
   },
 
   cardsContainer: {
@@ -98,40 +96,39 @@ export const styles = StyleSheet.create({
 
   card: {
     width: "42%",
-    height: 180,
-    borderRadius: 20,
-    marginBottom: 20,
-    padding: 20,
+    minHeight: verticalScale(180),
+    borderRadius: scale(20),
+    marginBottom: verticalScale(20),
+    padding: scale(20),
     justifyContent: "space-between",
     alignItems: "center",
   },
 
   cardTitle: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     textAlign: "center",
   },
 
   value: {
-    fontSize: 35,
+    fontSize: scaleFont(35),
     fontWeight: "bold",
   },
 
   buttonsContainer: {
     flexDirection: "row",
-    gap: 15,
+    gap: scale(15),
   },
 
   button: {
-    width: 45,
-    height: 45,
-    borderRadius: 12,
+    width: scale(45),
+    height: scale(45),
+    borderRadius: scale(12),
     justifyContent: "center",
     alignItems: "center",
   },
 
   buttonText: {
-    fontSize: 24,
+    fontSize: scaleFont(24),
     fontWeight: "bold",
   },
-
 });

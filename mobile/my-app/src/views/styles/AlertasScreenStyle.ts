@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { scale, verticalScale, scaleFont } from "../../themes/responsive";
 
 export const styles = StyleSheet.create({
 
@@ -7,68 +8,67 @@ export const styles = StyleSheet.create({
   },
 
   themeIcon:{
-    width: 29,
-    height: 29,
-    
+    width: scale(29),
+    height: scale(29),
   },
   
   titleConfig: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 19,
+    marginTop: verticalScale(19),
     position: "relative",
   },
 
   backButton: {
     position: "absolute",
-    left: 20,
+    left: scale(20),
   },
 
   backImage: {
-    width: 20,
-    height: 20,
+    width: scale(20),
+    height: scale(20),
     resizeMode: "contain",
   },
 
   title: {
-    fontSize: 22,
+    fontSize: scaleFont(22),
   },
 
   line:{
-    height: 1,
-    marginVertical: 10,
+    height: verticalScale(1),
+    marginVertical: verticalScale(10),
     width: "50%",
     alignSelf: "center",
-    borderRadius: 100,
+    borderRadius: scale(100),
   },
 
   listContent: {
-    padding: 16,
-    paddingBottom: 30,
+    padding: scale(16),
+    paddingBottom: verticalScale(30),
   },
 
   card: {
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 10,
+    borderRadius: scale(14),
+    padding: scale(16),
+    marginBottom: verticalScale(10),
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
   },
 
   indexCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: scale(36),
+    height: scale(36),
+    borderRadius: scale(18),
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 14,
+    marginRight: scale(14),
   },
 
   indexText: {
     fontWeight: "700",
-    fontSize: 13,
+    fontSize: scaleFont(13),
   },
 
   cardTextContainer: {
@@ -76,18 +76,18 @@ export const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    fontSize: 15,
+    fontSize: scaleFont(15),
     fontWeight: "600",
     textTransform:
       "capitalize",
   },
 
   cardSubtitle: {
-    fontSize: 13,
-    marginTop: 2,
+    fontSize: scaleFont(13),
+    marginTop: verticalScale(2),
   },
 
   checkButton: {
-    padding: 4,
+    padding: scale(4),
   },
 });

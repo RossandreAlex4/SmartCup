@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { scale, verticalScale, scaleFont } from "../../themes/responsive";
 
 export const styles = StyleSheet.create({
   container: {
@@ -8,33 +9,32 @@ export const styles = StyleSheet.create({
   },
 
   themeIcon:{
-    width: 35,
-    height: 35,
-    
+    width: scale(35),
+    height: scale(35),
   },
 
   title:{
-    fontSize: 45
+    fontSize: scaleFont(45)
   },
 
   image:{
-    width:300,
-    height:200,
+    width: scale(300),
+    height: verticalScale(200),
   },
 
   line:{
-    height: 1,
-    marginVertical: 20,
+    height: verticalScale(1),
+    marginVertical: verticalScale(20),
     width: "40%",
     alignSelf: "center",
-    borderRadius: 100,
+    borderRadius: scale(100),
   },
 
   subtitle:{
-    fontSize: 20,
+    fontSize: scaleFont(20),
     width: "65%",
     justifyContent: "center",
     textAlign: "center",
-    marginBottom: 10
+    marginBottom: verticalScale(10)
   }
 });

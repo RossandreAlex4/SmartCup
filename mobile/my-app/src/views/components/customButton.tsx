@@ -7,6 +7,7 @@ import {
   ViewStyle,
   StyleProp,
 } from "react-native";
+import { scale, verticalScale, scaleFont } from "../../themes/responsive";
 
 type CustomButtonProps = {
   title?: string;
@@ -33,15 +34,20 @@ export default function CustomButton({
   style,
   disabled = false,
 }: CustomButtonProps) {
+  const scaledWidth = typeof width === "number" ? scale(width) : width;
+  const scaledHeight = verticalScale(height);
+  const scaledBorderRadius = scale(borderRadius);
+  const scaledFontSize = scaleFont(fontSize);
+
   return (
     <TouchableOpacity
       style={[
         styles.button,
         {
           backgroundColor,
-          width,
-          height,
-          borderRadius,
+          width: scaledWidth,
+          height: scaledHeight,
+          borderRadius: scaledBorderRadius,
         },
         style,
         disabled && styles.disabled,
@@ -55,7 +61,7 @@ export default function CustomButton({
           styles.buttonText,
           {
             color: textColor,
-            fontSize,
+            fontSize: scaledFontSize,
           },
         ]}
       >

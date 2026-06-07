@@ -1,70 +1,67 @@
 import { StyleSheet } from 'react-native';
+import { scale, verticalScale, scaleFont } from "../../themes/responsive";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-
   },
 
   themeIcon:{
-    width: 29,
-    height: 29,
-    
+    width: scale(29),
+    height: scale(29),
   },
   
   titleConfig:{
     alignItems: "center",
-    marginTop: 19,
+    marginTop: verticalScale(19),
     width: '100%',
     justifyContent: "center"
-    
   },
 
   backButton: {
     position: "absolute",
-    left: 20,
+    left: scale(20),
   },
 
   title:{
-    fontSize: 20,
-
+    fontSize: scaleFont(20),
   },
 
   subtitle:{
-    fontSize: 15,
+    fontSize: scaleFont(15),
     width: "65%",
     justifyContent: "center",
     textAlign: "center",
-    marginTop: 5
+    marginTop: verticalScale(5)
   },
 
   image:{
-    width:20,
-    height:20,
+    width: scale(20),
+    height: scale(20),
   },
 
   line:{
-    height: 1,
-    marginVertical: 10,
+    height: verticalScale(1),
+    marginVertical: verticalScale(10),
     width: "50%",
     alignSelf: "center",
-    borderRadius: 100,
+    borderRadius: scale(100),
   },
 
   input: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     width: "100%"
   },
 
   inputContainer: {
     width: "100%",
-    height: 55,
-    borderRadius: 12,
+    height: verticalScale(55),
+    borderRadius: scale(12),
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
-    marginTop: 15,
+    paddingHorizontal: scale(15),
+    marginTop: verticalScale(15),
   },
 
   createContainer:{
@@ -76,53 +73,49 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
-    margin:20,
-   
+    margin: scale(20),
   },
 
   card: {
     width: "90%",
-    height: 100,
-    borderRadius: 20,
-    marginBottom: 10,
-    padding: 20,
+    minHeight: verticalScale(100),
+    borderRadius: scale(20),
+    marginBottom: verticalScale(10),
+    padding: scale(20),
     justifyContent: "space-evenly",
-    
   },
 
   cardTitle: {
     color: "white",
-    fontSize: 16,
-
+    fontSize: scaleFont(16),
   },
 
   cardEdit:{
-    width: 20,
-    height: 20,
+    width: scale(20),
+    height: scale(20),
     alignSelf: "flex-end"
   },
 
   cardStatusLine:{
     flexDirection: "row",
-    gap: 20,
-    marginTop: 10
+    gap: scale(20),
+    marginTop: verticalScale(10)
   },
 
   cardStatus: {
-    fontSize: 14,
+    fontSize: scaleFont(14),
   },
 
   button: {
-    width: 45,
-    height: 45,
-    borderRadius: 12,
+    width: scale(45),
+    height: scale(45),
+    borderRadius: scale(12),
     justifyContent: "center",
     alignItems: "center",
   },
 
   buttonText: {
-    fontSize: 24,
+    fontSize: scaleFont(24),
     fontWeight: "bold",
   },
-
 });

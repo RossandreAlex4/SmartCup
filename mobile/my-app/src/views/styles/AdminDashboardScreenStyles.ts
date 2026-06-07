@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { scale, verticalScale, scaleFont, isLargeScreen } from "../../themes/responsive";
 
 export const styles = StyleSheet.create({
   container: {
@@ -7,87 +8,85 @@ export const styles = StyleSheet.create({
   },
 
   themeIcon:{
-    width: 29,
-    height: 29,
-    
+    width: scale(29),
+    height: scale(29),
   },
 
   titleConfig:{
     alignItems: "center",
-    marginTop: 19,
+    marginTop: verticalScale(19),
     width: '100%',
     justifyContent: "center"
-    
   },
 
   backButton: {
     position: "absolute",
-    left: 20,
+    left: scale(20),
   },
 
   title:{
-    fontSize: 20,
-
+    fontSize: scaleFont(20),
   },
 
   subtitle:{
-    fontSize: 15,
+    fontSize: scaleFont(15),
     width: "65%",
     justifyContent: "center",
     textAlign: "center",
-    marginTop: 5
+    marginTop: verticalScale(5)
   },
 
   image:{
-    width:20,
-    height:20,
-    
+    width: scale(20),
+    height: scale(20),
   },
 
   line:{
-    height: 1,
-    marginVertical: 10,
+    height: verticalScale(1),
+    marginVertical: verticalScale(10),
     width: "50%",
     alignSelf: "center",
-    borderRadius: 100,
+    borderRadius: scale(100),
   },
 
   createContainer:{
     width: "90%",
-    marginTop: 4
+    marginTop: verticalScale(4)
   },
 
   overview:{
-    fontSize: 15,
+    fontSize: scaleFont(15),
     width: "85%",
-    marginTop: 4    
+    marginTop: verticalScale(4)    
   },
 
   statsContainer: {
     width: "90%",
     flexDirection: "row",
-    marginVertical: 10,
-   
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginVertical: verticalScale(10),
+    gap: scale(8),
   },
   
   statsCard: {
-    flex: 1,
-    marginHorizontal: 4,
-    height: 80,
-    borderRadius: 16,
+    width: isLargeScreen ? "23%" : "48%",
+    minHeight: verticalScale(80),
+    borderRadius: scale(16),
     justifyContent: "center",
     alignItems: "center",
-    
+    borderWidth: 1,
+    padding: scale(6),
   },
   
   value: {
-    fontSize: 22,
+    fontSize: scaleFont(22),
     fontWeight: "bold",
   },
   
   label: {
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: scaleFont(11),
+    marginTop: verticalScale(4),
     textAlign: "center",
   },
 
@@ -96,41 +95,39 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",
-    margin:20,
-   
+    margin: scale(20),
   },
 
   card: {
-    width: "47%",
-    height: 180,
-    borderRadius: 20,
-    marginBottom: 10,
-    padding: 20,
+    width: isLargeScreen ? "22%" : "47%",
+    minHeight: verticalScale(180),
+    borderRadius: scale(20),
+    marginBottom: verticalScale(10),
+    padding: scale(20),
     justifyContent: "space-evenly",
     alignItems: "center",
   },
 
   cardTitle: {
-    fontSize: 16,
+    fontSize: scaleFont(16),
     textAlign: "center",
   },
 
   cardStatus: {
-    fontSize: 14,
-    marginTop: 10,
+    fontSize: scaleFont(14),
+    marginTop: verticalScale(10),
   },
 
   button: {
-    width: 45,
-    height: 45,
-    borderRadius: 12,
+    width: scale(45),
+    height: scale(45),
+    borderRadius: scale(12),
     justifyContent: "center",
     alignItems: "center",
   },
 
   buttonText: {
-    fontSize: 24,
+    fontSize: scaleFont(24),
     fontWeight: "bold",
   },
-
 });

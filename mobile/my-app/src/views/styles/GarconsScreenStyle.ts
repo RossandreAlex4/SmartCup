@@ -1,22 +1,22 @@
 import { StyleSheet } from "react-native";
+import { scale, verticalScale, scaleFont } from "../../themes/responsive";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: scale(20),
   },
 
   themeIcon:{
-    width: 29,
-    height: 29,
-    
+    width: scale(29),
+    height: scale(29),
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: verticalScale(20),
     position: "relative",
   },
   
@@ -26,109 +26,108 @@ export const styles = StyleSheet.create({
   },
   
   backIcon: {
-    width: 20,
-    height: 20,
+    width: scale(20),
+    height: scale(20),
   },
   
   title: {
-    fontSize: 20,
+    fontSize: scaleFont(20),
     fontWeight: "600",
   },
   
   divider: {
-    height: 1,
-    marginVertical: 14,
+    height: verticalScale(1),
+    marginVertical: verticalScale(14),
     width: "50%",
     alignSelf: "center",
-    borderRadius: 100,
+    borderRadius: scale(100),
   },
   
   addContainer: {
-    marginBottom: 20,
+    marginBottom: verticalScale(20),
   },
   
   sectionTitle: {
-    fontSize: 13,
-    marginBottom: 10,
+    fontSize: scaleFont(13),
+    marginBottom: verticalScale(10),
     textTransform: "uppercase",
-    letterSpacing: 1,
+    letterSpacing: scale(1),
   },
   
   inputRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: scale(10),
   },
   
   input: {
     flex: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
+    borderRadius: scale(10),
+    paddingHorizontal: scale(14),
+    paddingVertical: verticalScale(12),
+    fontSize: scaleFont(15),
     borderWidth: 1,
-    
   },
   
   addButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
+    width: scale(48),
+    height: scale(48),
+    borderRadius: scale(10),
     justifyContent: "center",
     alignItems: "center",
   },
   
   addButtonText: {
-    fontSize: 24,
+    fontSize: scaleFont(24),
     fontWeight: "bold",
   },
   
   list: {
     flex: 1,
-    marginTop: 4,
+    marginTop: verticalScale(4),
   },
   
   emptyText: {
     color: "#555",
-    fontSize: 15,
+    fontSize: scaleFont(15),
     textAlign: "center",
-    marginTop: 40,
+    marginTop: verticalScale(40),
   },
   
   card: {
     backgroundColor: "#1e1e1e",
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: scale(14),
+    padding: scale(16),
+    marginBottom: verticalScale(12),
     borderWidth: 1,
     borderColor: "#2e2e2e",
   },
   
   cardInfo: {
-    marginBottom: 12,
+    marginBottom: verticalScale(12),
   },
   
   cardName: {
     color: "white",
-    fontSize: 16,
+    fontSize: scaleFont(16),
     fontWeight: "600",
   },
   
   cardDate: {
     color: "#666",
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: scaleFont(12),
+    marginTop: verticalScale(4),
   },
   
   cardActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: scale(8),
     flexWrap: "wrap",
   },
   
   actionButton: {
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingVertical: verticalScale(7),
+    paddingHorizontal: scale(12),
+    borderRadius: scale(8),
   },
   
   linkButton: {
@@ -139,7 +138,7 @@ export const styles = StyleSheet.create({
   
   actionButtonText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: scaleFont(12),
     fontWeight: "600",
   },
   
@@ -151,7 +150,7 @@ export const styles = StyleSheet.create({
   
   removeButtonText: {
     color: "#ce2a0f",
-    fontSize: 12,
+    fontSize: scaleFont(12),
     fontWeight: "600",
   },
   
@@ -160,13 +159,13 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.85)",
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: scale(24),
   },
   
   modalContainer: {
     backgroundColor: "#1e1e1e",
-    borderRadius: 20,
-    padding: 28,
+    borderRadius: scale(20),
+    padding: scale(28),
     alignItems: "center",
     width: "100%",
     borderWidth: 1,
@@ -175,49 +174,49 @@ export const styles = StyleSheet.create({
   
   modalTitle: {
     color: "white",
-    fontSize: 20,
+    fontSize: scaleFont(20),
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: verticalScale(6),
   },
   
   modalSubtitle: {
     color: "#888",
-    fontSize: 13,
+    fontSize: scaleFont(13),
     textAlign: "center",
-    marginBottom: 20,
-    lineHeight: 20,
+    marginBottom: verticalScale(20),
+    lineHeight: scaleFont(20),
   },
   
   qrImage: {
-    width: 240,
-    height: 240,
-    borderRadius: 12,
+    width: scale(240),
+    height: scale(240),
+    borderRadius: scale(12),
     backgroundColor: "white",
-    padding: 8,
+    padding: scale(8),
   },
   
   copyLinkButton: {
-    marginTop: 20,
+    marginTop: verticalScale(20),
     borderWidth: 1,
     borderColor: "#0fce52",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
+    borderRadius: scale(10),
+    paddingVertical: verticalScale(10),
+    paddingHorizontal: scale(24),
   },
   
   copyLinkText: {
-    fontSize: 14,
+    fontSize: scaleFont(14),
     fontWeight: "600",
   },
   
   closeButton: {
-    marginTop: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
+    marginTop: verticalScale(12),
+    paddingVertical: verticalScale(10),
+    paddingHorizontal: scale(24),
   },
   
   closeButtonText: {
     color: "#666",
-    fontSize: 14,
+    fontSize: scaleFont(14),
   },
 });
