@@ -202,6 +202,10 @@ export class UsuarioController {
       });
     }
   }
+  private static async verificarConfiguracao() {
+ const config: any = await UsuarioModel.buscarConfiguracao();
+  return config && config.status_configuracao === 1;
+}
 
   static async acessoWeb(req: Request, res: Response) {
     try {
@@ -248,10 +252,11 @@ export class UsuarioController {
         </body>
         </html>
       `;
-
+      
       return res.send(html);
     } catch (error: any) {
       return res.status(500).send("<h1>Erro interno do servidor</h1>");
     }
+    
   }
 }

@@ -43,7 +43,7 @@ const { user } = useContext(AuthContext);
    if (user?.tipo === "garcom") {
     router.replace("/(tabs)/garcom-mesas");
   } else {
-    router.replace("/(tabs)/mesas-screen");
+    router.back();
   }
   }
 

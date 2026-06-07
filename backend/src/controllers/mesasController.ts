@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { MesaModel } from "../models/mesaModel.js";
 import { ZonaService } from "../services/zonaService.js";
 import type { AuthenticatedRequest } from "../middlewares/authMiddleware.js";
+import { db } from "../database/database.js";
 
 export class MesaController {
     static async listar(req: Request, res: Response) {
@@ -89,8 +90,8 @@ export class MesaController {
 
     static async configurarEvento(req: Request, res: Response) {
     try {
+        
         const { qtd_mesas, qtd_zonas, volume_copo, gatilho_alerta, nome_evento } = req.body;
-
         if (!qtd_mesas || !qtd_zonas || !volume_copo || !gatilho_alerta || !nome_evento) {
             return res.status(400).json({ 
                 sucesso: false, 
@@ -99,7 +100,7 @@ export class MesaController {
         }
 
         await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(volume_copo), Number(gatilho_alerta), nome_evento);
-
+        db.run("UPDATE configuracoes SET status_configuracao = 1 WHERE id = 1");
         // Reatribuir zonas após reconfigurar as mesas/zonas do evento
         await ZonaService.atribuirZonasSequencialmente();
 
@@ -110,5 +111,21 @@ export class MesaController {
     } catch (error: any) {
         res.status(500).json({ sucesso: false, mensagem: error.message });
     }
+}
+
+ static async resetarEvento(req: Request, res: Response) {
+  try {
+    await db.serialize(() => {
+      db.run("DELETE FROM mesas");
+      db.run("DELETE FROM smartcups");
+      db.run("DELETE FROM leituras");
+      db.run("DELETE FROM alertas");
+      db.run("UPDATE configuracoes SET status_configuracao = 0, nome_evento = NULL WHERE id = 1");
+    });
+
+    return res.json({ sucesso: true, mensagem: "Evento encerrado e sistema resetado com sucesso!" });
+  } catch (error: any) {
+    return res.status(500).json({ sucesso: false, mensagem: error.message });
+  }
 }
 }

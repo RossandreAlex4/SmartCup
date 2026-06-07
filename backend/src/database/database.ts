@@ -79,7 +79,6 @@ db.serialize(() => {
   `);
 
   db.run("ALTER TABLE tokens_acesso ADD COLUMN zona TEXT", (error) => {
-    // Ignorar erro caso a coluna já exista no banco SQLite atual
   });
 
   console.log("Tabelas criadas");
@@ -89,7 +88,8 @@ db.run(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome_evento TEXT,
     volume_copo INTEGER,
-    gatilho_alerta INTEGER
+    gatilho_alerta INTEGER,
+    status_configuracao BOOLEAN DEFAULT 0
   )
 `);
 

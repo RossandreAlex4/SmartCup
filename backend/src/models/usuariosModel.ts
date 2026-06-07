@@ -22,6 +22,18 @@ export class UsuarioModel {
     });
   }
 
+  static buscarConfiguracao() {
+  return new Promise((resolve, reject) => {
+    db.get("SELECT * FROM configuracoes WHERE id = 1", (error, row) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(row);
+    });
+  });
+}
+
   static criarTokenGarcom(nome: string, token: string) {
     return new Promise((resolve, reject) => {
       const criadoEm = new Date().toISOString();
