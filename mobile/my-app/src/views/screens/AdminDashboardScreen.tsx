@@ -6,6 +6,7 @@ import { EventContext } from "../../context/EventContext";
 import { ThemeContext } from "../../context/ThemeContext";
 import {darkTheme,lightTheme,} from "../../themes/colors";
 import { api } from "../../services/api";
+import { AuthContext } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 
@@ -27,10 +28,22 @@ const [mesas, setMesas] = useState<Mesa[]>([]);
 const [loading, setLoading] = useState(true);
 const { eventData, setEventData } = useContext(EventContext);
 const [modalVisivel, setModalVisivel] = useState(false);
+const {theme,toggleTheme,} = useContext(ThemeContext);
+const { user, loading: authLoading } = useContext(AuthContext);
 
+useEffect(() => {
+    if (!authLoading && user?.tipo === "garcom") {
+      router.replace("/(tabs)/mesas-screen");
+    }
+  }, [user, authLoading]);
 
-  const {theme,toggleTheme,
-  } = useContext(ThemeContext);
+  if (authLoading || user?.tipo === "garcom") {
+    return (
+      <View style={{ flex: 1, backgroundColor: "#121212", justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#FF9000" />
+      </View>
+    );
+  }
 
  useEffect(() => {
     async function carregarDados() {

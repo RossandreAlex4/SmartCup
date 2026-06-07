@@ -170,7 +170,7 @@ export default function TabsLayout() {
         name="garcons"
         options={{
           title: "Garçons",
-
+          href: isGarcom ? null : undefined,
           tabBarIcon: ({
             focused,
           }) => (
