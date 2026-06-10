@@ -105,7 +105,7 @@ test("Endpoints da API", async (t) => {
         qtd_mesas: 3,
         qtd_zonas: 1,
         volume_copo: 350,
-        gatilho_alerta: 25,
+        peso_copo_vazio: 25,
         nome_evento: "API Event Config Test"
       })
     });

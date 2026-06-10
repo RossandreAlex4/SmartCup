@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 
-import { Text, View, Image, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from "react-native";
+import { Text, View, Image, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert, KeyboardAvoidingView,
+  Platform, } from "react-native";
 
 import CustomButton from "../components/customButton";
 
@@ -148,15 +149,25 @@ export default function Login() {
 
   return (
 
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={50}
+    >
+
     <ScrollView
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={{
         flexGrow: 1,
       }}
       style={{
-        backgroundColor:
-          colors.background,
+        backgroundColor: colors.background,
       }}
     >
+
+    
+
+      
 
       <View
         style={[
@@ -488,6 +499,8 @@ export default function Login() {
 
       </View>
 
-    </ScrollView>
+      </ScrollView>
+
+      </KeyboardAvoidingView>
   );
 }

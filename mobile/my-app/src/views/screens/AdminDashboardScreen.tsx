@@ -115,7 +115,7 @@ useBackHandlerModal(() => {setModalVisivel(true);});
         }
 
         const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
-        const gatilhoSalvo = await AsyncStorage.getItem("@gatilho_alerta");
+        const pesoCopoVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
 
         
@@ -125,7 +125,7 @@ useBackHandlerModal(() => {setModalVisivel(true);});
             eventName: nomeSalvo,
             tables: [],
             volumeCopo: volumeSalvo ? Number(volumeSalvo) : 0,
-            gatilhoAlerta: gatilhoSalvo ? Number(gatilhoSalvo) : 0,
+            pesoCopoVazio: pesoCopoVazioSalvo ? Number(pesoCopoVazioSalvo) : 0,
             zones: zonasSalvas ? Number(zonasSalvas) : 0,
           });
         }
@@ -174,8 +174,8 @@ useBackHandlerModal(() => {setModalVisivel(true);});
       value: eventData.zones,
     },
     {
-      label: "Gatilho de alerta",
-      value: eventData.gatilhoAlerta ? `${eventData.gatilhoAlerta}%` : "Não configurado"
+      label: "Peso do copo vazio",
+      value: eventData.pesoCopoVazio ? `${eventData.pesoCopoVazio} g` : "Não configurado"
     },
   ];
 async function encerrarEvento() {
@@ -186,7 +186,7 @@ async function encerrarEvento() {
       await AsyncStorage.setItem("@evento_encerrado", "true");
       await AsyncStorage.removeItem("@nome_evento");
       await AsyncStorage.removeItem("@volume_copo");
-      await AsyncStorage.removeItem("@gatilho_alerta");
+      await AsyncStorage.removeItem("@peso_copo_vazio");
       await AsyncStorage.removeItem("@qtd_zonas");
 
       await AsyncStorage.setItem("@evento_encerrado", "true");

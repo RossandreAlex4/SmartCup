@@ -88,7 +88,7 @@ db.run(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome_evento TEXT,
     volume_copo INTEGER,
-    gatilho_alerta INTEGER,
+    peso_copo_vazio INTEGER,
     status_configuracao BOOLEAN DEFAULT 0
   )
 `);
