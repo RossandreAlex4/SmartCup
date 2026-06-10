@@ -7,6 +7,7 @@ import { darkTheme, lightTheme } from "../../themes/colors";
 import { styles } from "../styles/MesaDetalhesStyles";
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from "@/src/context/AuthContext";
+import { useLeituras } from "../../context/LeituraContext";
 
 type SmartCupData = {
   id: number;
@@ -26,6 +27,8 @@ type MesaDetalhe = {
   smartcups: SmartCupData[];
 };
 
+
+
 export default function MesaDetalhesScreen() {
   const { id } = useLocalSearchParams();
   const [mesa, setMesa] = useState<MesaDetalhe | null>(null);
@@ -35,6 +38,12 @@ const { user } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const colors = theme === "dark" ? darkTheme : lightTheme;
   const navigation = useNavigation();
+  const { leiturasGlobais, iniciarMonitoramento, pararMonitoramento } = useLeituras();
+  const mesaId = Number(id);
+
+   useEffect(() => {
+    iniciarMonitoramento(mesaId);
+    return () => pararMonitoramento();}, [mesaId]);
 
   function lidarBotaoVoltar() {
 
@@ -62,7 +71,10 @@ const { user } = useContext(AuthContext);
 
   async function buscarDetalhesMesa() {
     try {
-      const response = await api.get(`/mesas/${id}`);
+     const response = await api.get(`http://192.168.1.34:3000/leituras/mesa/${id}`, {
+  timeout: 10000,
+        headers: { 'bypass-tunnel-reminder': 'true' }
+      });
       if (response.data) {
         const dadosDaMesa = response.data;
         let coposFiltrados: any[] = [];
@@ -194,9 +206,14 @@ const { user } = useContext(AuthContext);
           [...mesa.smartcups]
           .sort((a, b) => a.identificador.localeCompare(b.identificador))
           .map((cup) => {
-            let corStatus = "#0fce52";
-            if (cup.nivel_porcentagem <= 25) corStatus = "#ffd600";
-            if (cup.botao_pressionado) corStatus = "#ff5252";
+            const leituraAtual = leiturasGlobais.find(l => Number(l.smartcup_id) === Number(cup.id));
+            const nivelExibido = leituraAtual ? leituraAtual.porcentagem : cup.nivel_porcentagem;
+    const statusExibido = leituraAtual ? leituraAtual.status : "NORMAL";
+
+        let corStatus = "#0fce52";
+        if (nivelExibido < 70) corStatus = "#ff9800"; 
+        if (nivelExibido <= 30) corStatus = "#ff5252"; 
+        if (cup.botao_pressionado) corStatus = "#ff5252";
 
             return (
               <View key={cup.id} style={[styles.cupCard, { backgroundColor: colors.card }]}>
@@ -208,7 +225,7 @@ const { user } = useContext(AuthContext);
                   </View>
                   
                   <Text style={[styles.cupPercentage, { color: corStatus }]}>
-                    {cup.botao_pressionado ? "Chamado" : `${cup.nivel_porcentagem}%`}
+                  {cup.botao_pressionado ? "Chamado" : `${nivelExibido}%`}
                   </Text>
                 </View>
 
@@ -249,6 +266,7 @@ const { user } = useContext(AuthContext);
           <Text style={[styles.emptyText, { color: colors.secondaryText }]}>Nenhum SmartCup pareado nesta mesa.</Text>
         )}
       </ScrollView>
+
 
       <TouchableOpacity 
         style={styles.btnAtender} 

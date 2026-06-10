@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import { darkTheme, lightTheme } from "../src/themes/colors";
 import * as Linking from "expo-linking";
 import {ActivityIndicator, View} from 'react-native';
+import { LeiturasProvider } from "../src/context/LeituraContext";
 
 function DeepLinkHandler() {
 
@@ -94,6 +95,8 @@ function RootContent() {
   );
 }
 
+
+
 export default function RootLayout() {
 
   return (
@@ -104,16 +107,21 @@ export default function RootLayout() {
 
         <EventProvider>
 
+            <LeiturasProvider>
+
           <SafeAreaProvider>
 
             <RootContent />
 
           </SafeAreaProvider>
 
+          </LeiturasProvider>
+
         </EventProvider>
 
       </ThemeProvider>
 
     </AuthProvider>
+    
   );
 }

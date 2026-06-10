@@ -19,8 +19,8 @@ function getBackendHost() {
   return "localhost";
 }
 
-const host = getBackendHost();
-const baseURL = `http://${host}:3000`;
+export const host = getBackendHost();
+export const baseURL = `http://${host}:3000`;
 
 console.log("🔌 API Conectada em:", baseURL);
 

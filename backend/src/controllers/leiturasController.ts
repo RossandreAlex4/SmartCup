@@ -51,6 +51,7 @@ export class LeituraController {
     }
 
     static async criar(req: Request, res: Response) {
+        console.log("Recebendo dado do hardware:", req.body);
         try {
             const { smartcup_id, mesa_id, peso, porcentagem, status, data } = req.body;
 
