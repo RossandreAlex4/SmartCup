@@ -57,4 +57,24 @@ export class AlertaModel {
       );
     });
 }
+  static buscarAlertaAtivo(mesaId: number) {
+      return new Promise((resolve, reject) => {
+        db.get(
+          `
+          SELECT *
+          FROM alertas
+          WHERE mesa_id = ?
+          AND resolvido = 0
+          `,
+          [mesaId],
+          (error, row) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(row);
+          }
+        );
+      });
+    }
 }

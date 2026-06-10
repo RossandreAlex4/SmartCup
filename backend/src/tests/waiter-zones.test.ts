@@ -40,7 +40,7 @@ test("Visão Restrita por Zona do Garçom e Atribuição Sequencial", async (t) 
         qtd_mesas: 4,
         qtd_zonas: 2,
         volume_copo: 350,
-        gatilho_alerta: 20,
+        peso_copo_vazio: 20,
         nome_evento: "Teste de Zonas Sequenciais"
       })
     });

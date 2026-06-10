@@ -21,7 +21,7 @@ type State = {
   tables: number;
   volumeCopo: number;
   zones: number;
-  gatilhoAlerta: number;
+  pesoCopoVazio: number;
 };
 
 type Action =
@@ -38,19 +38,19 @@ const initialState: State = {
   tables: 0,
   volumeCopo: 0,
   zones: 0,
-  gatilhoAlerta: 0,
+  pesoCopoVazio: 0,
 };
 
 function reducer(state: State,action: Action): State {
     let passo = 1;
   if (action.field === "volumeCopo") passo = 50;
-  if (action.field === "gatilhoAlerta") passo = 5;
+  if (action.field === "pesoCopoVazio") passo = 10;
 
   switch (action.type) {
 
     case "INCREMENT":
 
-    if (action.field === "gatilhoAlerta" && state.gatilhoAlerta >= 40) {
+    if (action.field === "pesoCopoVazio" && state.pesoCopoVazio >= 1000) {
         return state;
       }
 
@@ -65,7 +65,7 @@ function reducer(state: State,action: Action): State {
       };
 
     case "DECREMENT":
-      const valorMinimo = action.field === "volumeCopo" || action.field === "gatilhoAlerta" ? passo : 0;
+      const valorMinimo = action.field === "volumeCopo" || action.field === "pesoCopoVazio" ? passo : 0;
 
       return {
         ...state,
@@ -149,7 +149,7 @@ export default function ConfigEvento() {
       
       if (nomeSalvo && Array.isArray(listaMesas) && listaMesas.length > 0) {
         const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
-        const gatilhoSalvo = await AsyncStorage.getItem("@gatilho_alerta");
+        const pesoCopoVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
 
         setEventData({
@@ -157,7 +157,7 @@ export default function ConfigEvento() {
           tables: [],
           volumeCopo: volumeSalvo ? Number(volumeSalvo) : 0,
           zones: zonasSalvas ? Number(zonasSalvas) : 0,
-          gatilhoAlerta: gatilhoSalvo ? Number(gatilhoSalvo) : 0,
+          pesoCopoVazio: pesoCopoVazioSalvo ? Number(pesoCopoVazioSalvo) : 0,
         });
         
         router.replace("/(tabs)/adm-dash");
@@ -210,9 +210,9 @@ export default function ConfigEvento() {
     },
 
     {
-      title: "Gatilho de alerta",
-      value: `${state.gatilhoAlerta}%`,
-      field: "gatilhoAlerta",
+      title: "Peso do copo vazio (g)",
+      value: `${state.pesoCopoVazio} g`,
+      field: "pesoCopoVazio",
     },
   ];
 
@@ -232,7 +232,7 @@ export default function ConfigEvento() {
       return;
     }
 
-    if (state.tables === 0 || state.volumeCopo === 0 || state.zones === 0 || state.gatilhoAlerta === 0) {
+    if (state.tables === 0 || state.volumeCopo === 0 || state.zones === 0 || state.pesoCopoVazio === 0) {
       const mensagemErro = "Por favor, configure todos os campos do evento antes de continuar.";
       
       if (Platform.OS === "web") {
@@ -255,13 +255,13 @@ export default function ConfigEvento() {
       qtd_mesas: state.tables,
       qtd_zonas: state.zones,
       volume_copo: state.volumeCopo,
-      gatilho_alerta: state.gatilhoAlerta,
+      peso_copo_vazio: state.pesoCopoVazio,
       nome_evento: eventName,
     });
 
     await AsyncStorage.setItem("@nome_evento", eventName)
     await AsyncStorage.setItem("@volume_copo", String(state.volumeCopo));
-    await AsyncStorage.setItem("@gatilho_alerta", String(state.gatilhoAlerta));
+    await AsyncStorage.setItem("@peso_copo_vazio", String(state.pesoCopoVazio));
     await AsyncStorage.setItem("@qtd_zonas", String(state.zones));
 
     setEventData({
@@ -269,7 +269,7 @@ export default function ConfigEvento() {
       tables: [], 
       volumeCopo: state.volumeCopo,
       zones: state.zones,
-      gatilhoAlerta: state.gatilhoAlerta,
+      pesoCopoVazio: state.pesoCopoVazio,
     });
 
     Alert.alert("Sucesso", "O evento e as mesas foram gerados no banco!");

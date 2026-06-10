@@ -71,7 +71,7 @@ export class MesaModel {
         );
         });
     }
-    static configurarEvento(qtdMesas: number, qtdZonas: number, volumeCopo: number, gatilhoAlerta: number, nomeEvento: string): Promise<boolean> {
+    static configurarEvento(qtdMesas: number, qtdZonas: number, volumeCopo: number, pesoCopoVazio: number, nomeEvento: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.run("DELETE FROM mesas", (error) => {
@@ -95,8 +95,8 @@ export class MesaModel {
             });
 
             db.run(
-                    "INSERT INTO configuracoes (nome_evento, volume_copo, gatilho_alerta) VALUES (?, ?, ?)",
-                    [nomeEvento, volumeCopo, gatilhoAlerta],
+                    "INSERT INTO configuracoes (nome_evento, volume_copo, peso_copo_vazio) VALUES (?, ?, ?)",
+                    [nomeEvento, volumeCopo, pesoCopoVazio],
                     (error) => {
                         if (error) return reject(error);
                     }

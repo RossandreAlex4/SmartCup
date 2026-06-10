@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { LeituraModel } from "../models/leituraModel.js";
+import { AlertaModel } from "../models/alertaModel.js";
 
 export class LeituraController {
     static async listar(req: Request, res: Response) {
@@ -85,14 +86,30 @@ export class LeituraController {
             }
 
             const leituraId = await LeituraModel.criar(
-                Number(smartcup_id),
-                Number(mesa_id),
-                peso,
-                porcentagem,
-                status,
-                data || new Date().toISOString()
-            );
+            Number(smartcup_id),
+            Number(mesa_id),
+            peso,
+            porcentagem,
+            status,
+            data || new Date().toISOString()
+        );
 
+        // Se o copo entrou em ALERTA
+        if (status === "ALERTA") {
+
+            const alertaExistente =
+                await AlertaModel.buscarAlertaAtivo(Number(mesa_id));
+
+            if (!alertaExistente) {
+
+                await AlertaModel.criar(
+                    Number(mesa_id),
+                    Number(smartcup_id),
+                    "REPOSICAO_BEBIDA"
+                );
+
+            }
+        }    
             res.status(201).json({
                 sucesso: true,
                 mensagem: "Leitura cadastrada com sucesso",
