@@ -91,16 +91,16 @@ export class MesaController {
     static async configurarEvento(req: Request, res: Response) {
     try {
         
-        const { qtd_mesas, qtd_zonas, volume_copo, peso_copo_vazio, nome_evento } = req.body;
-        if (!qtd_mesas || !qtd_zonas || !volume_copo || !peso_copo_vazio || !nome_evento) {
-            return res.status(400).json({ 
-                sucesso: false, 
-                mensagem: "Todos os campos são obrigatórios" 
+        const { qtd_mesas, qtd_zonas, limite_atencao, limite_critico, nome_evento } = req.body;
+        if (!qtd_mesas || !qtd_zonas || !limite_atencao || !limite_critico || !nome_evento) {
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "Todos os campos são obrigatórios"
             });
         }
 
-        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(volume_copo), Number(peso_copo_vazio), nome_evento);
-        db.run("UPDATE configuracoes SET status_configuracao = 1 WHERE id = 1");
+        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(limite_atencao), Number(limite_critico), nome_evento);
+        db.run("UPDATE configuracoes SET status_configuracao = 1, limite_atencao = ?, limite_critico = ? WHERE id = 1", [Number(limite_atencao), Number(limite_critico)]);
         await ZonaService.atribuirZonasSequencialmente();
 
         res.status(201).json({ 

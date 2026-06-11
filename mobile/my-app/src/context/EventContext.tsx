@@ -9,9 +9,9 @@ type TableType = {
 type EventData = {
   eventName: string;
   tables: TableType[];
-  volumeCopo: number;
+  limiteAtencao: number;
   zones: number;
-  pesoCopoVazio: number;
+  limiteCritico: number;
 };
 
 type EventContextType = {
@@ -31,9 +31,9 @@ export function EventProvider({
     useState<EventData>({
       eventName: "",
       tables: [],
-      volumeCopo: 0,
+      limiteAtencao: 60,
       zones: 0,
-      pesoCopoVazio: 0,
+      limiteCritico: 30,
     });
 
   useEffect(() => {
@@ -42,11 +42,11 @@ export function EventProvider({
         const nomeSalvo =
           await AsyncStorage.getItem("@nome_evento");
 
-        const volumeSalvo =
-          await AsyncStorage.getItem("@volume_copo");
+        const limiteAtencaoSalvo =
+          await AsyncStorage.getItem("@limite_atencao");
 
-        const pesoCopoVazioSalvo =
-          await AsyncStorage.getItem("@peso_copo_vazio");
+        const limiteCriticoSalvo =
+          await AsyncStorage.getItem("@limite_critico");
 
         const zonasSalvas =
           await AsyncStorage.getItem("@qtd_zonas");
@@ -55,13 +55,13 @@ export function EventProvider({
           setEventData({
             eventName: nomeSalvo,
             tables: [],
-            volumeCopo: volumeSalvo
-              ? Number(volumeSalvo)
-              : 0,
+            limiteAtencao: limiteAtencaoSalvo
+              ? Number(limiteAtencaoSalvo)
+              : 60,
 
-            pesoCopoVazio: pesoCopoVazioSalvo
-              ? Number(pesoCopoVazioSalvo)
-              : 0,
+            limiteCritico: limiteCriticoSalvo
+              ? Number(limiteCriticoSalvo)
+              : 30,
 
             zones: zonasSalvas
               ? Number(zonasSalvas)

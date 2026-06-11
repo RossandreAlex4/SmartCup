@@ -19,61 +19,39 @@ import { api } from "../../services/api";
 
 type State = {
   tables: number;
-  volumeCopo: number;
+  limiteAtencao: number;
   zones: number;
-  pesoCopoVazio: number;
+  limiteCritico: number;
 };
 
 type Action =
-  | {
-      type: "INCREMENT";
-      field: keyof State;
-    }
-  | {
-      type: "DECREMENT";
-      field: keyof State;
-    };
+  | { type: "INCREMENT"; field: keyof State }
+  | { type: "DECREMENT"; field: keyof State };
 
 const initialState: State = {
   tables: 0,
-  volumeCopo: 0,
+  limiteAtencao: 60,
   zones: 0,
-  pesoCopoVazio: 0,
+  limiteCritico: 30,
 };
 
-function reducer(state: State,action: Action): State {
-    let passo = 1;
-  if (action.field === "volumeCopo") passo = 50;
-  if (action.field === "pesoCopoVazio") passo = 10;
+function reducer(state: State, action: Action): State {
+  const passo = action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 : 1;
 
   switch (action.type) {
-
-    case "INCREMENT":
-
-    if (action.field === "pesoCopoVazio" && state.pesoCopoVazio >= 1000) {
-        return state;
-      }
-
-    if (action.field === "volumeCopo" && state.volumeCopo >= 950) {
-        return state;
-      }
-
+    case "INCREMENT": {
+      if (action.field === "limiteAtencao" && state.limiteAtencao >= 95) return state;
+      if (action.field === "limiteCritico" && state.limiteCritico >= state.limiteAtencao - 5) return state;
+      return { ...state, [action.field]: state[action.field] + passo };
+    }
+    case "DECREMENT": {
+      const minimo = action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 : 0;
+      if (action.field === "limiteAtencao" && state.limiteAtencao - passo <= state.limiteCritico) return state;
       return {
         ...state,
-        [action.field]:
-          state[action.field] + passo,
+        [action.field]: state[action.field] > minimo ? state[action.field] - passo : minimo,
       };
-
-    case "DECREMENT":
-      const valorMinimo = action.field === "volumeCopo" || action.field === "pesoCopoVazio" ? passo : 0;
-
-      return {
-        ...state,
-        [action.field]: state[action.field] > valorMinimo
-          ? state[action.field] - passo
-          : valorMinimo,
-      };
-
+    }
     default:
       return state;
   }
@@ -148,16 +126,16 @@ export default function ConfigEvento() {
       const listaMesas = response.data?.mesas || response.data;
       
       if (nomeSalvo && Array.isArray(listaMesas) && listaMesas.length > 0) {
-        const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
-        const pesoCopoVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
+        const limiteAtencaoSalvo = await AsyncStorage.getItem("@limite_atencao");
+        const limiteCriticoSalvo = await AsyncStorage.getItem("@limite_critico");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
 
         setEventData({
           eventName: nomeSalvo,
           tables: [],
-          volumeCopo: volumeSalvo ? Number(volumeSalvo) : 0,
+          limiteAtencao: limiteAtencaoSalvo ? Number(limiteAtencaoSalvo) : 60,
           zones: zonasSalvas ? Number(zonasSalvas) : 0,
-          pesoCopoVazio: pesoCopoVazioSalvo ? Number(pesoCopoVazioSalvo) : 0,
+          limiteCritico: limiteCriticoSalvo ? Number(limiteCriticoSalvo) : 30,
         });
         
         router.replace("/(tabs)/adm-dash");
@@ -196,23 +174,20 @@ export default function ConfigEvento() {
       value: `${state.tables}`,
       field: "tables",
     },
-
     {
-      title: "Volume do copo (ml)",
-      value: `${state.volumeCopo} ml`,
-      field: "volumeCopo",
+      title: "Limite de Atenção (%)",
+      value: `${state.limiteAtencao}%`,
+      field: "limiteAtencao",
     },
-
     {
       title: "Zonas",
       value: `${state.zones}`,
       field: "zones",
     },
-
     {
-      title: "Peso do copo vazio (g)",
-      value: `${state.pesoCopoVazio} g`,
-      field: "pesoCopoVazio",
+      title: "Limite Crítico (%)",
+      value: `${state.limiteCritico}%`,
+      field: "limiteCritico",
     },
   ];
 
@@ -232,7 +207,7 @@ export default function ConfigEvento() {
       return;
     }
 
-    if (state.tables === 0 || state.volumeCopo === 0 || state.zones === 0 || state.pesoCopoVazio === 0) {
+    if (state.tables === 0 || state.limiteAtencao === 0 || state.zones === 0 || state.limiteCritico === 0) {
       const mensagemErro = "Por favor, configure todos os campos do evento antes de continuar.";
       
       if (Platform.OS === "web") {
@@ -254,22 +229,22 @@ export default function ConfigEvento() {
       await api.post("/mesas/configurar-evento", {
       qtd_mesas: state.tables,
       qtd_zonas: state.zones,
-      volume_copo: state.volumeCopo,
-      peso_copo_vazio: state.pesoCopoVazio,
+      limite_atencao: state.limiteAtencao,
+      limite_critico: state.limiteCritico,
       nome_evento: eventName,
     });
 
-    await AsyncStorage.setItem("@nome_evento", eventName)
-    await AsyncStorage.setItem("@volume_copo", String(state.volumeCopo));
-    await AsyncStorage.setItem("@peso_copo_vazio", String(state.pesoCopoVazio));
+    await AsyncStorage.setItem("@nome_evento", eventName);
+    await AsyncStorage.setItem("@limite_atencao", String(state.limiteAtencao));
+    await AsyncStorage.setItem("@limite_critico", String(state.limiteCritico));
     await AsyncStorage.setItem("@qtd_zonas", String(state.zones));
 
     setEventData({
       eventName,
-      tables: [], 
-      volumeCopo: state.volumeCopo,
+      tables: [],
+      limiteAtencao: state.limiteAtencao,
       zones: state.zones,
-      pesoCopoVazio: state.pesoCopoVazio,
+      limiteCritico: state.limiteCritico,
     });
 
     Alert.alert("Sucesso", "O evento e as mesas foram gerados no banco!");

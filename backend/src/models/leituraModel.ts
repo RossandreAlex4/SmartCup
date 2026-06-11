@@ -58,7 +58,12 @@ export class LeituraModel {
     static buscarPorMesa(mesaId: number) {
         return new Promise((resolve, reject) => {
             db.all(
-                "SELECT * FROM leituras WHERE mesa_id = ? ORDER BY data DESC",
+                `SELECT l.* FROM leituras l
+                 INNER JOIN (
+                   SELECT smartcup_id, MAX(id) as max_id
+                   FROM leituras WHERE mesa_id = ?
+                   GROUP BY smartcup_id
+                 ) latest ON l.id = latest.max_id`,
                 [mesaId],
                 (error, rows) => {
                     if (error) {

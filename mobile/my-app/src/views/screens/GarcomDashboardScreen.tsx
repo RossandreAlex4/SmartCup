@@ -142,6 +142,17 @@ export default function GarcomDashboardScreen() {
     },
   ];
 
+  function labelAlerta(tipo: string) {
+    if (tipo === "REPOSICAO_CRITICA") return "Reposição Crítica";
+    if (tipo === "REPOSICAO_ATENCAO") return "Atenção";
+    return tipo;
+  }
+
+  function corAlerta(tipo: string) {
+    if (tipo === "REPOSICAO_CRITICA") return "#FF5252";
+    return "#FF9800";
+  }
+
   const renderAlerta = ({
     item,
   }: {
@@ -152,25 +163,18 @@ export default function GarcomDashboardScreen() {
       style={[
         styles.alertCard,
         {
-          backgroundColor:
-            colors.card,
-          borderColor:
-            colors.primary,
+          backgroundColor: colors.card,
+          borderColor: corAlerta(item.tipo),
         },
       ]}
     >
 
-      <View
-        style={styles.alertLeft}
-      >
+      <View style={styles.alertLeft}>
 
         <View
           style={[
             styles.alertDot,
-            {
-              backgroundColor:
-                colors.primary,
-            },
+            { backgroundColor: corAlerta(item.tipo) },
           ]}
         />
 
@@ -179,44 +183,31 @@ export default function GarcomDashboardScreen() {
           <Text
             style={[
               styles.alertTitle,
-              {
-                color:
-                  colors.text,
-              },
+              { color: corAlerta(item.tipo), fontWeight: "bold" },
             ]}
           >
-            {item.tipo}
+            {labelAlerta(item.tipo)}
           </Text>
 
           <Text
             style={[
               styles.alertSub,
-              {
-                color:
-                  colors.secondaryText,
-              },
+              { color: colors.secondaryText },
             ]}
           >
-            {item.mesa_nome ||
-              `Mesa ${item.mesa_id}`}
+            {item.mesa_nome || `Mesa ${item.mesa_id}`}
           </Text>
 
         </View>
 
       </View>
 
-      <TouchableOpacity
-        onPress={() =>
-          resolverAlerta(item.id)
-        }
-      >
-
+      <TouchableOpacity onPress={() => resolverAlerta(item.id)}>
         <Ionicons
           name="checkmark-circle"
           size={32}
-          color={colors.primary}
+          color={corAlerta(item.tipo)}
         />
-
       </TouchableOpacity>
 
     </View>

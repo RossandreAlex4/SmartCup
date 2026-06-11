@@ -71,60 +71,31 @@ const { user } = useContext(AuthContext);
 
   async function buscarDetalhesMesa() {
     try {
-     const response = await api.get(`http://192.168.100.139:3000/leituras/mesa/${id}`, {
-  timeout: 10000,
-        headers: { 'bypass-tunnel-reminder': 'true' }
-      });
-      if (response.data) {
-        const dadosDaMesa = response.data;
-        let coposFiltrados: any[] = [];
+      const [responseMesa, responseCopos] = await Promise.all([
+        api.get(`/mesas/${id}`),
+        api.get(`/smartcups/mesa/${id}`),
+      ]);
 
-        if (dadosDaMesa.smartcups && Array.isArray(dadosDaMesa.smartcups)) {
-          coposFiltrados = dadosDaMesa.smartcups;
-        } else {
-          try {
-            const responseCopos = await api.get("/smartcups");
-            const todosOsCopos = Array.isArray(responseCopos.data) 
-              ? responseCopos.data 
-              : (responseCopos.data?.smartcups || []);
-            
-            coposFiltrados = todosOsCopos.filter((c: any) => Number(c.mesa_id) === Number(id));
-          } catch (e) {
-            console.log("Falha ao buscar/filtrar rota de smartcups:", e);
-          }
-        }
+      const dadosMesa = responseMesa.data.mesa;
+      const copos: any[] = responseCopos.data.smartcups ?? [];
 
-        if (coposFiltrados.length === 0) {
-          const idFormatado = Number(id) < 10 ? `0${id}` : id;
-          coposFiltrados = [
-            { id: 101, identificador: `SC-${idFormatado}-1`, peso_atual: 0, botao_pressionado: 0 },
-            { id: 102, identificador: `SC-${idFormatado}-2`, peso_atual: 0, botao_pressionado: 0 },
-            { id: 103, identificador: `SC-${idFormatado}-3`, peso_atual: 0, botao_pressionado: 0 },
-            { id: 104, identificador: `SC-${idFormatado}-4`, peso_atual: 0, botao_pressionado: 0 },
-          ];
-        }
+      const mesaReal: MesaDetalhe = {
+        id: dadosMesa.id,
+        nome: dadosMesa.nome,
+        zona: dadosMesa.zona,
+        status: dadosMesa.status,
+        smartcups: copos.map((cup: any) => ({
+          id: cup.id,
+          identificador: cup.identificador || `SmartCup ${cup.id}`,
+          nivel_porcentagem: Number(cup.nivel_porcentagem) || Number(cup.peso_atual) || 0,
+          tipo_copo: cup.tipo_copo || "Copo Padrão",
+          bebida: cup.bebida || "Chopp",
+          botao_pressionado: cup.botao_pressionado === 1 || cup.botao_pressionado === true,
+          tempo_alerta: cup.tempo_alerta,
+        })),
+      };
 
-        const indiceLetra = Math.floor((Number(id) - 1) / 2); 
-        const letraCalculada = String.fromCharCode(65 + indiceLetra); 
-
-        const mesaReal: MesaDetalhe = {
-          id: dadosDaMesa.id,
-          nome: dadosDaMesa.nome,
-          zona: dadosDaMesa.zona || letraCalculada, 
-          status: dadosDaMesa.status,
-          smartcups: coposFiltrados.map((cup: any) => ({
-            id: cup.id,
-            identificador: cup.identificador || `SmartCup ${cup.id}`,
-            nivel_porcentagem: cup.peso_atual === 0 ? 70 : (Number(cup.nivel_porcentagem) || Number(cup.peso_atual) || 0),
-            tipo_copo: cup.tipo_copo || "Copo Padrão",
-            bebida: cup.bebida || "Chopp",
-            botao_pressionado: cup.botao_pressionado === 1 || cup.botao_pressionado === true,
-            tempo_alerta: cup.tempo_alerta
-          }))
-        };
-
-        setMesa(mesaReal);
-      }
+      setMesa(mesaReal);
     } catch (error) {
       console.error("Erro ao buscar dados da mesa:", error);
     } finally {
@@ -188,7 +159,7 @@ const { user } = useContext(AuthContext);
       <View style={[styles.metaRow, { backgroundColor: colors.card }]}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
             <Image source={require("../../../assets/images/avatar.png")} style={[styles.iconImage,{ tintColor: colors.primary }]} />
-            <Text style={[styles.metaText, { color: colors.text }]}> Zona {mesa.zona}</Text>
+            <Text style={[styles.metaText, { color: colors.text }]}> {mesa.zona}</Text>
         </View>
         
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -207,13 +178,16 @@ const { user } = useContext(AuthContext);
           .sort((a, b) => a.identificador.localeCompare(b.identificador))
           .map((cup) => {
             const leituraAtual = leiturasGlobais.find(l => Number(l.smartcup_id) === Number(cup.id));
-            const nivelExibido = leituraAtual ? leituraAtual.porcentagem : cup.nivel_porcentagem;
-    const statusExibido = leituraAtual ? leituraAtual.status : "NORMAL";
+            const temLeitura = !!leituraAtual;
+            const nivelExibido = temLeitura ? leituraAtual!.porcentagem : null;
 
-        let corStatus = "#0fce52";
-        if (nivelExibido < 70) corStatus = "#ff9800"; 
-        if (nivelExibido <= 30) corStatus = "#ff5252"; 
-        if (cup.botao_pressionado) corStatus = "#ff5252";
+            let corStatus = "#888";
+            if (temLeitura && nivelExibido !== null) {
+              corStatus = "#0fce52";
+              if (nivelExibido < 70) corStatus = "#ff9800";
+              if (nivelExibido <= 30) corStatus = "#ff5252";
+            }
+            if (cup.botao_pressionado) corStatus = "#ff5252";
 
             return (
               <View key={cup.id} style={[styles.cupCard, { backgroundColor: colors.card }]}>
@@ -225,7 +199,7 @@ const { user } = useContext(AuthContext);
                   </View>
                   
                   <Text style={[styles.cupPercentage, { color: corStatus }]}>
-                  {cup.botao_pressionado ? "Chamado" : `${nivelExibido}%`}
+                    {cup.botao_pressionado ? "Chamado" : temLeitura ? `${nivelExibido}%` : "—"}
                   </Text>
                 </View>
 
@@ -249,15 +223,6 @@ const { user } = useContext(AuthContext);
                   </View>
                 )}
 
-                {!cup.botao_pressionado && cup.nivel_porcentagem <= 25 && (
-                  <View style={styles.alertBarLow}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                        <Image source={require("../../../assets/images/danger.png")} style={[styles.iconImage, { tintColor: "#ffd600" }]} />
-                        <Text style={styles.alertBarText}> Bebida baixa</Text>
-                    </View>                    
-                    <Text style={styles.alertBarTime}>{cup.tempo_alerta || "Há 2 min"}</Text>
-                  </View>
-                )}
 
               </View>
             );

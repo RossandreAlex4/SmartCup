@@ -87,10 +87,13 @@ db.run(`
   CREATE TABLE IF NOT EXISTS configuracoes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome_evento TEXT,
-    volume_copo INTEGER,
-    peso_copo_vazio INTEGER,
+    limite_atencao INTEGER DEFAULT 60,
+    limite_critico INTEGER DEFAULT 30,
     status_configuracao BOOLEAN DEFAULT 0
   )
 `);
+
+db.run("ALTER TABLE configuracoes ADD COLUMN limite_atencao INTEGER DEFAULT 60", () => {});
+db.run("ALTER TABLE configuracoes ADD COLUMN limite_critico INTEGER DEFAULT 30", () => {});
 
 });

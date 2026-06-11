@@ -5,7 +5,7 @@ export class AlertaModel {
     return new Promise((resolve, reject) => {
       db.all(
         `
-        SELECT a.id, a.tipo, a.resolvido, a.data, a.mesa_id, m.nome AS mesa_nome
+        SELECT a.id, a.tipo, a.resolvido, a.data, a.mesa_id, a.smartcup_id, m.nome AS mesa_nome
         FROM alertas a
         LEFT JOIN mesas m ON a.mesa_id = m.id
         WHERE a.resolvido = 0 AND (? IS NULL OR m.zona = ?)

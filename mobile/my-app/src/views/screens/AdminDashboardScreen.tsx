@@ -1,4 +1,4 @@
-import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Platform } from "react-native";
+import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import { styles } from "../styles/AdminDashboardScreenStyles";
 import { router } from "expo-router";
 import { useContext,useState, useEffect } from "react";
@@ -114,18 +114,16 @@ useBackHandlerModal(() => {setModalVisivel(true);});
           return;
         }
 
-        const volumeSalvo = await AsyncStorage.getItem("@volume_copo");
-        const pesoCopoVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
+        const limiteAtencaoSalvo = await AsyncStorage.getItem("@limite_atencao");
+        const limiteCriticoSalvo = await AsyncStorage.getItem("@limite_critico");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
-
-        
 
         if (nomeSalvo) {
           setEventData({
             eventName: nomeSalvo,
             tables: [],
-            volumeCopo: volumeSalvo ? Number(volumeSalvo) : 0,
-            pesoCopoVazio: pesoCopoVazioSalvo ? Number(pesoCopoVazioSalvo) : 0,
+            limiteAtencao: limiteAtencaoSalvo ? Number(limiteAtencaoSalvo) : 60,
+            limiteCritico: limiteCriticoSalvo ? Number(limiteCriticoSalvo) : 30,
             zones: zonasSalvas ? Number(zonasSalvas) : 0,
           });
         }
@@ -161,22 +159,10 @@ useBackHandlerModal(() => {setModalVisivel(true);});
       : lightTheme;
 
   const stats = [
-    {
-      label: "Mesas",
-      value: mesas.length,
-    },
-    {
-      label: "Volume do copo",
-      value: eventData.volumeCopo ? `${eventData.volumeCopo} ml` : "Não configurado"
-    },
-    {
-      label: "Zonas",
-      value: eventData.zones,
-    },
-    {
-      label: "Peso do copo vazio",
-      value: eventData.pesoCopoVazio ? `${eventData.pesoCopoVazio} g` : "Não configurado"
-    },
+    { label: "Mesas", value: mesas.length },
+    { label: "Limite Atenção", value: `${eventData.limiteAtencao}%` },
+    { label: "Zonas", value: eventData.zones },
+    { label: "Limite Crítico", value: `${eventData.limiteCritico}%` },
   ];
 async function encerrarEvento() {
   try {
@@ -185,8 +171,8 @@ async function encerrarEvento() {
 
       await AsyncStorage.setItem("@evento_encerrado", "true");
       await AsyncStorage.removeItem("@nome_evento");
-      await AsyncStorage.removeItem("@volume_copo");
-      await AsyncStorage.removeItem("@peso_copo_vazio");
+      await AsyncStorage.removeItem("@limite_atencao");
+      await AsyncStorage.removeItem("@limite_critico");
       await AsyncStorage.removeItem("@qtd_zonas");
 
       await api.post("/mesas/configuracoes/reset");

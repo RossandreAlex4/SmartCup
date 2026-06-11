@@ -2,21 +2,25 @@ import axios from "axios";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 
+const IP_BACKEND = "192.168.1.34";
+
 function getBackendHost() {
   if (Platform.OS === "web") {
     return "localhost";
   }
-  if (Platform.OS === "android" && !Constants.expoConfig?.developmentClient) {
-  }
-  const hostUri = Constants.expoConfig?.hostUri || 
-  Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostUri ||
-  Constants.manifest?.debuggerHost;
+
+  const hostUri =
+    Constants.expoConfig?.hostUri ||
+    Constants.manifest2?.extra?.expoGo?.packagerOpts?.hostUri;
 
   if (hostUri) {
     const [host] = hostUri.split(":");
-    return host;
+    if (host && host !== "localhost" && host !== "127.0.0.1") {
+      return host;
+    }
   }
-  return "localhost";
+
+  return IP_BACKEND;
 }
 
 export const host = getBackendHost();

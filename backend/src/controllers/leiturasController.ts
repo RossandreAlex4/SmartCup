@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { LeituraModel } from "../models/leituraModel.js";
 import { AlertaModel } from "../models/alertaModel.js";
+import { db } from "../database/database.js";
 
 export class LeituraController {
     static async listar(req: Request, res: Response) {
@@ -70,9 +71,20 @@ export class LeituraController {
                 });
             }
 
+            const config = await new Promise<{ limite_atencao: number; limite_critico: number } | undefined>(
+                (resolve) => {
+                    db.get(
+                        "SELECT limite_atencao, limite_critico FROM configuracoes WHERE id = 1",
+                        (_, row: any) => resolve(row)
+                    );
+                }
+            );
+            const limiteAtencao = config?.limite_atencao ?? 60;
+            const limiteCritico = config?.limite_critico ?? 30;
+
             let statusCalculado = "NORMAL";
-            if (porcentagem < 60) statusCalculado = "ATENÇÃO";
-            if (porcentagem <= 30) statusCalculado = "ALERTA";
+            if (porcentagem < limiteAtencao) statusCalculado = "ATENÇÃO";
+            if (porcentagem <= limiteCritico) statusCalculado = "ALERTA";
             
 
             const leituraId = await LeituraModel.criar(
@@ -84,16 +96,16 @@ export class LeituraController {
             data || new Date().toISOString()
         );
 
-       if (statusCalculado === "ALERTA" || statusCalculado === "ATENCAO") {
-    
-    const tipoAlertaTabela = statusCalculado === "ALERTA" ? "REPOSICAO_CRITICA" : "REPOSICAO_AVISO";
+       if (statusCalculado === "ALERTA" || statusCalculado === "ATENÇÃO") {
+
+    const tipoAlertaTabela = statusCalculado === "ALERTA" ? "REPOSICAO_CRITICA" : "REPOSICAO_ATENCAO";
 
     await AlertaModel.criar(
         Number(mesa_id),
         Number(smartcup_id),
         tipoAlertaTabela
     );
-    console.log(`Alerta [${tipoAlertaTabela}] gerado SEM TRAVA para a Mesa ${mesa_id}.`);
+    console.log(`Alerta [${tipoAlertaTabela}] gerado para a Mesa ${mesa_id}.`);
 }
             res.status(201).json({
                 sucesso: true,

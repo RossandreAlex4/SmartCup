@@ -54,7 +54,7 @@ export default function AlertasScreen() {
 
   const [loading, setLoading] =
     useState(true);
-
+    
   async function carregarAlertas() {
 
     try {
