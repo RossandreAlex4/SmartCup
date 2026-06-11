@@ -323,16 +323,6 @@ export default function MesasScreen() {
                       onPress={() => {}}
                     >
 
-                      <Image
-                        source={require("../../../assets/images/edit.png")}
-                        style={[
-                          styles.cardEdit,
-                          {
-                            tintColor:
-                              colors.primary,
-                          },
-                        ]}
-                      />
 
                     </TouchableOpacity>
 
@@ -390,28 +380,3 @@ export default function MesasScreen() {
     </ScrollView>
   );
 }
-
-const localStyles = StyleSheet.create({
-
-  addButton: {
-    paddingVertical: 14,
-
-    paddingHorizontal: 32,
-
-    borderRadius: 12,
-
-    alignSelf: "center",
-
-    marginBottom: 25,
-
-    marginTop: 10,
-  },
-
-  addButtonText: {
-    color: "white",
-
-    fontWeight: "700",
-
-    fontSize: 15,
-  },
-});

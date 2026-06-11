@@ -71,7 +71,7 @@ const { user } = useContext(AuthContext);
 
   async function buscarDetalhesMesa() {
     try {
-     const response = await api.get(`http://192.168.1.34:3000/leituras/mesa/${id}`, {
+     const response = await api.get(`http://192.168.100.139:3000/leituras/mesa/${id}`, {
   timeout: 10000,
         headers: { 'bypass-tunnel-reminder': 'true' }
       });
