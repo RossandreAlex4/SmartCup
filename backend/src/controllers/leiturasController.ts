@@ -84,23 +84,17 @@ export class LeituraController {
             data || new Date().toISOString()
         );
 
-        // Se o copo entrou em ALERTA
-        if (statusCalculado === "ALERTA" || statusCalculado === "ATENÇÃO") {
+       if (statusCalculado === "ALERTA" || statusCalculado === "ATENCAO") {
+    
+    const tipoAlertaTabela = statusCalculado === "ALERTA" ? "REPOSICAO_CRITICA" : "REPOSICAO_AVISO";
 
-            const alertaExistente = await AlertaModel.buscarAlertaAtivo(Number(mesa_id));
-
-       if (!alertaExistente) {
-                    const tipoAlertaTabela = statusCalculado === "ALERTA" ? "REPOSICAO_CRITICA" : "REPOSICAO_AVISO";
-
-                    await AlertaModel.criar(
-                        Number(mesa_id),
-                        Number(smartcup_id),
-                        tipoAlertaTabela
-                    );
-                    console.log(`Registro de alerta [${tipoAlertaTabela}] gerado para a tela do Garçom.`);
-                }
-            }
-            
+    await AlertaModel.criar(
+        Number(mesa_id),
+        Number(smartcup_id),
+        tipoAlertaTabela
+    );
+    console.log(`Alerta [${tipoAlertaTabela}] gerado SEM TRAVA para a Mesa ${mesa_id}.`);
+}
             res.status(201).json({
                 sucesso: true,
                 mensagem: "Leitura cadastrada com sucesso",

@@ -4,6 +4,7 @@ import { MesaController } from "../controllers/mesasController.js";
 const router = Router();
 
 router.get("/", MesaController.listar);
+router.get("/status-evento", MesaController.statusEvento);
 router.get("/:id", MesaController.obterPorId);
 router.post("/", MesaController.criar);
 router.put("/:id", MesaController.atualizar);

@@ -189,9 +189,7 @@ async function encerrarEvento() {
       await AsyncStorage.removeItem("@peso_copo_vazio");
       await AsyncStorage.removeItem("@qtd_zonas");
 
-      await AsyncStorage.setItem("@evento_encerrado", "true");
-      await api.post("/mesas/configurar-evento", {qtd_mesas: 0,qtd_zonas: 0
-      }).catch(() => console.log("Apenas limpando o banco local"));
+      await api.post("/mesas/configuracoes/reset");
 
       await logout();
 

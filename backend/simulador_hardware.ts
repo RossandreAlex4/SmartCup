@@ -1,4 +1,3 @@
-import { baseURL } from "../../services/api.ts";
 async function enviarLeituraSimulada() {
   const payload = {
     smartcup_id: 1,
@@ -9,11 +8,11 @@ async function enviarLeituraSimulada() {
   };
 
   try {
-    const res = await fetch(`${baseURL}/leituras/mesa/${payload.mesa_id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  const res = await fetch('${baseURL}/leituras/mesa/${id}', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload),
+});
 
     if (!res.ok) {
       console.error('Erro ao enviar: HTTP', res.status);

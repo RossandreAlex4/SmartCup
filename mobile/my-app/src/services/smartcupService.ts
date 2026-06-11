@@ -1,4 +1,6 @@
 import { api } from "./api";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export async function loginAdmin(email: string, senha: string) {
   const response = await api.post("/usuarios/login", { email, senha });
@@ -18,7 +20,7 @@ export async function fetchMesas() {
   return response.data.mesas;
 }
 
-export async function fetchAlertas() {
+export const fetchAlertas = async () => {
   const response = await api.get("/alertas");
   if (!response.data.sucesso) {
     throw new Error(response.data.mensagem || "Erro ao buscar alertas");

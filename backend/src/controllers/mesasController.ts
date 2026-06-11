@@ -127,4 +127,16 @@ export class MesaController {
     return res.status(500).json({ sucesso: false, mensagem: error.message });
   }
 }
+
+  static async statusEvento(req: Request, res: Response) {
+    db.get(
+      "SELECT status_configuracao FROM configuracoes WHERE id = 1",
+      (error: Error | null, row: { status_configuracao: number } | undefined) => {
+        if (error || !row) {
+          return res.json({ ativo: false });
+        }
+        return res.json({ ativo: row.status_configuracao === 1 });
+      }
+    );
+  }
 }

@@ -3,7 +3,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { EventProvider } from "../src/context/EventContext";
 import { AuthProvider, AuthContext } from "../src/context/AuthContext";
 import { ThemeProvider, ThemeContext } from "../src/context/ThemeContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { darkTheme, lightTheme } from "../src/themes/colors";
 import * as Linking from "expo-linking";
 import {ActivityIndicator, View} from 'react-native';
@@ -53,7 +53,8 @@ function DeepLinkHandler() {
 }
 
 function RootContent() {
-  const { theme } = useContext(ThemeContext); 
+  const { theme } = useContext(ThemeContext);
+  const { user, loading } = useContext(AuthContext);
   const [appPronto, setAppPronto] = useState(false);
   const colors = theme === "dark" ? darkTheme : lightTheme;
 
@@ -62,6 +63,14 @@ function RootContent() {
       setAppPronto(true);
     }
   }, [theme]);
+
+  const userAnterior = useRef(user);
+  useEffect(() => {
+    if (!loading && userAnterior.current !== null && user === null) {
+      router.replace("/login");
+    }
+    userAnterior.current = user;
+  }, [user, loading]);
 
   if (!appPronto) {
     return (

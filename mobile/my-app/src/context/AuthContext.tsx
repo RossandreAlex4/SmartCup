@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { router } from "expo-router";
 import { api, setApiToken } from "../services/api";
 
 export interface User {
@@ -95,6 +96,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setApiToken(null);
     setUser(null);
   }
+
+  useEffect(() => {
+    if (user?.tipo !== "garcom") return;
+
+    const intervalo = setInterval(async () => {
+      try {
+        const response = await api.get("/mesas/status-evento");
+        console.log("[SmartCup] status-evento:", response.data);
+        if (!response.data.ativo) {
+          await logout();
+          router.replace("/login");
+        }
+      } catch (e) {
+        console.log("[SmartCup] erro ao checar evento:", e);
+      }
+    }, 10000);
+
+    return () => clearInterval(intervalo);
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, loading, loginAdmin, loginGarcom, logout }}>

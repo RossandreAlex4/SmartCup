@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || "mudando123_dev";
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || ""
 const SALT_ROUNDS = 10;
 const senhaHash = bcrypt.hashSync(ADMIN_PASSWORD, SALT_ROUNDS);
 
