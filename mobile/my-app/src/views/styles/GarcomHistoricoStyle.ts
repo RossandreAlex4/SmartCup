@@ -22,12 +22,10 @@ export const styles = StyleSheet.create({
     borderColor: '#00FF00',
     alignItems: 'center',
     justifyContent: 'center',
-    // Glow effect for iOS
     shadowColor: '#00FF00',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: scale(10),
-    // Glow effect for Android
     elevation: 5,
   },
   logoInner: {
