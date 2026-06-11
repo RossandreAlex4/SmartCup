@@ -54,62 +54,53 @@ export class LeituraController {
     static async criar(req: Request, res: Response) {
         console.log("Recebendo dado do hardware:", req.body);
         try {
-            const { smartcup_id, mesa_id, peso, porcentagem, status, data } = req.body;
+            const { smartcup_id, mesa_id, peso, porcentagem, data } = req.body;
 
-            if (!smartcup_id || !mesa_id || peso === undefined || porcentagem === undefined || status === undefined) {
+            if (!smartcup_id || !mesa_id || peso === undefined || porcentagem === undefined) {
                 return res.status(400).json({
                     sucesso: false,
-                    mensagem: "smartcup_id, mesa_id, peso, porcentagem e status são obrigatórios"
+                    mensagem: "smartcup_id, mesa_id, peso, porcentagem  são obrigatórios"
                 });
             }
 
-            if (typeof peso !== "number") {
+            if (typeof peso !== "number" || typeof porcentagem !== "number") {
                 return res.status(400).json({
                     sucesso: false,
-                    mensagem: "O peso deve ser um número"
+                    mensagem: "O peso e a porcentagem devem ser um número"
                 });
             }
 
-            if (typeof porcentagem !== "number") {
-                return res.status(400).json({
-                    sucesso: false,
-                    mensagem: "A porcentagem deve ser um número"
-                });
-            }
-
-            if (typeof status !== "string") {
-                return res.status(400).json({
-                    sucesso: false,
-                    mensagem: "O status deve ser um texto"
-                });
-
-            }
+            let statusCalculado = "NORMAL";
+            if (porcentagem < 60) statusCalculado = "ATENÇÃO";
+            if (porcentagem <= 30) statusCalculado = "ALERTA";
+            
 
             const leituraId = await LeituraModel.criar(
             Number(smartcup_id),
             Number(mesa_id),
             peso,
             porcentagem,
-            status,
+            statusCalculado,
             data || new Date().toISOString()
         );
 
         // Se o copo entrou em ALERTA
-        if (status === "ALERTA") {
+        if (statusCalculado === "ALERTA" || statusCalculado === "ATENÇÃO") {
 
-            const alertaExistente =
-                await AlertaModel.buscarAlertaAtivo(Number(mesa_id));
+            const alertaExistente = await AlertaModel.buscarAlertaAtivo(Number(mesa_id));
 
-            if (!alertaExistente) {
+       if (!alertaExistente) {
+                    const tipoAlertaTabela = statusCalculado === "ALERTA" ? "REPOSICAO_CRITICA" : "REPOSICAO_AVISO";
 
-                await AlertaModel.criar(
-                    Number(mesa_id),
-                    Number(smartcup_id),
-                    "REPOSICAO_BEBIDA"
-                );
-
+                    await AlertaModel.criar(
+                        Number(mesa_id),
+                        Number(smartcup_id),
+                        tipoAlertaTabela
+                    );
+                    console.log(`Registro de alerta [${tipoAlertaTabela}] gerado para a tela do Garçom.`);
+                }
             }
-        }    
+            
             res.status(201).json({
                 sucesso: true,
                 mensagem: "Leitura cadastrada com sucesso",
@@ -122,6 +113,8 @@ export class LeituraController {
             });
         }
     }
+    
+    
 
     static async obterPorMesa(req: Request, res: Response) {
         try {

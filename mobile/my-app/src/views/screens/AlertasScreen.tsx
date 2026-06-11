@@ -83,9 +83,7 @@ export default function AlertasScreen() {
     carregarAlertas();
 
     const interval =
-      setInterval(
-        carregarAlertas,
-        10000
+      setInterval(carregarAlertas,10000
       );
 
     return () =>
@@ -121,89 +119,49 @@ export default function AlertasScreen() {
     item,
   }: {
     item: Alerta;
-  }) => (
+  }) => {
+    let corDoTipo = "#FF9800"; 
+    if (item.tipo === "REPOSICAO_CRITICA") {
+      corDoTipo = "#FF5252"; 
+  }
 
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor:
-            colors.card,
-
-          borderColor:
-            colors.primary,
-        },
-      ]}
-    >
-
+    return (
       <View
         style={[
-          styles.indexCircle,
+          styles.card,
           {
-            backgroundColor:
-              colors.primary,
+            backgroundColor: colors.card,
+            borderColor: corDoTipo,
+            borderWidth: 1.5,
           },
         ]}
       >
+        <View style={[styles.indexCircle, { backgroundColor: corDoTipo }]}>
+          <Text style={styles.indexText}>{item.id}</Text>
+        </View>
 
-        <Text
-          style={styles.indexText}
+        <View style={styles.cardTextContainer}>
+          <Text style={[styles.cardTitle, { color: corDoTipo, fontWeight: "bold" }]}>
+            {item.tipo === "REPOSICAO_CRITICA" ? "REPOSIÇÃO CRÍTICA" : "ATENÇÃO"}
+          </Text>
+          <Text style={[styles.cardSubtitle, { color: colors.text }]}>
+            {item.mesa_nome || `Mesa ${item.mesa_id}`}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.checkButton}
+          onPress={() => atenderAlerta(item.id)}
         >
-          {item.id}
-        </Text>
-
+          <Ionicons
+            name="checkmark-circle-outline"
+            size={34}
+            color={corDoTipo}
+          />
+        </TouchableOpacity>
       </View>
-
-      <View
-        style={
-          styles.cardTextContainer
-        }
-      >
-
-        <Text
-          style={[
-            styles.cardTitle,
-            {
-              color:
-                colors.text,
-            },
-          ]}
-        >
-          {item.tipo}
-        </Text>
-
-        <Text
-          style={[
-            styles.cardSubtitle,
-            {
-              color:
-                colors.secondaryText,
-            },
-          ]}
-        >
-          {item.mesa_nome ||
-            `Mesa ${item.mesa_id}`}
-        </Text>
-
-      </View>
-
-      <TouchableOpacity
-        style={styles.checkButton}
-        onPress={() =>
-          atenderAlerta(item.id)
-        }
-      >
-
-        <Ionicons
-          name="checkmark-circle-outline"
-          size={32}
-          color={colors.primary}
-        />
-
-      </TouchableOpacity>
-
-    </View>
-  );
+    );
+  };
 
   return (
 

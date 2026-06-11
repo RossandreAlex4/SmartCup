@@ -1,5 +1,4 @@
-// Use global fetch instead of axios to avoid needing the axios dependency
-
+import { baseURL } from "../../services/api.ts";
 async function enviarLeituraSimulada() {
   const payload = {
     smartcup_id: 1,
@@ -10,11 +9,11 @@ async function enviarLeituraSimulada() {
   };
 
   try {
-    const res = await fetch('http://192.168.1.34:3000/leituras', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(payload),
-});
+    const res = await fetch(`${baseURL}/leituras/mesa/${payload.mesa_id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     if (!res.ok) {
       console.error('Erro ao enviar: HTTP', res.status);
