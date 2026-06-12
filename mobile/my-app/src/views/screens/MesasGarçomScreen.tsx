@@ -28,6 +28,7 @@ const COR_NORMAL = "#444";
 
 function corDoAlerta(tipo: string) {
   if (tipo === "REPOSICAO_CRITICA") return COR_CRITICA;
+  if (tipo === "GARCOM_CHAMADO") return "#2196F3";
   if (tipo === "REPOSICAO_ATENCAO") return COR_ATENCAO;
   return COR_ATENCAO;
 }

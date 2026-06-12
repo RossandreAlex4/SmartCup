@@ -1,7 +1,7 @@
 import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, Platform } from "react-native";
 import { styles } from "../styles/AdminDashboardScreenStyles";
 import { router } from "expo-router";
-import { useContext,useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { EventContext } from "../../context/EventContext";
 import { ThemeContext } from "../../context/ThemeContext";
 import {darkTheme,lightTheme,} from "../../themes/colors";
@@ -20,7 +20,7 @@ type Mesa = {
 
   totalCopos?: number;
   totalAlertas?: number;
-  percentualMedio?: number;
+  percentualMedio?: number | null;
 };
 
 export default function AdmDash() {
@@ -33,82 +33,103 @@ const {theme,toggleTheme,} = useContext(ThemeContext);
 const { user, loading: authLoading, logout } = useContext(AuthContext);
 useBackHandlerModal(() => {setModalVisivel(true);});
 
+const mesasBaseRef = useRef<any[]>([]);
+const smartcupsRef = useRef<any[]>([]);
+
+const atualizarDadosAoVivo = useCallback(async () => {
+    if (mesasBaseRef.current.length === 0) return;
+    try {
+      const [resAlertas, resLeituras] = await Promise.all([
+        api.get("/alertas"),
+        api.get("/leituras/recentes"),
+      ]);
+      const alertasAtivos: any[] = resAlertas.data?.alertas || [];
+      const leiturasRecentes: any[] = resLeituras.data?.leituras || [];
+
+      const mesasAtualizadas = mesasBaseRef.current.map((mesa: any) => {
+        const totalAlertas = alertasAtivos.filter(
+          (a: any) => Number(a.mesa_id) === Number(mesa.id)
+        ).length;
+        const leiturasMesa = leiturasRecentes.filter(
+          (l: any) => Number(l.mesa_id) === Number(mesa.id)
+        );
+        const percentualMedio =
+          leiturasMesa.length > 0
+            ? Math.round(
+                leiturasMesa.reduce((acc: number, l: any) => acc + Number(l.porcentagem), 0) /
+                  leiturasMesa.length
+              )
+            : null;
+        return { ...mesa, totalAlertas, percentualMedio };
+      });
+
+      setMesas(mesasAtualizadas);
+    } catch {}
+  }, []);
 
  useEffect(() => {
     async function carregarDados() {
+      if (!user || user.tipo !== "admin") return;
+
       try {
         setLoading(true);
-        
+
+        const statusResp = await api.get("/mesas/status-evento");
+        if (!statusResp.data?.ativo) {
+          await AsyncStorage.multiRemove([
+            "@nome_evento", "@limite_atencao", "@limite_critico",
+            "@qtd_zonas", "@volume_copo", "@peso_copo_vazio",
+          ]);
+          router.replace("/evento-config");
+          return;
+        }
+
         const response = await api.get("/mesas");
-        let mesasApi = [];
-   
+        let mesasApi: any[] = [];
         if (response.data && response.data.mesas) {
           mesasApi = response.data.mesas;
         } else if (Array.isArray(response.data)) {
           mesasApi = response.data;
         }
-        
-        try {
-          const responseCopos = await api.get("/smartcups");
-        
-          const smartcups = Array.isArray(responseCopos.data)
-            ? responseCopos.data
-            : responseCopos.data?.smartcups || [];
-        
-          const mesasComResumo = mesasApi.map((mesa: any) => {
-        
-            const coposMesa = smartcups.filter(
-              (cup: any) => Number(cup.mesa_id) === Number(mesa.id)
-            );
-        
-            const alertas = coposMesa.filter((cup: any) => {
-        
-              const nivel =
-                Number(cup.nivel_porcentagem) ||
-                Number(cup.peso_atual) ||
-                0;
-        
-              return (
-                cup.botao_pressionado === true ||
-                cup.botao_pressionado === 1 ||
-                nivel <= 25
-              );
-            });
 
-            const somaPercentuais = coposMesa.reduce(
-              (acc: number, cup: any) =>
-                acc +
-                (
-                  Number(cup.nivel_porcentagem) ||
-                  Number(cup.peso_atual) ||
-                  0
-                ),
-              0
-            );
-          
-            const percentualMedio =
-              coposMesa.length > 0
-                ? Math.round(
-                    somaPercentuais / coposMesa.length
-                  )
-                : 0;
-        
-            return {
-              ...mesa,
-              totalCopos: coposMesa.length,
-              totalAlertas: alertas.length,
-              percentualMedio,
-            };
-          });
-        
-          setMesas(mesasComResumo);
-        
-        } catch {
-          setMesas(mesasApi);
-        }
+        const [resCopos, resAlertas, resLeituras] = await Promise.all([
+          api.get("/smartcups"),
+          api.get("/alertas"),
+          api.get("/leituras/recentes"),
+        ]);
+
+        const smartcups = Array.isArray(resCopos.data)
+          ? resCopos.data
+          : resCopos.data?.smartcups || [];
+
+        const alertasAtivos: any[] = resAlertas.data?.alertas || [];
+        const leiturasRecentes: any[] = resLeituras.data?.leituras || [];
+
+        const mesasComResumo = mesasApi.map((mesa: any) => {
+          const coposMesa = smartcups.filter(
+            (cup: any) => Number(cup.mesa_id) === Number(mesa.id)
+          );
+          const totalAlertas = alertasAtivos.filter(
+            (a: any) => Number(a.mesa_id) === Number(mesa.id)
+          ).length;
+          const leiturasMesa = leiturasRecentes.filter(
+            (l: any) => Number(l.mesa_id) === Number(mesa.id)
+          );
+          const percentualMedio =
+            leiturasMesa.length > 0
+              ? Math.round(
+                  leiturasMesa.reduce((acc: number, l: any) => acc + Number(l.porcentagem), 0) /
+                    leiturasMesa.length
+                )
+              : null;
+          return { ...mesa, totalCopos: coposMesa.length, totalAlertas, percentualMedio };
+        });
+
+        mesasBaseRef.current = mesasComResumo;
+        smartcupsRef.current = smartcups;
+        setMesas(mesasComResumo);
 
         const nomeSalvo = await AsyncStorage.getItem("@nome_evento");
-
         if (!nomeSalvo) {
           router.replace("/evento-config");
           return;
@@ -117,16 +138,18 @@ useBackHandlerModal(() => {setModalVisivel(true);});
         const limiteAtencaoSalvo = await AsyncStorage.getItem("@limite_atencao");
         const limiteCriticoSalvo = await AsyncStorage.getItem("@limite_critico");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
+        const volumeCopoSalvo = await AsyncStorage.getItem("@volume_copo");
+        const pesoCopioVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
 
-        if (nomeSalvo) {
-          setEventData({
-            eventName: nomeSalvo,
-            tables: [],
-            limiteAtencao: limiteAtencaoSalvo ? Number(limiteAtencaoSalvo) : 60,
-            limiteCritico: limiteCriticoSalvo ? Number(limiteCriticoSalvo) : 30,
-            zones: zonasSalvas ? Number(zonasSalvas) : 0,
-          });
-        }
+        setEventData({
+          eventName: nomeSalvo,
+          tables: [],
+          limiteAtencao: limiteAtencaoSalvo ? Number(limiteAtencaoSalvo) : 60,
+          limiteCritico: limiteCriticoSalvo ? Number(limiteCriticoSalvo) : 30,
+          zones: zonasSalvas ? Number(zonasSalvas) : 0,
+          volumeCopo: volumeCopoSalvo ? Number(volumeCopoSalvo) : 300,
+          pesoCopioVazio: pesoCopioVazioSalvo ? Number(pesoCopioVazioSalvo) : 139,
+        });
       } catch (error) {
         console.error("Erro ao buscar mesas:", error);
       } finally {
@@ -135,7 +158,9 @@ useBackHandlerModal(() => {setModalVisivel(true);});
     }
 
     carregarDados();
-  }, []);
+    const intervalo = setInterval(atualizarDadosAoVivo, 8000);
+    return () => clearInterval(intervalo);
+  }, [atualizarDadosAoVivo]);
 
   useEffect(() => {
     console.log("Estado atual do usuário:", user);
@@ -163,6 +188,8 @@ useBackHandlerModal(() => {setModalVisivel(true);});
     { label: "Limite Atenção", value: `${eventData.limiteAtencao}%` },
     { label: "Zonas", value: eventData.zones },
     { label: "Limite Crítico", value: `${eventData.limiteCritico}%` },
+    { label: "Volume do Copo", value: `${eventData.volumeCopo}ml` },
+    { label: "Peso Copo Vazio", value: `${eventData.pesoCopioVazio}g` },
   ];
 async function encerrarEvento() {
   try {
@@ -174,6 +201,8 @@ async function encerrarEvento() {
       await AsyncStorage.removeItem("@limite_atencao");
       await AsyncStorage.removeItem("@limite_critico");
       await AsyncStorage.removeItem("@qtd_zonas");
+      await AsyncStorage.removeItem("@volume_copo");
+      await AsyncStorage.removeItem("@peso_copo_vazio");
 
       await api.post("/mesas/configuracoes/reset");
 
@@ -462,27 +491,31 @@ async function encerrarEvento() {
                           width: 16,
                           height: 16,
                           tintColor:
-                            (table.percentualMedio || 0) <= 25
+                            table.percentualMedio == null
+                              ? "#888"
+                              : table.percentualMedio <= 25
                               ? "#ff5252"
-                              : (table.percentualMedio || 0) <= 50
+                              : table.percentualMedio <= 50
                               ? "#ffd600"
                               : "#0fce52",
                         }}
                       />
-                  
+
                       <Text
                         style={{
                           color:
-                            (table.percentualMedio || 0) <= 25
+                            table.percentualMedio == null
+                              ? "#888"
+                              : table.percentualMedio <= 25
                               ? "#ff5252"
-                              : (table.percentualMedio || 0) <= 50
+                              : table.percentualMedio <= 50
                               ? "#ffd600"
                               : "#0fce52",
                           fontSize: 12,
                           fontWeight: "600",
                         }}
                       >
-                        Média: {table.percentualMedio || 0}%
+                        {table.percentualMedio == null ? "Média: —" : `Média: ${table.percentualMedio}%`}
                       </Text>
                     </View>
                   </View>

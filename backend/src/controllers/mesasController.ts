@@ -90,17 +90,19 @@ export class MesaController {
 
     static async configurarEvento(req: Request, res: Response) {
     try {
-        
-        const { qtd_mesas, qtd_zonas, limite_atencao, limite_critico, nome_evento } = req.body;
-        if (!qtd_mesas || !qtd_zonas || !limite_atencao || !limite_critico || !nome_evento) {
+        const { qtd_mesas, qtd_zonas, limite_atencao, limite_critico, volume_copo, peso_copo_vazio, nome_evento } = req.body;
+        if (!qtd_mesas || !qtd_zonas || !limite_atencao || !limite_critico || !volume_copo || !peso_copo_vazio || !nome_evento) {
             return res.status(400).json({
                 sucesso: false,
                 mensagem: "Todos os campos são obrigatórios"
             });
         }
 
-        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(limite_atencao), Number(limite_critico), nome_evento);
-        db.run("UPDATE configuracoes SET status_configuracao = 1, limite_atencao = ?, limite_critico = ? WHERE id = 1", [Number(limite_atencao), Number(limite_critico)]);
+        await MesaModel.configurarEvento(Number(qtd_mesas), Number(qtd_zonas), Number(limite_atencao), Number(limite_critico), Number(volume_copo), Number(peso_copo_vazio), nome_evento);
+        db.run(
+            "UPDATE configuracoes SET status_configuracao = 1, limite_atencao = ?, limite_critico = ?, volume_copo = ?, peso_copo_vazio = ? WHERE id = 1",
+            [Number(limite_atencao), Number(limite_critico), Number(volume_copo), Number(peso_copo_vazio)]
+        );
         await ZonaService.atribuirZonasSequencialmente();
 
         res.status(201).json({ 
@@ -114,6 +116,8 @@ export class MesaController {
 
  static async resetarEvento(req: Request, res: Response) {
   try {
+    const { UsuarioModel } = await import("../models/usuariosModel.js");
+    await UsuarioModel.marcarTodosOffline();
     await db.serialize(() => {
       db.run("DELETE FROM mesas");
       db.run("DELETE FROM smartcups");
@@ -127,6 +131,29 @@ export class MesaController {
     return res.status(500).json({ sucesso: false, mensagem: error.message });
   }
 }
+
+  static async getConfiguracoes(req: Request, res: Response) {
+    db.get(
+      "SELECT limite_atencao, limite_critico, volume_copo, peso_copo_vazio FROM configuracoes WHERE id = 1",
+      (error: Error | null, row: any) => {
+        if (error || !row) {
+          return res.json({ sucesso: true, configuracoes: { limite_atencao: 60, limite_critico: 30, volume_copo: 300, peso_copo_vazio: 139 } });
+        }
+        return res.json({ sucesso: true, configuracoes: row });
+      }
+    );
+  }
+
+  static async atenderTodos(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { AlertaModel } = await import("../models/alertaModel.js");
+      await AlertaModel.resolverTodosDaMesa(Number(id));
+      return res.json({ sucesso: true, mensagem: "Todos os alertas da mesa foram resolvidos" });
+    } catch (error: any) {
+      return res.status(500).json({ sucesso: false, mensagem: error.message });
+    }
+  }
 
   static async statusEvento(req: Request, res: Response) {
     db.get(

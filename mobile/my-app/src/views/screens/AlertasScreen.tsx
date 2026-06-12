@@ -27,6 +27,7 @@ import {
 import {
   fetchAlertas,
   resolveAlerta,
+  resolverTodosAlertas,
 } from "../../services/smartcupService";
 
 interface Alerta {
@@ -35,6 +36,15 @@ interface Alerta {
   mesa_nome: string;
   mesa_id: number;
   data: string;
+}
+
+function tempoDecorrido(data: string): string {
+  const diffMin = Math.floor((Date.now() - new Date(data).getTime()) / 60000);
+  if (diffMin < 1) return "agora";
+  if (diffMin < 60) return `há ${diffMin} min`;
+  const h = Math.floor(diffMin / 60);
+  const m = diffMin % 60;
+  return m === 0 ? `há ${h}h` : `há ${h}h ${m}min`;
 }
 
 export default function AlertasScreen() {
@@ -91,6 +101,15 @@ export default function AlertasScreen() {
 
   }, []);
 
+  async function resolverTodos() {
+    try {
+      await resolverTodosAlertas();
+      setAlertas([]);
+    } catch {
+      Alert.alert("Erro", "Não foi possível resolver todos os alertas.");
+    }
+  }
+
   async function atenderAlerta(
     id: number
   ) {
@@ -120,10 +139,9 @@ export default function AlertasScreen() {
   }: {
     item: Alerta;
   }) => {
-    let corDoTipo = "#FF9800"; 
-    if (item.tipo === "REPOSICAO_CRITICA") {
-      corDoTipo = "#FF5252"; 
-  }
+    let corDoTipo = "#FF9800";
+    if (item.tipo === "REPOSICAO_CRITICA") corDoTipo = "#FF5252";
+    if (item.tipo === "GARCOM_CHAMADO") corDoTipo = "#2196F3";
 
     return (
       <View
@@ -142,10 +160,17 @@ export default function AlertasScreen() {
 
         <View style={styles.cardTextContainer}>
           <Text style={[styles.cardTitle, { color: corDoTipo, fontWeight: "bold" }]}>
-            {item.tipo === "REPOSICAO_CRITICA" ? "REPOSIÇÃO CRÍTICA" : "ATENÇÃO"}
+            {item.tipo === "REPOSICAO_CRITICA"
+              ? "REPOSIÇÃO CRÍTICA"
+              : item.tipo === "GARCOM_CHAMADO"
+              ? "GARÇOM CHAMADO"
+              : "ATENÇÃO"}
           </Text>
           <Text style={[styles.cardSubtitle, { color: colors.text }]}>
             {item.mesa_nome || `Mesa ${item.mesa_id}`}
+          </Text>
+          <Text style={{ color: colors.secondaryText, fontSize: 11, marginTop: 2 }}>
+            {tempoDecorrido(item.data)}
           </Text>
         </View>
 
@@ -242,6 +267,27 @@ export default function AlertasScreen() {
           },
         ]}
       />
+
+      {!loading && alertas.length > 0 && (
+        <TouchableOpacity
+          onPress={resolverTodos}
+          style={{
+            marginHorizontal: 20,
+            marginTop: 12,
+            marginBottom: 4,
+            paddingVertical: 10,
+            borderRadius: 8,
+            backgroundColor: colors.card,
+            borderWidth: 1,
+            borderColor: colors.primary,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: colors.primary, fontWeight: "bold", fontSize: 14 }}>
+            Resolver todos
+          </Text>
+        </TouchableOpacity>
+      )}
 
       {loading ? (
 

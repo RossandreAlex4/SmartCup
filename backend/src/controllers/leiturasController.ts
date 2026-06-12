@@ -55,7 +55,7 @@ export class LeituraController {
     static async criar(req: Request, res: Response) {
         console.log("Recebendo dado do hardware:", req.body);
         try {
-            const { smartcup_id, mesa_id, peso, porcentagem, data } = req.body;
+            const { smartcup_id, mesa_id, peso, porcentagem, status: statusHardware, data } = req.body;
 
             if (!smartcup_id || !mesa_id || peso === undefined || porcentagem === undefined) {
                 return res.status(400).json({
@@ -83,8 +83,12 @@ export class LeituraController {
             const limiteCritico = config?.limite_critico ?? 30;
 
             let statusCalculado = "NORMAL";
-            if (porcentagem < limiteAtencao) statusCalculado = "ATENÇÃO";
-            if (porcentagem <= limiteCritico) statusCalculado = "ALERTA";
+            if (statusHardware === "SEM_COPO") {
+                statusCalculado = "SEM_COPO";
+            } else {
+                if (porcentagem < limiteAtencao) statusCalculado = "ATENÇÃO";
+                if (porcentagem <= limiteCritico) statusCalculado = "ALERTA";
+            }
             
 
             const leituraId = await LeituraModel.criar(
@@ -96,16 +100,13 @@ export class LeituraController {
             data || new Date().toISOString()
         );
 
-       if (statusCalculado === "ALERTA" || statusCalculado === "ATENÇÃO") {
-
+       if (statusCalculado !== "SEM_COPO" && (statusCalculado === "ALERTA" || statusCalculado === "ATENÇÃO")) {
     const tipoAlertaTabela = statusCalculado === "ALERTA" ? "REPOSICAO_CRITICA" : "REPOSICAO_ATENCAO";
-
-    await AlertaModel.criar(
-        Number(mesa_id),
-        Number(smartcup_id),
-        tipoAlertaTabela
-    );
-    console.log(`Alerta [${tipoAlertaTabela}] gerado para a Mesa ${mesa_id}.`);
+    const alertaExistente = await AlertaModel.buscarAlertaAtivoSmartcup(Number(smartcup_id), tipoAlertaTabela);
+    if (!alertaExistente) {
+        await AlertaModel.criar(Number(mesa_id), Number(smartcup_id), tipoAlertaTabela);
+        console.log(`Alerta [${tipoAlertaTabela}] gerado para a Mesa ${mesa_id}.`);
+    }
 }
             res.status(201).json({
                 sucesso: true,
@@ -121,6 +122,15 @@ export class LeituraController {
     }
     
     
+
+    static async listarRecentes(req: Request, res: Response) {
+        try {
+            const leituras = await LeituraModel.buscarRecentes();
+            res.json({ sucesso: true, leituras });
+        } catch (error: any) {
+            res.status(500).json({ sucesso: false, mensagem: error.message });
+        }
+    }
 
     static async obterPorMesa(req: Request, res: Response) {
         try {

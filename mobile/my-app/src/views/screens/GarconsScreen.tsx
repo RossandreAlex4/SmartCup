@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useContext } from "react";
+import { useState, useCallback, useContext, useRef } from "react";
+import { useFocusEffect } from "expo-router";
 
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Modal, Image, Platform, FlatList } from "react-native";
 
@@ -28,6 +29,20 @@ interface Garcom {
   token: string;
   criado_em: string;
   zona?: string;
+  online?: number;
+  ultimo_acesso?: string;
+}
+
+function statusGarcom(garcom: Garcom): { label: string; cor: string } {
+  if (garcom.online === 1) return { label: "Online", cor: "#0fce52" };
+  if (!garcom.ultimo_acesso) return { label: "Nunca entrou", cor: "#888" };
+  const diffMin = Math.floor((Date.now() - new Date(garcom.ultimo_acesso).getTime()) / 60000);
+  let label: string;
+  if (diffMin < 1) label = "Visto agora";
+  else if (diffMin < 60) label = `Visto há ${diffMin} min`;
+  else if (diffMin < 1440) label = `Visto há ${Math.floor(diffMin / 60)}h`;
+  else label = `Visto há ${Math.floor(diffMin / 1440)}d`;
+  return { label, cor: "#888" };
 }
 
 export default function GarconsScreen() {
@@ -81,11 +96,17 @@ export default function GarconsScreen() {
 
     }, []);
 
-  useEffect(() => {
+  const intervaloRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    buscarGarcons();
-
-  }, [buscarGarcons]);
+  useFocusEffect(
+    useCallback(() => {
+      buscarGarcons();
+      intervaloRef.current = setInterval(buscarGarcons, 8000);
+      return () => {
+        if (intervaloRef.current) clearInterval(intervaloRef.current);
+      };
+    }, [buscarGarcons])
+  );
 
   async function criarGarcom() {
 
@@ -371,7 +392,13 @@ export default function GarconsScreen() {
         renderItem={({ item: garcom }: { item: Garcom }) => (
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.primary }]}>
             <View style={styles.cardInfo}>
-              <Text style={[styles.cardName, { color: colors.text }]}>{garcom.nome}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: statusGarcom(garcom).cor }} />
+                <Text style={[styles.cardName, { color: colors.text }]}>{garcom.nome}</Text>
+              </View>
+              <Text style={[styles.cardDate, { color: statusGarcom(garcom).cor, fontSize: 11 }]}>
+                {statusGarcom(garcom).label}
+              </Text>
               <Text style={[styles.cardDate, { color: colors.secondaryText }]}>
                 {new Date(garcom.criado_em).toLocaleDateString("pt-BR")} | Zona: {garcom.zona || "Nenhuma"}
               </Text>

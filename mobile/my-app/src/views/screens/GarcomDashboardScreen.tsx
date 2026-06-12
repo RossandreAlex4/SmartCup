@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndi
 import { styles } from "../styles/GarcomDashboardScreenStyle";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { fetchAlertas, resolveAlerta, } from "../../services/smartcupService";
+import { fetchAlertas, resolveAlerta, resolverTodosAlertas } from "../../services/smartcupService";
 import { AuthContext } from "../../context/AuthContext";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -83,6 +83,15 @@ export default function GarcomDashboardScreen() {
 
   }, []);
 
+  async function resolverTodos() {
+    try {
+      await resolverTodosAlertas();
+      setAlertas([]);
+    } catch {
+      Alert.alert("Erro", "Não foi possível resolver todos os alertas.");
+    }
+  }
+
   async function resolverAlerta(
     id: number
   ) {
@@ -145,12 +154,23 @@ export default function GarcomDashboardScreen() {
   function labelAlerta(tipo: string) {
     if (tipo === "REPOSICAO_CRITICA") return "Reposição Crítica";
     if (tipo === "REPOSICAO_ATENCAO") return "Atenção";
+    if (tipo === "GARCOM_CHAMADO") return "Garçom Chamado";
     return tipo;
   }
 
   function corAlerta(tipo: string) {
     if (tipo === "REPOSICAO_CRITICA") return "#FF5252";
+    if (tipo === "GARCOM_CHAMADO") return "#2196F3";
     return "#FF9800";
+  }
+
+  function tempoDecorrido(data: string): string {
+    const diffMin = Math.floor((Date.now() - new Date(data).getTime()) / 60000);
+    if (diffMin < 1) return "agora";
+    if (diffMin < 60) return `há ${diffMin} min`;
+    const h = Math.floor(diffMin / 60);
+    const m = diffMin % 60;
+    return m === 0 ? `há ${h}h` : `há ${h}h ${m}min`;
   }
 
   const renderAlerta = ({
@@ -196,6 +216,9 @@ export default function GarcomDashboardScreen() {
             ]}
           >
             {item.mesa_nome || `Mesa ${item.mesa_id}`}
+          </Text>
+          <Text style={{ color: colors.secondaryText, fontSize: 11, marginTop: 2 }}>
+            {tempoDecorrido(item.data)}
           </Text>
 
         </View>
@@ -374,17 +397,28 @@ export default function GarcomDashboardScreen() {
 
         </View>
 
-        <Text
-          style={[
-            styles.overview,
-            {
-              color:
-                colors.text,
-            },
-          ]}
-        >
-          Visão geral dos alertas
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 15 }}>
+          <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600" }}>
+            Visão geral dos alertas
+          </Text>
+          {alertas.length > 0 && (
+            <TouchableOpacity
+              onPress={resolverTodos}
+              style={{
+                paddingVertical: 6,
+                paddingHorizontal: 12,
+                borderRadius: 8,
+                backgroundColor: colors.card,
+                borderWidth: 1,
+                borderColor: colors.primary,
+              }}
+            >
+              <Text style={{ color: colors.primary, fontWeight: "bold", fontSize: 12 }}>
+                Resolver todos
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {loading ? (
 

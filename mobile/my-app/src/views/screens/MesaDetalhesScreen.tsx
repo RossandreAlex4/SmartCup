@@ -69,30 +69,46 @@ const { user } = useContext(AuthContext);
   });
 }, [navigation, user]);
 
+  function tempoDecorrido(data: string): string {
+    const diffMin = Math.floor((Date.now() - new Date(data).getTime()) / 60000);
+    if (diffMin < 1) return "agora";
+    if (diffMin < 60) return `há ${diffMin} min`;
+    const h = Math.floor(diffMin / 60);
+    const m = diffMin % 60;
+    return m === 0 ? `há ${h}h` : `há ${h}h ${m}min`;
+  }
+
   async function buscarDetalhesMesa() {
     try {
-      const [responseMesa, responseCopos] = await Promise.all([
+      const [responseMesa, responseCopos, responseAlertas] = await Promise.all([
         api.get(`/mesas/${id}`),
         api.get(`/smartcups/mesa/${id}`),
+        api.get(`/alertas`),
       ]);
 
       const dadosMesa = responseMesa.data.mesa;
       const copos: any[] = responseCopos.data.smartcups ?? [];
+      const alertasAtivos: any[] = responseAlertas.data?.alertas ?? [];
 
       const mesaReal: MesaDetalhe = {
         id: dadosMesa.id,
         nome: dadosMesa.nome,
         zona: dadosMesa.zona,
         status: dadosMesa.status,
-        smartcups: copos.map((cup: any) => ({
-          id: cup.id,
-          identificador: cup.identificador || `SmartCup ${cup.id}`,
-          nivel_porcentagem: Number(cup.nivel_porcentagem) || Number(cup.peso_atual) || 0,
-          tipo_copo: cup.tipo_copo || "Copo Padrão",
-          bebida: cup.bebida || "Chopp",
-          botao_pressionado: cup.botao_pressionado === 1 || cup.botao_pressionado === true,
-          tempo_alerta: cup.tempo_alerta,
-        })),
+        smartcups: copos.map((cup: any) => {
+          const alertaCup = alertasAtivos.find(
+            (a: any) => Number(a.smartcup_id) === Number(cup.id) && a.tipo === "GARCOM_CHAMADO"
+          );
+          return {
+            id: cup.id,
+            identificador: cup.identificador || `SmartCup ${cup.id}`,
+            nivel_porcentagem: Number(cup.nivel_porcentagem) || Number(cup.peso_atual) || 0,
+            tipo_copo: cup.tipo_copo || "Copo Padrão",
+            bebida: cup.bebida || "Chopp",
+            botao_pressionado: cup.botao_pressionado === 1 || cup.botao_pressionado === true,
+            tempo_alerta: alertaCup ? tempoDecorrido(alertaCup.data) : undefined,
+          };
+        }),
       };
 
       setMesa(mesaReal);
@@ -113,10 +129,9 @@ const { user } = useContext(AuthContext);
     try {
       setAtendendo(true);
       await api.post(`/mesas/${id}/atender-todos`);
-      Alert.alert("Sucesso", "Todos os chamados foram marcados como resolvidos!");
       buscarDetalhesMesa();
     } catch (error) {
-      Alert.alert("Sucesso (Simulado)", "Atendimento registrado com sucesso!");
+      Alert.alert("Erro", "Não foi possível marcar os alertas como resolvidos.");
     } finally {
       setAtendendo(false);
     }

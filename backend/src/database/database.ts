@@ -78,8 +78,9 @@ db.serialize(() => {
     )
   `);
 
-  db.run("ALTER TABLE tokens_acesso ADD COLUMN zona TEXT", (error) => {
-  });
+  db.run("ALTER TABLE tokens_acesso ADD COLUMN zona TEXT", () => {});
+  db.run("ALTER TABLE tokens_acesso ADD COLUMN online INTEGER DEFAULT 0", () => {});
+  db.run("ALTER TABLE tokens_acesso ADD COLUMN ultimo_acesso TEXT", () => {});
 
   console.log("Tabelas criadas");
 
@@ -89,11 +90,15 @@ db.run(`
     nome_evento TEXT,
     limite_atencao INTEGER DEFAULT 60,
     limite_critico INTEGER DEFAULT 30,
+    volume_copo INTEGER DEFAULT 300,
+    peso_copo_vazio INTEGER DEFAULT 139,
     status_configuracao BOOLEAN DEFAULT 0
   )
 `);
 
 db.run("ALTER TABLE configuracoes ADD COLUMN limite_atencao INTEGER DEFAULT 60", () => {});
 db.run("ALTER TABLE configuracoes ADD COLUMN limite_critico INTEGER DEFAULT 30", () => {});
+db.run("ALTER TABLE configuracoes ADD COLUMN volume_copo INTEGER DEFAULT 300", () => {});
+db.run("ALTER TABLE configuracoes ADD COLUMN peso_copo_vazio INTEGER DEFAULT 139", () => {});
 
 });

@@ -91,6 +91,36 @@ export class UsuarioModel {
     });
   }
 
+  static marcarOnline(id: number) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        "UPDATE tokens_acesso SET online = 1, ultimo_acesso = ? WHERE id = ?",
+        [new Date().toISOString(), id],
+        (error) => { if (error) reject(error); else resolve(true); }
+      );
+    });
+  }
+
+  static marcarOffline(token: string) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        "UPDATE tokens_acesso SET online = 0, ultimo_acesso = ? WHERE token = ?",
+        [new Date().toISOString(), token],
+        (error) => { if (error) reject(error); else resolve(true); }
+      );
+    });
+  }
+
+  static marcarTodosOffline() {
+    return new Promise((resolve, reject) => {
+      db.run(
+        "UPDATE tokens_acesso SET online = 0, ultimo_acesso = ?",
+        [new Date().toISOString()],
+        (error) => { if (error) reject(error); else resolve(true); }
+      );
+    });
+  }
+
   static deletarTodosTokens() {
     return new Promise((resolve, reject) => {
       db.run("DELETE FROM tokens_acesso", (error) => {

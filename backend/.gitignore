@@ -1,3 +1,4 @@
 node_modules/
 src/database/smartcup.db
 .env
+esp32/

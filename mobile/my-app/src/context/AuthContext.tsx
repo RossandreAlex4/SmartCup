@@ -92,6 +92,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout() {
+    const storagedUser = await AsyncStorage.getItem("@SmartCup:user");
+    if (storagedUser) {
+      const parsed = JSON.parse(storagedUser) as User;
+      if (parsed.tipo === "garcom" && parsed.token) {
+        try { await api.post("/usuarios/garcons/logout", { token: parsed.token }); } catch {}
+      }
+    }
     await AsyncStorage.removeItem("@SmartCup:user");
     setApiToken(null);
     setUser(null);
@@ -102,14 +109,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const intervalo = setInterval(async () => {
       try {
-        const response = await api.get("/mesas/status-evento");
-        console.log("[SmartCup] status-evento:", response.data);
-        if (!response.data.ativo) {
+        const [statusResult, sessaoResult] = await Promise.allSettled([
+          api.get("/mesas/status-evento"),
+          api.post("/usuarios/garcons/validar-sessao", { token: user.token }),
+        ]);
+
+        const eventoInativo =
+          statusResult.status === "fulfilled" && !statusResult.value.data?.ativo;
+
+        const tokenRemovido =
+          sessaoResult.status === "rejected" &&
+          (sessaoResult.reason as any)?.response?.status === 401;
+
+        if (eventoInativo || tokenRemovido) {
           await logout();
           router.replace("/login");
         }
       } catch (e) {
-        console.log("[SmartCup] erro ao checar evento:", e);
+        console.log("[SmartCup] erro ao checar sessao:", e);
       }
     }, 10000);
 

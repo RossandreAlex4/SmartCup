@@ -7,6 +7,8 @@ const router = Router();
 
 router.post("/login", UsuarioController.login);
 router.post("/login-token", UsuarioController.loginToken);
+router.post("/garcons/logout", UsuarioController.logoutGarcom);
+router.post("/garcons/validar-sessao", UsuarioController.validarSessaoGarcom);
 router.post("/garcons", UsuarioController.criarGarcom);
 router.get("/garcons", UsuarioController.listarGarcons);
 router.delete("/garcons", UsuarioController.deletarTodosGarcons);

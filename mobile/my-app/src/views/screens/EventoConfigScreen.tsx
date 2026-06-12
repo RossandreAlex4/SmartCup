@@ -22,6 +22,8 @@ type State = {
   limiteAtencao: number;
   zones: number;
   limiteCritico: number;
+  volumeCopo: number;
+  pesoCopioVazio: number;
 };
 
 type Action =
@@ -33,19 +35,28 @@ const initialState: State = {
   limiteAtencao: 60,
   zones: 0,
   limiteCritico: 30,
+  volumeCopo: 300,
+  pesoCopioVazio: 139,
 };
 
 function reducer(state: State, action: Action): State {
-  const passo = action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 : 1;
+  const passo =
+    action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 :
+    action.field === "volumeCopo" ? 10 :
+    action.field === "pesoCopioVazio" ? 5 : 1;
 
   switch (action.type) {
     case "INCREMENT": {
       if (action.field === "limiteAtencao" && state.limiteAtencao >= 95) return state;
       if (action.field === "limiteCritico" && state.limiteCritico >= state.limiteAtencao - 5) return state;
+      if (action.field === "volumeCopo" && state.volumeCopo >= 1000) return state;
+      if (action.field === "pesoCopioVazio" && state.pesoCopioVazio >= 500) return state;
       return { ...state, [action.field]: state[action.field] + passo };
     }
     case "DECREMENT": {
-      const minimo = action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 : 0;
+      const minimo =
+        action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 :
+        action.field === "volumeCopo" || action.field === "pesoCopioVazio" ? 50 : 0;
       if (action.field === "limiteAtencao" && state.limiteAtencao - passo <= state.limiteCritico) return state;
       return {
         ...state,
@@ -169,26 +180,12 @@ export default function ConfigEvento() {
   }
 
   const cards = [
-    {
-      title: "Mesas",
-      value: `${state.tables}`,
-      field: "tables",
-    },
-    {
-      title: "Limite de Atenção (%)",
-      value: `${state.limiteAtencao}%`,
-      field: "limiteAtencao",
-    },
-    {
-      title: "Zonas",
-      value: `${state.zones}`,
-      field: "zones",
-    },
-    {
-      title: "Limite Crítico (%)",
-      value: `${state.limiteCritico}%`,
-      field: "limiteCritico",
-    },
+    { title: "Mesas", value: `${state.tables}`, field: "tables" },
+    { title: "Limite de Atenção (%)", value: `${state.limiteAtencao}%`, field: "limiteAtencao" },
+    { title: "Zonas", value: `${state.zones}`, field: "zones" },
+    { title: "Limite Crítico (%)", value: `${state.limiteCritico}%`, field: "limiteCritico" },
+    { title: "Volume do Copo (ml)", value: `${state.volumeCopo}ml`, field: "volumeCopo" },
+    { title: "Peso do Copo Vazio (g)", value: `${state.pesoCopioVazio}g`, field: "pesoCopioVazio" },
   ];
 
   async function criarEvento() {
@@ -207,7 +204,7 @@ export default function ConfigEvento() {
       return;
     }
 
-    if (state.tables === 0 || state.limiteAtencao === 0 || state.zones === 0 || state.limiteCritico === 0) {
+    if (state.tables === 0 || state.limiteAtencao === 0 || state.zones === 0 || state.limiteCritico === 0 || state.volumeCopo === 0 || state.pesoCopioVazio === 0) {
       const mensagemErro = "Por favor, configure todos os campos do evento antes de continuar.";
       
       if (Platform.OS === "web") {
@@ -231,6 +228,8 @@ export default function ConfigEvento() {
       qtd_zonas: state.zones,
       limite_atencao: state.limiteAtencao,
       limite_critico: state.limiteCritico,
+      volume_copo: state.volumeCopo,
+      peso_copo_vazio: state.pesoCopioVazio,
       nome_evento: eventName,
     });
 
@@ -238,6 +237,8 @@ export default function ConfigEvento() {
     await AsyncStorage.setItem("@limite_atencao", String(state.limiteAtencao));
     await AsyncStorage.setItem("@limite_critico", String(state.limiteCritico));
     await AsyncStorage.setItem("@qtd_zonas", String(state.zones));
+    await AsyncStorage.setItem("@volume_copo", String(state.volumeCopo));
+    await AsyncStorage.setItem("@peso_copo_vazio", String(state.pesoCopioVazio));
 
     setEventData({
       eventName,
@@ -245,6 +246,8 @@ export default function ConfigEvento() {
       limiteAtencao: state.limiteAtencao,
       zones: state.zones,
       limiteCritico: state.limiteCritico,
+      volumeCopo: state.volumeCopo,
+      pesoCopioVazio: state.pesoCopioVazio,
     });
 
     Alert.alert("Sucesso", "O evento e as mesas foram gerados no banco!");

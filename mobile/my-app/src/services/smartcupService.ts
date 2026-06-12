@@ -28,6 +28,14 @@ export const fetchAlertas = async () => {
   return response.data.alertas;
 }
 
+export async function resolverTodosAlertas() {
+  const response = await api.post("/alertas/resolver-todos");
+  if (!response.data.sucesso) {
+    throw new Error(response.data.mensagem || "Erro ao resolver alertas");
+  }
+  return response.data;
+}
+
 export async function resolveAlerta(id: number) {
   const response = await api.put(`/alertas/${id}/resolver`);
   if (!response.data.sucesso) {

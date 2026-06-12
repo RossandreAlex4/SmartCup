@@ -76,6 +76,22 @@ export class LeituraModel {
         });
     }
 
+    static buscarRecentes() {
+        return new Promise((resolve, reject) => {
+            db.all(
+                `SELECT l.* FROM leituras l
+                 INNER JOIN (
+                   SELECT smartcup_id, MAX(id) as max_id
+                   FROM leituras GROUP BY smartcup_id
+                 ) latest ON l.id = latest.max_id`,
+                (error, rows) => {
+                    if (error) return reject(error);
+                    resolve(rows);
+                }
+            );
+        });
+    }
+
     static buscarPorSmartcup(smartcupId: number) {
         return new Promise((resolve, reject) => {
             db.all(

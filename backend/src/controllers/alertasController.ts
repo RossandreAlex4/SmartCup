@@ -40,6 +40,17 @@ export class AlertasController {
     }
   }
 
+  static async resolverTodos(req: Request, res: Response) {
+    try {
+      const usuario = (req as AuthenticatedRequest).usuario;
+      const zona = usuario && usuario.tipo === "garcom" ? (usuario.zona || "NENHUMA_ZONA") : undefined;
+      await AlertaModel.resolverTodos(zona);
+      return res.json({ sucesso: true, mensagem: "Todos os alertas resolvidos" });
+    } catch (error: any) {
+      return res.status(500).json({ sucesso: false, mensagem: error.message });
+    }
+  }
+
   static async criar(req: Request, res: Response) {
     try {
       const { mesa_id, smartcup_id, tipo } = req.body;
@@ -49,6 +60,11 @@ export class AlertasController {
           sucesso: false,
           mensagem: "mesa_id, smartcup_id e tipo são obrigatórios"
         });
+      }
+
+      const alertaExistente = await AlertaModel.buscarAlertaAtivoSmartcup(Number(smartcup_id), tipo);
+      if (alertaExistente) {
+        return res.status(200).json({ sucesso: true, mensagem: "Alerta já ativo para este smartcup" });
       }
 
       const alertaId = await AlertaModel.criar(

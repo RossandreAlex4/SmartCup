@@ -12,6 +12,8 @@ type EventData = {
   limiteAtencao: number;
   zones: number;
   limiteCritico: number;
+  volumeCopo: number;
+  pesoCopioVazio: number;
 };
 
 type EventContextType = {
@@ -34,6 +36,8 @@ export function EventProvider({
       limiteAtencao: 60,
       zones: 0,
       limiteCritico: 30,
+      volumeCopo: 300,
+      pesoCopioVazio: 139,
     });
 
   useEffect(() => {
@@ -42,30 +46,21 @@ export function EventProvider({
         const nomeSalvo =
           await AsyncStorage.getItem("@nome_evento");
 
-        const limiteAtencaoSalvo =
-          await AsyncStorage.getItem("@limite_atencao");
-
-        const limiteCriticoSalvo =
-          await AsyncStorage.getItem("@limite_critico");
-
-        const zonasSalvas =
-          await AsyncStorage.getItem("@qtd_zonas");
+        const limiteAtencaoSalvo = await AsyncStorage.getItem("@limite_atencao");
+        const limiteCriticoSalvo = await AsyncStorage.getItem("@limite_critico");
+        const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
+        const volumeCopoSalvo = await AsyncStorage.getItem("@volume_copo");
+        const pesoCopioVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
 
         if (nomeSalvo) {
           setEventData({
             eventName: nomeSalvo,
             tables: [],
-            limiteAtencao: limiteAtencaoSalvo
-              ? Number(limiteAtencaoSalvo)
-              : 60,
-
-            limiteCritico: limiteCriticoSalvo
-              ? Number(limiteCriticoSalvo)
-              : 30,
-
-            zones: zonasSalvas
-              ? Number(zonasSalvas)
-              : 0,
+            limiteAtencao: limiteAtencaoSalvo ? Number(limiteAtencaoSalvo) : 60,
+            limiteCritico: limiteCriticoSalvo ? Number(limiteCriticoSalvo) : 30,
+            zones: zonasSalvas ? Number(zonasSalvas) : 0,
+            volumeCopo: volumeCopoSalvo ? Number(volumeCopoSalvo) : 300,
+            pesoCopioVazio: pesoCopioVazioSalvo ? Number(pesoCopioVazioSalvo) : 139,
           });
         }
       } catch (error) {

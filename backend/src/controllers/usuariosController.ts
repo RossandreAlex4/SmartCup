@@ -185,6 +185,8 @@ export class UsuarioController {
         });
       }
 
+      await UsuarioModel.marcarOnline(garcom.id);
+
       return res.json({
         sucesso: true,
         usuario: {
@@ -202,6 +204,28 @@ export class UsuarioController {
       });
     }
   }
+  static async logoutGarcom(req: Request, res: Response) {
+    try {
+      const { token } = req.body;
+      if (token) await UsuarioModel.marcarOffline(token);
+      return res.json({ sucesso: true });
+    } catch (error: any) {
+      return res.status(500).json({ sucesso: false, mensagem: error.message });
+    }
+  }
+
+  static async validarSessaoGarcom(req: Request, res: Response) {
+    try {
+      const { token } = req.body;
+      if (!token) return res.status(400).json({ valido: false });
+      const garcom: any = await UsuarioModel.buscarToken(token);
+      if (!garcom) return res.status(401).json({ valido: false });
+      return res.json({ valido: true });
+    } catch (error: any) {
+      return res.status(500).json({ valido: false, mensagem: error.message });
+    }
+  }
+
   private static async verificarConfiguracao() {
  const config: any = await UsuarioModel.buscarConfiguracao();
   return config && config.status_configuracao === 1;

@@ -76,8 +76,32 @@ async function enviarTodasLeituras() {
   await Promise.all(cenarios.map(enviarLeitura));
 }
 
+async function simularBotao() {
+  if (cenarios.length === 0) return;
+  const alvo = cenarios[Math.floor(Math.random() * cenarios.length)]!;
+  try {
+    const res = await fetch(`${BASE_URL}/alertas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mesa_id: alvo.mesa_id,
+        smartcup_id: alvo.id,
+        tipo: "GARCOM_CHAMADO",
+      }),
+    });
+    const corpo = await res.json();
+    console.log(
+      `[Simulador] 🔔 Botão pressionado em ${alvo.identificador} Mesa-${alvo.mesa_id} → ${res.status}`,
+      corpo.mensagem ?? ""
+    );
+  } catch (err) {
+    console.error("[Simulador] Erro ao simular botão:", err instanceof Error ? err.message : err);
+  }
+}
+
 console.log("[Simulador] Iniciado — buscando smartcups do banco...");
 carregarCenarios().then(() => {
   enviarTodasLeituras();
-  setInterval(enviarTodasLeituras, 5000);
+  setInterval(enviarTodasLeituras, 50000);
+  setInterval(simularBotao, 30000);
 });
