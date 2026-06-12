@@ -1,0 +1,193 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include "HX711.h"
+#define DT 16
+#define SCK 4
+#define BOTAO 18
+HX711 scale;
+bool ultimoEstadoBotao = HIGH;
+unsigned long ultimoClique = 0;
+const unsigned long DEBOUNCE = 50;
+// Controle do botão
+bool botaoPressionado = false;
+// Wi-Fi
+const char* ssid = "Fé";
+const char* password = "12345678";
+// APIs
+const char* apiLeituras = "http://10.253.109.162:3000/leituras";
+const char* apiAlertas = "http://10.253.109.162:3000/alertas";
+// IDs cadastrados
+const int SMARTCUP_ID = 1;
+const int MESA_ID = 1;
+// Fator calibrado
+const float FATOR_CALIBRACAO = 706.53;
+// Pesos reais do copo
+const float LIMITE_SEM_COPO = 80.0;
+const float PESO_COPO_VAZIO = 139.00;
+const float PESO_COPO_CHEIO = 354.00.00;
+// Limites
+const float LIMITE_OK = 70.0;
+const float LIMITE_ATENCAO = 30.0;
+// Controle de envio
+unsigned long ultimoEnvio = 0;
+const unsigned long INTERVALO_ENVIO = 10000;
+void setup() {
+Serial.begin(115200);
+pinMode(BOTAO, INPUT_PULLUP);
+conectarWiFi();
+scale.begin(DT, SCK);
+scale.set_scale(FATOR_CALIBRACAO);
+Serial.println("Remova qualquer peso...");
+delay(3000);
+scale.tare();
+Serial.println("SmartCup iniciado!");
+}
+void loop() {
+if (WiFi.status() != WL_CONNECTED) {
+conectarWiFi();
+}
+if (scale.is_ready()) {
+float peso = scale.get_units(20);
+if (peso < 0) {
+peso = 0;
+}
+float porcentagem = calcularPorcentagem(peso);
+String statusCopo =
+classificarStatus(peso, porcentagem);
+Serial.print("Peso: ");
+Serial.print(peso);
+Serial.print(" g | Nivel: ");
+Serial.print(porcentagem);
+Serial.print("% | Status: ");
+Serial.println(statusCopo);
+if (millis() - ultimoEnvio >= INTERVALO_ENVIO) {
+enviarLeituraAPI(
+peso,
+porcentagem,
+statusCopo
+);
+ultimoEnvio = millis();
+}
+} else {
+Serial.println("HX711 nao encontrado");
+}
+verificarBotao();
+delay(500);
+}
+void conectarWiFi() {
+Serial.print("Conectando ao Wi-Fi");
+WiFi.begin(ssid, password);
+while (WiFi.status() != WL_CONNECTED) {
+delay(500);
+Serial.print(".");
+}
+Serial.println();
+Serial.println("Wi-Fi conectado!");
+Serial.print("IP do ESP32: ");
+Serial.println(WiFi.localIP());
+}
+float calcularPorcentagem(float pesoAtual) {
+float capacidadeLiquido =
+PESO_COPO_CHEIO - PESO_COPO_VAZIO;
+float porcentagem =
+((pesoAtual - PESO_COPO_VAZIO) /
+capacidadeLiquido) * 100.0;
+if (porcentagem > 100) {
+porcentagem = 100;
+}
+if (porcentagem < 0) {
+porcentagem = 0;
+}
+return porcentagem;
+}
+String classificarStatus(
+float peso,
+float porcentagem
+) {
+if (peso < LIMITE_SEM_COPO) {
+return "SEM_COPO";
+}
+if (porcentagem >= LIMITE_OK) {
+return "OK";
+}
+if (porcentagem >= LIMITE_ATENCAO) {
+return "ATENCAO";
+}
+return "ALERTA";
+}
+void verificarBotao() {
+bool estadoAtual = digitalRead(BOTAO);
+// Detecta soltura do botão
+if (
+ultimoEstadoBotao == LOW &&
+estadoAtual == HIGH &&
+millis() - ultimoClique > DEBOUNCE
+) {
+Serial.println("GARCOM CHAMADO!");
+enviarAlertaGarcom();
+ultimoClique = millis();
+}
+ultimoEstadoBotao = estadoAtual;
+}
+void enviarAlertaGarcom() {
+if (WiFi.status() != WL_CONNECTED) {
+return;
+}
+HTTPClient http;
+http.begin(apiAlertas);
+http.addHeader(
+"Content-Type",
+"application/json"
+);
+String json = "{";
+json += ""mesa_id":" + String(MESA_ID) + ",";
+json += ""smartcup_id":" + String(SMARTCUP_ID) + ",";
+json += ""tipo":"GARCOM_CHAMADO"";
+json += "}";
+Serial.print("Enviando alerta: ");
+Serial.println(json);
+int respostaHttp = http.POST(json);
+Serial.print("Resposta alerta: ");
+Serial.println(respostaHttp);
+http.end();
+}
+void enviarLeituraAPI(
+float peso,
+float porcentagem,
+String statusCopo
+) {
+if (WiFi.status() != WL_CONNECTED) {
+Serial.println(
+"Wi-Fi desconectado. Leitura nao enviada."
+);
+return;
+}
+HTTPClient http;
+http.begin(apiLeituras);
+http.addHeader(
+"Content-Type",
+"application/json"
+);
+String json = "{";
+json += ""smartcup_id":" +
+String(SMARTCUP_ID) + ",";
+json += ""mesa_id":" +
+String(MESA_ID) + ",";
+json += ""peso":" +
+String(peso, 2) + ",";
+json += ""porcentagem":" +
+String(porcentagem, 2) + ",";
+json += ""status":"" +
+statusCopo + """;
+json += "}";
+Serial.print("Enviando JSON: ");
+Serial.println(json);
+int respostaHttp = http.POST(json);
+Serial.print("Resposta HTTP: ");
+Serial.println(respostaHttp);
+String respostaApi =
+http.getString();
+Serial.print("Resposta API: ");
+Serial.println(respostaApi);
+http.end();
+}
