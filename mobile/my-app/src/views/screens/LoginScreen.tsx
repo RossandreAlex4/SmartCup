@@ -36,9 +36,6 @@ export default function Login() {
       ? darkTheme
       : lightTheme;
 
-  const [rememberMe, setRememberMe] =
-    useState(false);
-
   const [email, setEmail] =
     useState("");
 
@@ -366,55 +363,6 @@ export default function Login() {
 
           </View>
 
-          <TouchableOpacity
-            style={
-              styles.checkboxContainer
-            }
-            onPress={() =>
-              setRememberMe(
-                !rememberMe
-              )
-            }
-          >
-
-            <View
-              style={[
-                styles.checkbox,
-                {
-                  borderColor:
-                    colors.primary,
-                },
-                rememberMe &&
-                  styles.checkboxActive,
-              ]}
-            >
-
-              {rememberMe && (
-
-                <Image
-                  source={require("../../../assets/images/check.png")}
-                  style={
-                    styles.checkboxImage
-                  }
-                />
-
-              )}
-
-            </View>
-
-            <Text
-              style={[
-                styles.checkboxText,
-                {
-                  color: colors.text,
-                },
-              ]}
-            >
-              Lembrar meus dados
-            </Text>
-
-          </TouchableOpacity>
-
           {loginError ? (
 
             <Text
@@ -471,28 +419,6 @@ export default function Login() {
             }}
           >
             Acesso Garçom (QR Code)
-          </Text>
-
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() =>
-            console.log(
-              "Forgot password"
-            )
-          }
-        >
-
-          <Text
-            style={[
-              styles.forgot,
-              {
-                color:
-                  colors.secondaryText,
-              },
-            ]}
-          >
-            Esqueci minha senha
           </Text>
 
         </TouchableOpacity>

@@ -28,6 +28,7 @@ export const baseURL = `http://${host}:3000`;
 
 console.log("🔌 API Conectada em:", baseURL);
 
+
 export const api = axios.create({
     baseURL,
     timeout: 5000,

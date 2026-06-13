@@ -339,7 +339,7 @@ export default function MesasScreen() {
                         styles.cardStatus,
                         {
                           color:
-                            mesa.status === "Livre"
+                            mesa.status === "Livre" || mesa.status === "Ativa"
                               ? "#0fce52"
                               : "#ff5252",
                         },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext,useLayoutEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Image } from "react-native";
 import { useLocalSearchParams, router, useNavigation } from "expo-router";
 import { api } from "../../services/api";
 import { ThemeContext } from "../../context/ThemeContext";
@@ -34,7 +34,6 @@ export default function MesaDetalhesScreen() {
   const { id } = useLocalSearchParams();
   const [mesa, setMesa] = useState<MesaDetalhe | null>(null);
   const [loading, setLoading] = useState(true);
-  const [atendendo, setAtendendo] = useState(false);
 const { user } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
   const colors = theme === "dark" ? darkTheme : lightTheme;
@@ -127,18 +126,6 @@ const { user } = useContext(AuthContext);
     const interval = setInterval(buscarDetalhesMesa, 5000);
     return () => clearInterval(interval);
   }, [id]);
-
-  async function marcarTodosAtendidos() {
-    try {
-      setAtendendo(true);
-      await api.post(`/mesas/${id}/atender-todos`);
-      buscarDetalhesMesa();
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível marcar os alertas como resolvidos.");
-    } finally {
-      setAtendendo(false);
-    }
-  }
 
   if (loading) {
     return (
@@ -250,19 +237,6 @@ const { user } = useContext(AuthContext);
         )}
       </ScrollView>
 
-
-      <TouchableOpacity 
-        style={styles.btnAtender} 
-        onPress={marcarTodosAtendidos}
-        disabled={atendendo}
-        activeOpacity={0.8}
-      >
-        {atendendo ? (
-          <ActivityIndicator color="#ffffff" />
-        ) : (
-          <Text style={styles.btnAtenderText}>✓ Marcar todos como atendidos</Text>
-        )}
-      </TouchableOpacity>
 
     </View>
   );

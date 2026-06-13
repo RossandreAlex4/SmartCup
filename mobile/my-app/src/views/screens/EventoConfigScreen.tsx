@@ -47,7 +47,7 @@ function reducer(state: State, action: Action): State {
 
   switch (action.type) {
     case "INCREMENT": {
-      if (action.field === "limiteAtencao" && state.limiteAtencao >= 95) return state;
+      if (action.field === "limiteAtencao" && state.limiteAtencao >= 60) return state;
       if (action.field === "limiteCritico" && state.limiteCritico >= state.limiteAtencao - 5) return state;
       if (action.field === "volumeCopo" && state.volumeCopo >= 1000) return state;
       if (action.field === "pesoCopioVazio" && state.pesoCopioVazio >= 500) return state;
@@ -55,9 +55,9 @@ function reducer(state: State, action: Action): State {
     }
     case "DECREMENT": {
       const minimo =
-        action.field === "limiteAtencao" || action.field === "limiteCritico" ? 5 :
+        action.field === "limiteAtencao" ? Math.max(30, state.limiteCritico + 5) :
+        action.field === "limiteCritico" ? 5 :
         action.field === "volumeCopo" || action.field === "pesoCopioVazio" ? 50 : 0;
-      if (action.field === "limiteAtencao" && state.limiteAtencao - passo <= state.limiteCritico) return state;
       return {
         ...state,
         [action.field]: state[action.field] > minimo ? state[action.field] - passo : minimo,
