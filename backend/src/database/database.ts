@@ -81,6 +81,8 @@ db.serialize(() => {
   db.run("ALTER TABLE tokens_acesso ADD COLUMN zona TEXT", () => {});
   db.run("ALTER TABLE tokens_acesso ADD COLUMN online INTEGER DEFAULT 0", () => {});
   db.run("ALTER TABLE tokens_acesso ADD COLUMN ultimo_acesso TEXT", () => {});
+  db.run("ALTER TABLE tokens_acesso ADD COLUMN avatar TEXT", () => {});
+  db.run("ALTER TABLE usuarios ADD COLUMN avatar TEXT", () => {});
 
   console.log("Tabelas criadas");
 

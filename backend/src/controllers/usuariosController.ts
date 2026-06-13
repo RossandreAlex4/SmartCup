@@ -51,7 +51,7 @@ export class UsuarioController {
 
   static async criarGarcom(req: Request, res: Response) {
     try {
-      const { nome } = req.body;
+      const { nome, avatar } = req.body;
       if (!nome) {
         return res.status(400).json({
           sucesso: false,
@@ -60,7 +60,7 @@ export class UsuarioController {
       }
 
       const token = "tkn_" + crypto.randomBytes(16).toString("hex");
-      const id = await UsuarioModel.criarTokenGarcom(nome, token);
+      const id = await UsuarioModel.criarTokenGarcom(nome, token, avatar || null);
 
       // Reatribuir zonas sequencialmente
       await ZonaService.atribuirZonasSequencialmente();
@@ -71,6 +71,7 @@ export class UsuarioController {
           id,
           nome,
           token,
+          avatar: avatar || null,
         },
       });
     } catch (error: any) {
@@ -107,6 +108,27 @@ export class UsuarioController {
       return res.json({
         sucesso: true,
         mensagem: "Garçom removido",
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        sucesso: false,
+        mensagem: error.message,
+      });
+    }
+  }
+
+  static async atualizarAvatar(req: Request, res: Response) {
+    try {
+      const { token, avatar } = req.body;
+      if (!token) {
+        return res.status(400).json({ sucesso: false, mensagem: "Token é obrigatório" });
+      }
+
+      await UsuarioModel.atualizarAvatarToken(token, avatar || null);
+
+      return res.json({
+        sucesso: true,
+        mensagem: "Avatar atualizado",
       });
     } catch (error: any) {
       return res.status(500).json({
@@ -195,6 +217,7 @@ export class UsuarioController {
           tipo: "garcom",
           token: garcom.token,
           zona: garcom.zona,
+          avatar: garcom.avatar,
         },
       });
     } catch (error: any) {

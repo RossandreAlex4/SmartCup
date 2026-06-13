@@ -34,12 +34,12 @@ export class UsuarioModel {
   });
 }
 
-  static criarTokenGarcom(nome: string, token: string) {
+  static criarTokenGarcom(nome: string, token: string, avatar: string | null = null) {
     return new Promise((resolve, reject) => {
       const criadoEm = new Date().toISOString();
       db.run(
-        "INSERT INTO tokens_acesso (nome, token, criado_em) VALUES (?, ?, ?)",
-        [nome, token, criadoEm],
+        "INSERT INTO tokens_acesso (nome, token, criado_em, avatar) VALUES (?, ?, ?, ?)",
+        [nome, token, criadoEm, avatar],
         function (error) {
           if (error) {
             reject(error);
@@ -62,6 +62,22 @@ export class UsuarioModel {
             return;
           }
           resolve(row);
+        }
+      );
+    });
+  }
+
+  static atualizarAvatarToken(token: string, avatar: string | null) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        "UPDATE tokens_acesso SET avatar = ? WHERE token = ?",
+        [avatar, token],
+        (error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(true);
         }
       );
     });
