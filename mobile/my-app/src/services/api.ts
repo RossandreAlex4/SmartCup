@@ -29,7 +29,8 @@ export const baseURL = `http://${host}:3000`;
 console.log("🔌 API Conectada em:", baseURL);
 
 export const api = axios.create({
-    baseURL
+    baseURL,
+    timeout: 5000,
 });
 
 export function setApiToken(token: string | null) {

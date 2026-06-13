@@ -140,6 +140,8 @@ export default function ConfigEvento() {
         const limiteAtencaoSalvo = await AsyncStorage.getItem("@limite_atencao");
         const limiteCriticoSalvo = await AsyncStorage.getItem("@limite_critico");
         const zonasSalvas = await AsyncStorage.getItem("@qtd_zonas");
+        const volumeCopoSalvo = await AsyncStorage.getItem("@volume_copo");
+        const pesoCopioVazioSalvo = await AsyncStorage.getItem("@peso_copo_vazio");
 
         setEventData({
           eventName: nomeSalvo,
@@ -147,14 +149,17 @@ export default function ConfigEvento() {
           limiteAtencao: limiteAtencaoSalvo ? Number(limiteAtencaoSalvo) : 60,
           zones: zonasSalvas ? Number(zonasSalvas) : 0,
           limiteCritico: limiteCriticoSalvo ? Number(limiteCriticoSalvo) : 30,
+          volumeCopo: volumeCopoSalvo ? Number(volumeCopoSalvo) : 300,
+          pesoCopioVazio: pesoCopioVazioSalvo ? Number(pesoCopioVazioSalvo) : 139,
         });
-        
+
         router.replace("/(tabs)/adm-dash");
       } else {
-        setChecandoEvento(false); 
+        setChecandoEvento(false);
       }
     } catch (error) {
       console.log("Nenhum evento ativo ou erro ao conectar:", error);
+      setChecandoEvento(false);
     }
   }
 

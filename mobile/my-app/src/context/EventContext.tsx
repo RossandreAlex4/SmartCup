@@ -1,5 +1,6 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { salvarConfiguracao } from "../services/localDatabase";
 
 type TableType = {
   id: number;
@@ -62,6 +63,15 @@ export function EventProvider({
             volumeCopo: volumeCopoSalvo ? Number(volumeCopoSalvo) : 300,
             pesoCopioVazio: pesoCopioVazioSalvo ? Number(pesoCopioVazioSalvo) : 139,
           });
+
+          await Promise.allSettled([
+            salvarConfiguracao("@nome_evento", nomeSalvo),
+            salvarConfiguracao("@limite_atencao", limiteAtencaoSalvo ?? "60"),
+            salvarConfiguracao("@limite_critico", limiteCriticoSalvo ?? "30"),
+            salvarConfiguracao("@qtd_zonas", zonasSalvas ?? "0"),
+            salvarConfiguracao("@volume_copo", volumeCopoSalvo ?? "300"),
+            salvarConfiguracao("@peso_copo_vazio", pesoCopioVazioSalvo ?? "139"),
+          ]);
         }
       } catch (error) {
         console.error(

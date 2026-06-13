@@ -35,7 +35,8 @@
         {
           "photosPermission": "O aplicativo precisa de acesso à galeria para definir os avatares."
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

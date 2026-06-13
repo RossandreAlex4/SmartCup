@@ -8,6 +8,7 @@ import { styles } from "../styles/MesaDetalhesStyles";
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from "@/src/context/AuthContext";
 import { useLeituras } from "../../context/LeituraContext";
+import { salvarMesaCache, buscarMesaCache } from "../../services/localDatabase";
 
 type SmartCupData = {
   id: number;
@@ -112,8 +113,10 @@ const { user } = useContext(AuthContext);
       };
 
       setMesa(mesaReal);
+      await salvarMesaCache(mesaId, mesaReal);
     } catch (error) {
-      console.error("Erro ao buscar dados da mesa:", error);
+      const cache = await buscarMesaCache(mesaId);
+      if (cache) setMesa(cache);
     } finally {
       setLoading(false);
     }

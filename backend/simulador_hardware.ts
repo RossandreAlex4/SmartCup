@@ -102,6 +102,6 @@ async function simularBotao() {
 console.log("[Simulador] Iniciado — buscando smartcups do banco...");
 carregarCenarios().then(() => {
   enviarTodasLeituras();
-  setInterval(enviarTodasLeituras, 50000);
-  setInterval(simularBotao, 30000);
+  setInterval(enviarTodasLeituras, 5000);
+  setInterval(simularBotao, 3000);
 });

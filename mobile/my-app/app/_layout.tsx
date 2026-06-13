@@ -8,6 +8,7 @@ import { darkTheme, lightTheme } from "../src/themes/colors";
 import * as Linking from "expo-linking";
 import {ActivityIndicator, View} from 'react-native';
 import { LeiturasProvider } from "../src/context/LeituraContext";
+import { initDatabase } from "../src/services/localDatabase";
 
 function DeepLinkHandler() {
 
@@ -57,6 +58,10 @@ function RootContent() {
   const { user, loading } = useContext(AuthContext);
   const [appPronto, setAppPronto] = useState(false);
   const colors = theme === "dark" ? darkTheme : lightTheme;
+
+  useEffect(() => {
+    initDatabase().catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (theme) {
