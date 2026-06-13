@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { useBackHandlerModal } from "../../hooks/useBackHandlerModal";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator, Image, ScrollView, } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
 import { styles } from "../styles/GarcomDashboardScreenStyle";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -25,7 +26,7 @@ interface Alerta {
 
 export default function GarcomDashboardScreen() {
 
-  const { user, logout } =
+  const { user, logout, updateAvatar } =
     useContext(AuthContext);
   const [modalVisivel, setModalVisivel] = useState(false)
   useBackHandlerModal(() => setModalVisivel(true))
@@ -43,6 +44,30 @@ export default function GarcomDashboardScreen() {
 
   const [loading, setLoading] =
     useState(true);
+
+  const [updatingAvatar, setUpdatingAvatar] = useState(false);
+
+  async function escolherFoto() {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const base64 = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setUpdatingAvatar(true);
+      try {
+        await updateAvatar(base64);
+      } catch (e) {
+        Alert.alert("Erro", "Não foi possível atualizar a foto.");
+      } finally {
+        setUpdatingAvatar(false);
+      }
+    }
+  }
 
 
   async function carregarAlertas() {
@@ -258,82 +283,42 @@ export default function GarcomDashboardScreen() {
         ]}
       >
 
-        <View
-          style={styles.titleConfig}
-        >
+        <View style={{ width: "92%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <TouchableOpacity onPress={escolherFoto} style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.card, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }} disabled={updatingAvatar}>
+              {updatingAvatar ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : user?.avatar ? (
+                <Image source={{ uri: user.avatar }} style={{ width: 56, height: 56 }} />
+              ) : (
+                <Ionicons name="camera" size={26} color={colors.primary} />
+              )}
+            </TouchableOpacity>
 
-          <Text
-            style={[
-              styles.title,
-              {
-                color:
-                  colors.text,
-              },
-            ]}
-          >
-            Dashboard
-          </Text>
+            <View>
+              <Text style={[styles.title, { color: colors.text }]}>Dashboard</Text>
+              <Text style={[styles.subtitle, { color: colors.secondaryText }]}>Olá, {user?.nome}</Text>
+            </View>
+          </View>
 
-          <Text
-            style={[
-              styles.subtitle,
-              {
-                color:
-                  colors.secondaryText,
-              },
-            ]}
-          >
-            Olá, {user?.nome}
-          </Text>
+          <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+            <TouchableOpacity onPress={toggleTheme} style={styles.themeButton}>
+              <Image
+                source={require("../../../assets/images/themes.png")}
+                style={{ width: 28, height: 28, tintColor: colors.primary }}
+              />
+            </TouchableOpacity>
 
-        </View>
-
-        <View
-          style={
-            styles.headerActions
-          }
-        >
-
-          <TouchableOpacity
-            onPress={toggleTheme}
-            style={
-              styles.themeButton
-            }
-          >
-
-            <Image
-              source={require("../../../assets/images/themes.png")}
-              style={{
-                width: 28,
-                height: 28,
-                tintColor:
-                  colors.primary,
-              }}
-            />
-
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.logoutButton,
-              {
-                backgroundColor:
-                  colors.card,
-                borderColor:
-                  colors.primary,
-              },
-            ]}
-            onPress={() => setModalVisivel(true)}
-          >
-
-            <Ionicons
-              name="log-out-outline"
-              size={22}
-              color="#ce2a0f"
-            />
-
-          </TouchableOpacity>
-
+            <TouchableOpacity
+              style={[
+                styles.logoutButton,
+                { backgroundColor: colors.card, borderColor: colors.primary },
+              ]}
+              onPress={() => setModalVisivel(true)}
+            >
+              <Ionicons name="log-out-outline" size={22} color="#ce2a0f" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View

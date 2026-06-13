@@ -1,4 +1,6 @@
 import { useState, useCallback, useContext, useRef } from "react";
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Modal, Image, Platform, FlatList } from "react-native";
@@ -31,6 +33,7 @@ interface Garcom {
   zona?: string;
   online?: number;
   ultimo_acesso?: string;
+  avatar?: string | null;
 }
 
 function statusGarcom(garcom: Garcom): { label: string; cor: string } {
@@ -62,6 +65,23 @@ export default function GarconsScreen() {
 
   const [nome, setNome] =
     useState("");
+
+  const [avatar, setAvatar] =
+    useState<string | null>(null);
+
+  async function escolherFoto() {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setAvatar(`data:image/jpeg;base64,${result.assets[0].base64}`);
+    }
+  }
 
   const [loading, setLoading] =
     useState(false);
@@ -125,10 +145,12 @@ export default function GarconsScreen() {
       setLoading(true);
 
       await createGarcom(
-        nome.trim()
+        nome.trim(),
+        avatar
       );
 
       setNome("");
+      setAvatar(null);
 
       await buscarGarcons();
 
@@ -311,6 +333,10 @@ export default function GarconsScreen() {
           ]}
         >
 
+          <TouchableOpacity onPress={escolherFoto} style={{width: 44, height: 44, borderRadius: 22, backgroundColor: colors.card, justifyContent: 'center', alignItems: 'center', overflow: 'hidden', marginRight: 10}}>
+             {avatar ? <Image source={{uri: avatar}} style={{width: 44, height: 44}} /> : <Ionicons name="camera" size={24} color={colors.primary} />}
+          </TouchableOpacity>
+
           <TextInput
             placeholder="Nome do garçom"
             placeholderTextColor="#999"
@@ -394,6 +420,11 @@ export default function GarconsScreen() {
             <View style={styles.cardInfo}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: statusGarcom(garcom).cor }} />
+                {garcom.avatar ? (
+                  <Image source={{uri: garcom.avatar}} style={{width: 24, height: 24, borderRadius: 12}} />
+                ) : (
+                  <Ionicons name="person-circle-outline" size={24} color={colors.primary} />
+                )}
                 <Text style={[styles.cardName, { color: colors.text }]}>{garcom.nome}</Text>
               </View>
               <Text style={[styles.cardDate, { color: statusGarcom(garcom).cor, fontSize: 11 }]}>
