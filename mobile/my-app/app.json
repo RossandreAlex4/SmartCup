@@ -29,7 +29,13 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O aplicativo precisa de acesso à galeria para definir os avatares."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
