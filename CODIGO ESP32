@@ -1,193 +1,273 @@
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include "HX711.h"
-#define DT 16
-#define SCK 4
-#define BOTAO 18
-HX711 scale;
-bool ultimoEstadoBotao = HIGH;
-unsigned long ultimoClique = 0;
-const unsigned long DEBOUNCE = 50;
+#include <WiFi.h> // PERMITE O ESP32 A CONECTAR AO WIFI
+#include <HTTPClient.h> // ENVIO DE REQUI HTTP
+#include "HX711.h" //BBT QUE CONTROLA O MODULO
+
+#define DT 16 //PINO HX711
+#define SCK 4 //PINO HX711
+#define BOTAO 18 // PINO BOTAO
+
+HX711 scale; // objeto balança scale.get_units()
+
+bool ultimoEstadoBotao = HIGH; //estado definido como high pra detectar a mudança
+unsigned long ultimoClique = 0; //guarda o instante do clique
+const unsigned long DEBOUNCE = 50; //ignora novos cliques
+
 // Controle do botão
 bool botaoPressionado = false;
+
 // Wi-Fi
 const char* ssid = "Fé";
 const char* password = "12345678";
+
 // APIs
 const char* apiLeituras = "http://10.253.109.162:3000/leituras";
 const char* apiAlertas = "http://10.253.109.162:3000/alertas";
+
 // IDs cadastrados
 const int SMARTCUP_ID = 1;
 const int MESA_ID = 1;
+
 // Fator calibrado
 const float FATOR_CALIBRACAO = 706.53;
+
 // Pesos reais do copo
 const float LIMITE_SEM_COPO = 80.0;
 const float PESO_COPO_VAZIO = 139.00;
-const float PESO_COPO_CHEIO = 354.00.00;
+const float PESO_COPO_CHEIO = 354.00;
+
 // Limites
-const float LIMITE_OK = 70.0;
-const float LIMITE_ATENCAO = 30.0;
+const float LIMITE_OK = 70.0; // 70 ++
+const float LIMITE_ATENCAO = 30.0; // entre 30 a 69 
+
 // Controle de envio
 unsigned long ultimoEnvio = 0;
-const unsigned long INTERVALO_ENVIO = 10000;
+const unsigned long INTERVALO_ENVIO = 10000; //10sec
+
 void setup() {
-Serial.begin(115200);
-pinMode(BOTAO, INPUT_PULLUP);
-conectarWiFi();
-scale.begin(DT, SCK);
-scale.set_scale(FATOR_CALIBRACAO);
-Serial.println("Remova qualquer peso...");
-delay(3000);
-scale.tare();
-Serial.println("SmartCup iniciado!");
+    Serial.begin(115200); //monitor serial 
+
+    pinMode(BOTAO, INPUT_PULLUP); //estado normal high apertado low
+
+    conectarWiFi();
+
+    scale.begin(DT, SCK); //hx711
+    scale.set_scale(FATOR_CALIBRACAO); //aplica a calibração
+
+    Serial.println("Remova qualquer peso...");
+    delay(3000);
+
+    scale.tare();//peso zero
+
+    Serial.println("SmartCup iniciado!");
 }
+
 void loop() {
-if (WiFi.status() != WL_CONNECTED) {
-conectarWiFi();
+    if (WiFi.status() != WL_CONNECTED) {
+        conectarWiFi(); // caso perca conexão tenta reconexão 
+    }
+
+    if (scale.is_ready())//verifica hx711 {
+        float peso = scale.get_units(20); //pega 20 leituras e faz uma média do valor
+        if (peso < 0) {
+            peso = 0;
+        }
+
+        float porcentagem = calcularPorcentagem(peso);
+
+        String statusCopo = // transforma os valores em estados
+            classificarStatus(peso, porcentagem);
+
+        //mostra no serial monitor
+        Serial.print("Peso: ");
+        Serial.print(peso);
+        Serial.print(" g | Nivel: ");
+        Serial.print(porcentagem);
+        Serial.print("% | Status: ");
+        Serial.println(statusCopo);
+        
+
+        if (millis() - ultimoEnvio >= INTERVALO_ENVIO){ //10 sec
+            enviarLeituraAPI(
+                peso,
+                porcentagem,
+                statusCopo
+            );
+
+            ultimoEnvio = millis(); // atualiza o ultimo envio
+        }
+    } else { 
+        Serial.println("HX711 nao encontrado");
+    }
+
+    verificarBotao(); //botão chamar garçom 
+
+    delay(500);
 }
-if (scale.is_ready()) {
-float peso = scale.get_units(20);
-if (peso < 0) {
-peso = 0;
-}
-float porcentagem = calcularPorcentagem(peso);
-String statusCopo =
-classificarStatus(peso, porcentagem);
-Serial.print("Peso: ");
-Serial.print(peso);
-Serial.print(" g | Nivel: ");
-Serial.print(porcentagem);
-Serial.print("% | Status: ");
-Serial.println(statusCopo);
-if (millis() - ultimoEnvio >= INTERVALO_ENVIO) {
-enviarLeituraAPI(
-peso,
-porcentagem,
-statusCopo
-);
-ultimoEnvio = millis();
-}
-} else {
-Serial.println("HX711 nao encontrado");
-}
-verificarBotao();
-delay(500);
-}
+
+//conexao wifi
 void conectarWiFi() {
-Serial.print("Conectando ao Wi-Fi");
-WiFi.begin(ssid, password);
-while (WiFi.status() != WL_CONNECTED) {
-delay(500);
-Serial.print(".");
+    Serial.print("Conectando ao Wi-Fi");
+
+    WiFi.begin(ssid, password); //tentativa de conexao com os parametros que passamos
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    Serial.println();
+    Serial.println("Wi-Fi conectado!");
+    Serial.print("IP do ESP32: ");
+    Serial.println(WiFi.localIP());
 }
-Serial.println();
-Serial.println("Wi-Fi conectado!");
-Serial.print("IP do ESP32: ");
-Serial.println(WiFi.localIP());
-}
+
+
+//calculo%
 float calcularPorcentagem(float pesoAtual) {
-float capacidadeLiquido =
-PESO_COPO_CHEIO - PESO_COPO_VAZIO;
-float porcentagem =
-((pesoAtual - PESO_COPO_VAZIO) /
-capacidadeLiquido) * 100.0;
-if (porcentagem > 100) {
-porcentagem = 100;
+    float capacidadeLiquido =
+        PESO_COPO_CHEIO - PESO_COPO_VAZIO;
+
+    //calculo de %
+    float porcentagem =
+        ((pesoAtual - PESO_COPO_VAZIO) /
+         capacidadeLiquido) * 100.0;
+
+    if (porcentagem > 100) {
+        porcentagem = 100;
+    }
+
+    if (porcentagem < 0) {
+        porcentagem = 0;
+    }
+
+    return porcentagem;
 }
-if (porcentagem < 0) {
-porcentagem = 0;
-}
-return porcentagem;
-}
+
+//classificação de Status
 String classificarStatus(
-float peso,
-float porcentagem
+    float peso,
+    float porcentagem
 ) {
-if (peso < LIMITE_SEM_COPO) {
-return "SEM_COPO";
+    if (peso < LIMITE_SEM_COPO) {
+        return "SEM_COPO";
+    }
+
+    if (porcentagem >= LIMITE_OK) {
+        return "OK";
+    }
+
+    if (porcentagem >= LIMITE_ATENCAO) {
+        return "ATENCAO";
+    }
+
+    return "ALERTA";
 }
-if (porcentagem >= LIMITE_OK) {
-return "OK";
-}
-if (porcentagem >= LIMITE_ATENCAO) {
-return "ATENCAO";
-}
-return "ALERTA";
-}
+
+
 void verificarBotao() {
-bool estadoAtual = digitalRead(BOTAO);
-// Detecta soltura do botão
-if (
-ultimoEstadoBotao == LOW &&
-estadoAtual == HIGH &&
-millis() - ultimoClique > DEBOUNCE
-) {
-Serial.println("GARCOM CHAMADO!");
-enviarAlertaGarcom();
-ultimoClique = millis();
+    bool estadoAtual = digitalRead(BOTAO);
+    // Detecta soltura do botão
+    if (
+        ultimoEstadoBotao == LOW &&
+        estadoAtual == HIGH &&
+        millis() - ultimoClique > DEBOUNCE //delay
+    ) {
+        Serial.println("GARCOM CHAMADO!");
+
+        enviarAlertaGarcom();
+
+        ultimoClique = millis();
+    }
+
+    ultimoEstadoBotao = estadoAtual;
 }
-ultimoEstadoBotao = estadoAtual;
-}
+
 void enviarAlertaGarcom() {
-if (WiFi.status() != WL_CONNECTED) {
-return;
+    if (WiFi.status() != WL_CONNECTED) {
+        return;
+    }
+
+    HTTPClient http; //cria um objeto http
+
+    http.begin(apiAlertas); //define a url
+
+    http.addHeader( // cabeçalho da requi
+        "Content-Type",
+        "application/json"
+    );
+    
+    //monta o json
+    String json = "{";
+    json += ""mesa_id":" + String(MESA_ID) + ",";
+    json += ""smartcup_id":" + String(SMARTCUP_ID) + ",";
+    json += ""tipo":"GARCOM_CHAMADO"";
+    json += "}";
+
+    //mostra no serial monitor o json criado
+    Serial.print("Enviando alerta: ");
+    Serial.println(json);
+
+    int respostaHttp = http.POST(json); //envio do json
+
+    Serial.print("Resposta alerta: "); //verificar o retorno da requi
+    Serial.println(respostaHttp);
+
+    http.end();
 }
-HTTPClient http;
-http.begin(apiAlertas);
-http.addHeader(
-"Content-Type",
-"application/json"
-);
-String json = "{";
-json += ""mesa_id":" + String(MESA_ID) + ",";
-json += ""smartcup_id":" + String(SMARTCUP_ID) + ",";
-json += ""tipo":"GARCOM_CHAMADO"";
-json += "}";
-Serial.print("Enviando alerta: ");
-Serial.println(json);
-int respostaHttp = http.POST(json);
-Serial.print("Resposta alerta: ");
-Serial.println(respostaHttp);
-http.end();
-}
+
 void enviarLeituraAPI(
-float peso,
-float porcentagem,
-String statusCopo
+    float peso,
+    float porcentagem,
+    String statusCopo
 ) {
-if (WiFi.status() != WL_CONNECTED) {
-Serial.println(
-"Wi-Fi desconectado. Leitura nao enviada."
-);
-return;
-}
-HTTPClient http;
-http.begin(apiLeituras);
-http.addHeader(
-"Content-Type",
-"application/json"
-);
-String json = "{";
-json += ""smartcup_id":" +
-String(SMARTCUP_ID) + ",";
-json += ""mesa_id":" +
-String(MESA_ID) + ",";
-json += ""peso":" +
-String(peso, 2) + ",";
-json += ""porcentagem":" +
-String(porcentagem, 2) + ",";
-json += ""status":"" +
-statusCopo + """;
-json += "}";
-Serial.print("Enviando JSON: ");
-Serial.println(json);
-int respostaHttp = http.POST(json);
-Serial.print("Resposta HTTP: ");
-Serial.println(respostaHttp);
-String respostaApi =
-http.getString();
-Serial.print("Resposta API: ");
-Serial.println(respostaApi);
-http.end();
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println(
+            "Wi-Fi desconectado. Leitura nao enviada."
+        );
+        return;
+    }
+
+    HTTPClient http;
+
+    http.begin(apiLeituras);
+
+    http.addHeader(
+        "Content-Type",
+        "application/json"
+    );
+
+    String json = "{";
+
+    json += ""smartcup_id":" +
+            String(SMARTCUP_ID) + ",";
+
+    json += ""mesa_id":" +
+            String(MESA_ID) + ",";
+
+    json += ""peso":" +
+            String(peso, 2) + ",";
+
+    json += ""porcentagem":" +
+            String(porcentagem, 2) + ",";
+
+    json += ""status":"" +
+            statusCopo + """;
+
+    json += "}";
+
+    Serial.print("Enviando JSON: ");
+    Serial.println(json);
+
+    int respostaHttp = http.POST(json);
+
+    Serial.print("Resposta HTTP: ");
+    Serial.println(respostaHttp);
+
+    String respostaApi =
+        http.getString();
+
+    Serial.print("Resposta API: ");
+    Serial.println(respostaApi);
+
+    http.end();
 }
