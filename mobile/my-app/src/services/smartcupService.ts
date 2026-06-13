@@ -52,12 +52,20 @@ export async function fetchGarcons() {
   return response.data.garcons;
 }
 
-export async function createGarcom(nome: string) {
-  const response = await api.post("/usuarios/garcons", { nome });
+export async function createGarcom(nome: string, avatar: string | null = null) {
+  const response = await api.post("/usuarios/garcons", { nome, avatar });
   if (!response.data.sucesso) {
     throw new Error(response.data.mensagem || "Erro ao criar garcom");
   }
   return response.data.garcom;
+}
+
+export async function updateGarcomAvatar(token: string, avatar: string | null) {
+  const response = await api.put("/usuarios/garcons/avatar", { token, avatar });
+  if (!response.data.sucesso) {
+    throw new Error(response.data.mensagem || "Erro ao atualizar avatar");
+  }
+  return response.data;
 }
 
 export async function deleteGarcom(id: number) {

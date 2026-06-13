@@ -11,6 +11,7 @@ export interface User {
   email?: string;
   token?: string;
   zona?: string;
+  avatar?: string | null;
 }
 
 interface AuthContextType {
@@ -18,6 +19,7 @@ interface AuthContextType {
   loading: boolean;
   loginAdmin: (email: string, senha: string) => Promise<void>;
   loginGarcom: (token: string) => Promise<void>;
+  updateAvatar: (avatar: string | null) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -91,6 +93,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function updateAvatar(avatar: string | null) {
+    if (user && user.token) {
+      const { updateGarcomAvatar } = await import("../services/smartcupService");
+      await updateGarcomAvatar(user.token, avatar);
+      const updatedUser = { ...user, avatar };
+      setUser(updatedUser);
+      await AsyncStorage.setItem("@SmartCup:user", JSON.stringify(updatedUser));
+    }
+  }
+
   async function logout() {
     const storagedUser = await AsyncStorage.getItem("@SmartCup:user");
     if (storagedUser) {
@@ -134,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginAdmin, loginGarcom, logout }}>
+    <AuthContext.Provider value={{ user, loading, loginAdmin, loginGarcom, updateAvatar, logout }}>
       {children}
     </AuthContext.Provider>
   );
