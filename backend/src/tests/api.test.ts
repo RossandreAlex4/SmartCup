@@ -104,6 +104,8 @@ test("Endpoints da API", async (t) => {
       body: JSON.stringify({
         qtd_mesas: 3,
         qtd_zonas: 1,
+        limite_atencao: 50,
+        limite_critico: 20,
         volume_copo: 350,
         peso_copo_vazio: 25,
         nome_evento: "API Event Config Test"

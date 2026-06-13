@@ -39,9 +39,11 @@ test("Visão Restrita por Zona do Garçom e Atribuição Sequencial", async (t) 
       body: JSON.stringify({
         qtd_mesas: 4,
         qtd_zonas: 2,
+        limite_atencao: 50,
+        limite_critico: 20,
         volume_copo: 350,
-        peso_copo_vazio: 20,
-        nome_evento: "Teste de Zonas Sequenciais"
+        peso_copo_vazio: 25,
+        nome_evento: "Zonas Test Event"
       })
     });
     assert.strictEqual(configRes.status, 201);
